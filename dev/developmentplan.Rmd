@@ -1,0 +1,128 @@
+---
+title: "Development plan"
+author: "Anton Grau Larsen"
+date: "October 10, 2016"
+output: html_document
+---
+```{r, include = FALSE}
+library(soc.elite)
+library(knitr)
+```
+
+# Development plan
+Functions wil be separated into two packages:  
+* __eliteDB__: Contains functions for selecting, cleaning and importing data from EliteDB and CVR. Held privately.
+*__soc.elite__: Contains all other functions that are relevant for analysis of den objects. Publicly available.
+
+### Package hosting
+We are not trying to comply to CRAN policies and none of the packages will be uploaded to CRAN. soc.elite is hosted in its current github repo.
+
+### Backwards compability
+Soc.elite will break backwards compability and we will fork the current soc.elite into a soc.elite.retro branch. 
+
+### Documentation style
+All documentation is written in English and held in as clear prose as possible but will use terminology from social network analysis and R lingo. We will use the terminology used in igraph. E.g. nodes are vertices and connections are edges. All functions will have examples and will have recommendations for other functions, primarily within the soc.elite universe or igraph.  
+Documentation is written in Roxygen2 syntax.
+
+__Vignettes__ are written as close as possible to everyday language, but still in English. Vignettes will have instructions for all parts of the analysis: data import, data cleaning, data selection, data analysis, plotting and presentation and export.
+
+### Plots and exports
+ggplot2 is used for static plots. Markdown for reports and visNetwork for interactive graphs. We will not at this stage develop Shiny further as others are likely to do this better than us at some point.  
+For exports we rely on svglite and cairo. This might give some issues on Windows and Mac computers so if these dependencies are too heavy we should reconsider.
+
+# eliteDB
+
+
+
+## Functions
+
+## Documentation
+## Vignettes
+
+
+# soc.elite
+
+## Functions
+
+### den.class
+* __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class.
+* __is.den()__: Is the object of class den.  
+* __summary.den()__
+* __plot.den()__  
+* __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. 
+
+### period
+* __as.period.den()__  
+* __summary.period.den()__  
+* __by.period()__  
+
+
+### Variables
+* __affil.attributes()__: Create a data.frame with attributes for each affiliation.  
+* __member.attributes()__: Create a data.frame with attributes for each member.
+* __memberships()__: Number of memberships for each individual.
+* __members()___: Number of members.
+* __membership.vector()__: A vector with the names of all affiliation memberships.
+* __members.vector()___: A vector with the names of all members.
+
+### Tags and sectors
+* __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
+* __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive.
+* __standard.sectors__: A list of tags with the standard sectors.  
+* __show.all.tags()__: A list of all active tags within a den object.[Coded, Quality Checked, Documented, Examples]
+* __has.tags()__: Return den, members or affils with matchin tags. [Coded, Quality Checked, Documented, Examples]
+
+### Search
+* __who()__: Find members matching a string
+* __what()__: Find affiliations matching a string
+
+### Graph creation
+* __elite.network()__
+* __elite.network.affil()__
+* __two.mode()__ : perhaps we can also weight this one
+* __ego.two.mode()__:
+* __ego.network()__:
+
+### Core identification
+* __largest.component()__ : Either the graph with the largest component or a vector with TRUE/FALSE [Coded, Quality Checked, Documented, Examples]
+
+* __betweenness.decomposition()__ : Either the graph with the betweenness core or a vector with the betweenness decomposition score for each vertex. [Coded, Quality Checked, Documented, Examples]
+
+* __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [Coded, Quality Checked, Documented, Examples]
+
+* __secondary.agents()__: Find secondary agents [Coded, Quality Checked, Documented, Examples]
+
+* __proximity():___:  [Dysfunctional]
+
+* __vertex.communities()__: A function that returns all the different memberships of a vertex [Coded, Quality Checked, Documented, Examples]
+
+### Centrality
+* __reach()__[Coded, Quality Checked, Documented, Examples]
+* __sector.degree()__: A matrix approach to do.you.know
+* __vertex.measures()__: Combine vertex.measures and vertex.measures.directed[Coded, Quality Checked, Documented, Examples]
+* __do.you.know()__: [Coded, Quality Checked, Documented, Examples]
+
+### Layouts
+* __layout.cl()__
+* __layout.isolates.in.box()__
+* __layout.elite()__
+
+### Plots
+* __time.lines()__ : Plot one or several lines on a time scale
+* __graph.plot()__
+* __ego.two.mode()__
+* __dist.plot()__
+
+### Themes
+* __standard.theme()__ 
+
+### Data recoding
+* __code.gender()__  
+* __code.region()__  
+* __geographical.neighbours()__
+* __find.geoposition()__
+
+## Documentation
+## Vignettes
+## Datasets
+
