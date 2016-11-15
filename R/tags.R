@@ -76,16 +76,21 @@ show.all.tags   <- function(den){
 
 #' Convert list of tags to sectors
 #'
-#' @param den 
-#' @param sector.tags 
-#' @param other 
-#' @param silent 
-#' @param mutually.exclusive 
+#' @param den a den class object
+#' @param sector.tags a list of tags
+#' @param other The other category, if FALSE, it is omitted
+#' @param silent if FALSE the number of matched positions and affiliations is printed
+#' @param mutually.exclusive if TRUE the produced sectors are mutually exclusive 
+#' @param sector.membership if TRUE a data.frame with a mutually exclusive sector memberships vector is returned
 #'
-#' @return
+#' @return a list of den objects
 #' @export
 #'
 #' @examples
+#' data(den)
+#' sectors        <- standard.sectors("Danish")
+#' tags.to.sectors(den, sectors)
+
 tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, mutually.exclusive = FALSE, sector.membership = FALSE){
  
    # Match tags
@@ -112,15 +117,14 @@ tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, m
   incidence.sector            <- xtabs(~ AFFILIATION + SECTOR, sector.edge, sparse = T)
   
   sector.membership           <- vector(mode = "logical", length = nrow(incidence.sector))
-  for (i in 1:ncol(inc)) sector.membership[incidence.sector[, i] == 1] <- colnames(incidence.sector)[i]
-  sector.membership
-
+  for (i in 1:ncol(incidence.sector)) sector.membership[incidence.sector[, i] == 1] <- colnames(incidence.sector)[i]
+  
   exclusive.names             <- split(affil.names, f = sector.membership)
   for (i in 1:length(list.dens)) list.dens[[i]] <- list.dens[[i]][list.dens[[i]]$AFFILIATION %in% exclusive.names[[i]] ,  , drop = TRUE]
 
   # Out  
   
-  if (sector.membership == TRUE & mutually.exclusive == TRUE) data.frame("AFFILIATION" = rownames(incidence.sector), "Sector" = sector.membership)
+  if (sector.membership == TRUE & mutually.exclusive == TRUE) return(data.frame("AFFILIATION" = rownames(incidence.sector), "Sector" = sector.membership))
   
   list.dens
 }
@@ -131,7 +135,7 @@ tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, m
 #'
 #' @param sets a character vector with the sets of sector tags
 #'
-#' @return
+#' @return a list of tags
 #' @export
 #'
 #' @examples

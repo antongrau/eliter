@@ -12,10 +12,16 @@ secondary.actors(x, rel.all)
 \item{rel.all}{an affiliation edge list}
 }
 \value{
-a character vector
+a character vector with all the individuals with similar affiliation memberships seperated by "|". Unique actors return "FALSE"
 }
 \description{
 Identify secondary actors within a group. A secondary actor is an individual with a neighborhood that is perfectly nested within the neighborhood of another individual.
 Here it is identified by comparing memberships between all agents within a group. If any individual has the exact same memberships as another individual he is considered a secondary actor.
+See Faust, Katherine. “Centrality in Affiliation Networks.” Social Networks 19, no. 2 (1997): 157–191. for considerations on the exclusion of secondary actors.
+Consider betweenness decomposition as it is a more general solution to the same problem, see \link{betweenness.decomposition}
+}
+\examples{
+example(find.core)
+secondary.actors(core.health, den.health)
 }
 

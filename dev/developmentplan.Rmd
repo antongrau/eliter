@@ -5,23 +5,20 @@ date: "October 10, 2016"
 output: html_document
 ---
 ```{r, include = FALSE}
-library(soc.elite)
+library(eliter)
 library(knitr)
 ```
 
 # Development plan
 Functions wil be separated into two packages:  
 * __eliteDB__: Contains functions for selecting, cleaning and importing data from EliteDB and CVR. Held privately.
-*__soc.elite__: Contains all other functions that are relevant for analysis of den objects. Publicly available.
+*__eliter__: Contains all other functions that are relevant for analysis of den objects. Publicly available.
 
 ### Package hosting
-We are not trying to comply to CRAN policies and none of the packages will be uploaded to CRAN. soc.elite is hosted in its current github repo.
-
-### Backwards compability
-Soc.elite will break backwards compability and we will fork the current soc.elite into a soc.elite.retro branch. 
+We are not trying to comply to CRAN policies and none of the packages will be uploaded to CRAN. eliter is hosted in its current github repo.
 
 ### Documentation style
-All documentation is written in English and held in as clear prose as possible but will use terminology from social network analysis and R lingo. We will use the terminology used in igraph. E.g. nodes are vertices and connections are edges. All functions will have examples and will have recommendations for other functions, primarily within the soc.elite universe or igraph.  
+All documentation is written in English and held in as clear prose as possible but will use terminology from social network analysis and R lingo. We will use the terminology used in igraph. E.g. nodes are vertices and connections are edges. All functions will have examples and will have recommendations for other functions, primarily within the eliter universe or igraph.  
 Documentation is written in Roxygen2 syntax.
 
 __Vignettes__ are written as close as possible to everyday language, but still in English. Vignettes will have instructions for all parts of the analysis: data import, data cleaning, data selection, data analysis, plotting and presentation and export.
@@ -40,7 +37,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ## Vignettes
 
 
-# soc.elite
+# eliter
 
 ## Functions
 
@@ -53,7 +50,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 
 ### period
 * __as.period.den()__  
-* __summary.period.den()__  
+* __summary.period.den()__: A list of tables with descriptives: Positions, tags, archived, roles, time, gender
 * __by.period()__  
 
 
@@ -68,7 +65,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ### Tags and sectors
 * __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
 * __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive.
-* __standard.sectors__: A list of tags with the standard sectors.  
+* __standard.sectors__: A list of tags with the standard sectors. [Coded, Quality Checked, Documented, Examples]  
 * __show.all.tags()__: A list of all active tags within a den object.[Coded, Quality Checked, Documented, Examples]
 * __has.tags()__: Return den, members or affils with matchin tags. [Coded, Quality Checked, Documented, Examples]
 

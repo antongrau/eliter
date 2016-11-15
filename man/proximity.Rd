@@ -9,14 +9,28 @@ proximity(graph, neighborhood = 2, mode = "total")
 \arguments{
 \item{graph}{is a \link{igraph} network}
 
-\item{mode}{if "total" the proximity is calculated on the size of the combined neighborhood. If "own" or "other" proximity is calculated on the basis of either of the vertices in a relation.}
+\item{mode}{if "total" the proximity is calculated on the size of the
+combined neighborhood. If "own" or "other" proximity is calculated on the
+basis of either of the vertices in a relation.}
 
-\item{neihborhood}{a numerical value indicating the order of the neighborhood, see \link{neighborhood}}
+\item{neihborhood}{a numerical value indicating the order of the
+neighborhood, see \link{neighborhood}}
 }
 \value{
 a matrix with proximity measures
 }
 \description{
-Calculates the social proximity of all vertices in a graph as described by Alba and Kadushin.
+Calculates the social proximity of all vertices in a graph as described by
+Alba and Kadushin:
+Alba, Richard D., and Charles Kadushin. “The Intersection
+of Social Circles: A New Measure of Social Proximity in Networks.”
+Sociological Methods & Research 5, no. 1 (August 1, 1976): 77–102.
+}
+\examples{
+data(den)
+den.health       <- has.tags(den, "Health", res = "relations", silent = TRUE)
+graph.health     <- elite.network(den.health)
+graph.health     <- betweenness.decomposition(graph.health)
+proximity(graph.health)
 }
 

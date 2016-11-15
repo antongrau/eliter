@@ -21,10 +21,8 @@ Uses the k-core decomposition, see \link{graph.adjacency}, to identify the elite
 data(den)
 health.affil  <- has.tags(den, c("Health"))
 den.health    <- den[den$AFFILIATION \%in\% health.affil,]
-adj.health    <- adj.ind(den.health)
-net.health    <- graph.adjacency(adj.health)
-net.health    <- graph.adjacency(adj.health, mode = "undirected", weighted = TRUE)
-sp.health     <- shortest.paths(net.health)
+graph.health  <- elite.network(den.health)
+sp.health     <- shortest.paths(graph.health)
 core.health   <- find.core(sp.health)
 table(core.health)
 }
