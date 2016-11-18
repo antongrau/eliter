@@ -1,0 +1,42 @@
+---
+title: "How to do a sector degree"
+author: "Anton Grau Larsen"
+date: "November 15, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goal: How many do you know from each sector?
+You have a list of people that you are interested in. It could be directors of cultural institutions, and you are interested in their network profile. How well are they connected to different sectors like the corporate world, foundations, science etc.
+This analysis has the following steps:  
+
+1. Load your data
+2. Find the people of interest within the dataset
+3. Create a network
+4. Define sectors within the network by tags for each affiliation
+5. Find the sector degree
+6. Plot it a matrix
+
+## 1. Loading data and packages
+We only need the eliter package for this analysis if we are interested in the 2013 elite. Otherwise we get another "den"-class affiliation network from either eliteDB or another source.
+
+```{r cars}
+library(eliter)
+data(den)
+
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

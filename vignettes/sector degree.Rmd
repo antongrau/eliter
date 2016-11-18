@@ -1,0 +1,52 @@
+---
+title: "How to do a sector degree"
+author: "Anton Grau Larsen"
+date: "November 15, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goal: How many do you know from each sector?
+You have a list of people that you are interested in. It could be directors of cultural institutions, and you are interested in their network profile. How well are they connected to different sectors like the corporate world, foundations, science etc.
+This analysis has the following steps:  
+
+1. Load your data and create a network
+2. Find the people of interest within the dataset
+3. Define sectors within the network by tags for each affiliation
+4. Find the sector degree
+5. Plot it a matrix
+
+## 1. Loading data and packages
+We only need the eliter package for this analysis if we are interested in the 2013 elite. Otherwise we get another "den"-class affiliation network from either eliteDB or another source.
+
+```{r cars}
+library(eliter)
+data(den)
+den              <- as.den(den)
+graph.elite      <- elite.network(den)
+```
+
+## 2. Find the people of interest
+In this analysis we are interested in directors of cultural institutions. In this case we are certain they have the right names, but if we had a list of names from another source we would have to manually match each name on the list to the dataset.
+```{r}
+culture.affils        <- has.tags(den, "Culture")
+culture.leaders       <- unique(den$NAME[which(den$ROLE == "Chief executive" & den$AFFILIATION %in% culture.affils)])
+head(culture.leaders)
+```
+
+## 3. Define sectors with tags
+```{r}
+sectors            <- standard.sectors("English")
+sector.dens        <- tags.to.sectors(den, sectors)
+sector.dens
+```
+We might be interested in a subset of each sector, for instance how many women or directors from each sector they know. In this analysis we want to know if they know chairmen or directors from other sectors.
+
+```{r}
+sector.dens.chiefs        <- lapply(sector.dens, function(x) x[which(x$ROLE %in% c("Chief executive", "Chairman")),])
+sapply(sector.dens.chiefs, nrow)
+```
+

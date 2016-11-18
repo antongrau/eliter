@@ -49,6 +49,7 @@ as.den <- function(x){
 
 is.den <- function(x){
   # It is - or it could be.
+  inherits(x, "den")
 }
 
 #' Print den objects

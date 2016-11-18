@@ -90,6 +90,7 @@ show.all.tags   <- function(den){
 #' data(den)
 #' sectors        <- standard.sectors("Danish")
 #' tags.to.sectors(den, sectors)
+#' tags.to.sectors(den, sectors, mutually.exclusive = TRUE, sector.membership = TRUE)
 
 tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, mutually.exclusive = FALSE, sector.membership = FALSE){
  
@@ -108,6 +109,7 @@ tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, m
   }
   
   # Mutually exclusive
+  if (identical(mutually.exclusive, TRUE)) {
   affil.names                 <- lapply(list.dens, getElement, "AFFILIATION")
   affil.names                 <- sort(as.character(unique(unlist(affil.names, use.names = F))))
   
@@ -116,17 +118,21 @@ tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, m
   sector.edge                 <- do.call("rbind", sector.edge)
   incidence.sector            <- xtabs(~ AFFILIATION + SECTOR, sector.edge, sparse = T)
   
-  sector.membership           <- vector(mode = "logical", length = nrow(incidence.sector))
-  for (i in 1:ncol(incidence.sector)) sector.membership[incidence.sector[, i] == 1] <- colnames(incidence.sector)[i]
+  membership.sector           <- vector(mode = "logical", length = nrow(incidence.sector))
+  for (i in 1:ncol(incidence.sector)) membership.sector[incidence.sector[, i] == 1] <- colnames(incidence.sector)[i]
   
-  exclusive.names             <- split(affil.names, f = sector.membership)
+  exclusive.names             <- split(affil.names, f = membership.sector)
   for (i in 1:length(list.dens)) list.dens[[i]] <- list.dens[[i]][list.dens[[i]]$AFFILIATION %in% exclusive.names[[i]] ,  , drop = TRUE]
-
+  }
+  
   # Out  
-  
-  if (sector.membership == TRUE & mutually.exclusive == TRUE) return(data.frame("AFFILIATION" = rownames(incidence.sector), "Sector" = sector.membership))
-  
-  list.dens
+  if (sector.membership == TRUE & mutually.exclusive == TRUE){
+  mem.out <-  data.frame("AFFILIATION" = rownames(incidence.sector), "Sector" = factor(membership.sector, levels = names(list.dens), ordered = TRUE)) 
+  return(mem.out)
+
+}else{
+  return(list.dens)
+  }
 }
 
 #' Standard sector tags
@@ -169,7 +175,7 @@ standard.sectors <- function(sets = c("Danish", "English", "4 Sectors")){
   # English and detailed set
     list.tags                           <- list()
     list.tags$Corporations              <- c("Corporation")
-    list.tags$"Employers"               <- c("Corporation", "Business association", "Employers association")
+    list.tags$"Employers"               <- c("Business association", "Employers association")
     list.tags$"Unions"                  <- c("Unions", "Standsforening", "A-kasse", "Union controlled")
     list.tags$"Culture and media"       <- c("Culture", "Design", "Media", "Journalists", "MEFO", "Libraries", "Language")
     list.tags$"Science and education"   <- c("Science", "Education", "Universities", "Museums")

@@ -42,10 +42,12 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ## Functions
 
 ### den.class
-* __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class.
+
 * __is.den()__: Is the object of class den.  
-* __summary.den()__
 * __plot.den()__  
+
+* __summary.den()__
+* __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class.
 * __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. 
 
 ### period
@@ -64,7 +66,8 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 
 ### Tags and sectors
 * __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
-* __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive.
+
+* __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive. [Coded, Quality Checked, Documented, Examples]
 * __standard.sectors__: A list of tags with the standard sectors. [Coded, Quality Checked, Documented, Examples]  
 * __show.all.tags()__: A list of all active tags within a den object.[Coded, Quality Checked, Documented, Examples]
 * __has.tags()__: Return den, members or affils with matchin tags. [Coded, Quality Checked, Documented, Examples]
@@ -81,23 +84,20 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __ego.network()__:
 
 ### Core identification
-* __largest.component()__ : Either the graph with the largest component or a vector with TRUE/FALSE [Coded, Quality Checked, Documented, Examples]
-
-* __betweenness.decomposition()__ : Either the graph with the betweenness core or a vector with the betweenness decomposition score for each vertex. [Coded, Quality Checked, Documented, Examples]
-
-* __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [Coded, Quality Checked, Documented, Examples]
-
-* __secondary.agents()__: Find secondary agents [Coded, Quality Checked, Documented, Examples]
-
 * __proximity():___:  [Dysfunctional]
 
+* __largest.component()__ : Either the graph with the largest component or a vector with TRUE/FALSE [Coded, Quality Checked, Documented, Examples]
+* __betweenness.decomposition()__ : Either the graph with the betweenness core or a vector with the betweenness decomposition score for each vertex. [Coded, Quality Checked, Documented, Examples]
+* __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [Coded, Quality Checked, Documented, Examples]
+* __secondary.agents()__: Find secondary agents [Coded, Quality Checked, Documented, Examples]
 * __vertex.communities()__: A function that returns all the different memberships of a vertex [Coded, Quality Checked, Documented, Examples]
 
 ### Centrality
 * __reach()__[Coded, Quality Checked, Documented, Examples]
-* __sector.degree()__: A matrix approach to do.you.know
 * __vertex.measures()__: Combine vertex.measures and vertex.measures.directed[Coded, Quality Checked, Documented, Examples]
 * __do.you.know()__: [Coded, Quality Checked, Documented, Examples]
+
+* __sector.degree()__: A matrix approach to do.you.know
 
 ### Layouts
 * __layout.cl()__
@@ -121,5 +121,19 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 
 ## Documentation
 ## Vignettes
+* How to make a sector degree
+* How to identify the power elite
+* How to identify the most prominent sector members
+* Plot a set of agents and affiliations
+
+
 ## Datasets
+* __Den 2013 classic__
+* __Den 2013 extended__
+* __Corporations 2013__
+* __Power Elite 2013__
+* __Economists and social scientists__
+* __Commission members__
+
+
 

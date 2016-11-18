@@ -75,8 +75,6 @@ reach            <- function(graph, order = 2, mode = "all", weight = E(graph)$w
 
 do.you.know <- function(graph, you, people, how.well = 1){
   
-  stopifnot(inherits(graph, "elite.network")) # This is not a elegant test
-  
   people.position    <- which(V(graph)$name %in% people)
   
   people.in.your.hood <- function(graph, your.name, people.position, how.well = 1){
@@ -177,3 +175,29 @@ vertex.measures.directed <- function(net, n = 2.5){
   out
 }
 
+# data(pe13)
+# graph <- net.elite
+# sectors <- tags.to.sectors(den, standard.sectors("Danish"))
+# how.well <- 2
+# you = V(graph)$name
+
+#' Title
+#'
+#' @param graph 
+#' @param you 
+#' @param sectors 
+#' @param how.well 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+sector.connections  <- function(graph, you = V(graph)$name, sectors, how.well = 2){
+  #stopifnot(all(sapply(sectors, is.den)))
+  sector.names      <- lapply(sectors, getElement, name = "NAME")
+  sector.names      <- lapply(sector.names, unique)
+  
+  sector.know       <- lapply(sector.names, FUN = do.you.know, graph = graph, you = you, how.well = how.well)
+  sector.mat        <- do.call("cbind", sector.know)  
+  sector.mat
+}
