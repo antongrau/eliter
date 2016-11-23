@@ -7,9 +7,9 @@
 elite.network.org(den = den, sigma = 14)
 }
 \arguments{
-\item{sigma}{the number of members in an affiliation above which all affiliations are weighted down}
+\item{den}{an affiliation edge list in the\link{den} format.}
 
-\item{rel.all}{an affiliation edge list in the\link{den} format.}
+\item{sigma}{the number of members in an affiliation above which all affiliations are weighted down}
 }
 \value{
 a elite network object

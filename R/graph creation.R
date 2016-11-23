@@ -17,87 +17,62 @@ two.mode <- function(den){
 #' Elite network
 #'
 #' Construct a weighted elite network
-#' @param rel.all an affiliation edge list, in the \link{den} format.
+#' @param den an affiliation edge list, in the \link{den} format.
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
 #' @return a elite network object
 #' @export
+#' @examples 
+#' data(den)
+#' den.health <- has.tags(den, "Health", result = "den")
+#' elite.network(den.health)
 
-elite.network     <- function(rel.all = rel.all, sigma = 14, check.nested = TRUE){
+elite.network     <- function(den, sigma = 14){
   # Måske skal vi have et argument der tillader at man smider svage forbindelser?
   
-  ## Vægt baseret på størrelse af org
-  netmat              <- droplevels(data.frame(rel.all$NAME, rel.all$AFFILIATION))
-  colnames(netmat)    <- c("navn", "org")
-  #tabnet              <- Matrix(table(netmat), sparse=TRUE)
+  ## Vægt baseret på størrelse af affil
+  netmat              <- droplevels(data.frame(den$NAME, den$AFFILIATION))
+  
   tabnet              <- xtabs(formula = ~., data = netmat, sparse = TRUE)
   
-  org.medlemmer       <- colSums(tabnet)
-  medlemskaber        <- rowSums(tabnet)
+  affil.members       <- colSums(tabnet)
+  memberships         <- rowSums(tabnet)
   
   # Occassions weight
   col.max             <- as.numeric(qlcMatrix::colMax(tabnet))
-  #col.max             <- apply(tabnet, 2, max)
   
   tabweight           <- t(t(tabnet) * (1 / col.max))
   dimnames(tabweight) <- dimnames(tabnet)
   
-  # Org size weight
-  org.weight           <- sqrt((sigma/org.medlemmer))
-  org.weight[org.weight > 1]      <- 1
-  names(org.weight)    <- colnames(tabnet)
+  # affil size weight
+  affil.weight           <- sqrt((sigma/affil.members))
+  affil.weight[affil.weight > 1]      <- 1
+  names(affil.weight)    <- colnames(tabnet)
   
-  # Tildel en vægt til rel.all
-  tb                   <- t(tabweight) * org.weight
-  tb                   <- t(tb)
-  cs                   <- colSums(tb)
-  
+  # Tildel en vægt til den
+  tb                     <- t(tabweight) * affil.weight
+  tb                     <- t(tb)
+ 
   # Adjacency matrix for individer
-  tb                   <- Matrix(tb, sparse=TRUE)
-  adj.all              <- sqrt(tb) %*% sqrt(t(tb)) # Her kan vi speede op med tcrossprod()
+  tb                     <- Matrix(tb, sparse = TRUE)
+  adj.all                <- sqrt(tb) %*% sqrt(t(tb)) # Her kan vi speede op med tcrossprod()
+  weighted.memberships   <- diag(adj.all)
   
-  antal.medlemskaber   <- diag(adj.all)
   
-  ## Indlejrede
-  if(identical(check.nested, TRUE)){
-    
-    org.1a               <- nested$Nested.org
-    org.2a               <- nested$Nested.in
-    org.navne            <- colnames(tb)
-    org.1                <- org.1a[org.1a %in% org.navne & org.2a %in% org.navne]
-    org.2                <- org.2a[org.1a %in% org.navne & org.2a %in% org.navne]
-    
-    for (i in 1:length(org.1)){
-      ret.org.1         <- which(colnames(tb) == org.1[i])
-      ret.org.2         <- which(colnames(tb) == org.2[i])
-      if (length(ret.org.1) > 0 & length(ret.org.2) >0){
-        ret.org.1.navn    <- org.navne[ret.org.1]
-        ret.org.2.navn    <- org.navne[ret.org.2]
-        
-        ret.rel.1         <- tb[, ret.org.1]
-        ret.rel.2         <- tb[, ret.org.2]
-        ret.mem.1         <- which(ret.rel.1 > 0)
-        ret.mem.2         <- which(ret.rel.2 > 0)
-        ret.mem           <- intersect(ret.mem.1, ret.mem.2)
-        
-        ret.vaegt.1        <- org.weight[ret.org.1]
-        ret.vaegt.2        <- org.weight[ret.org.2]
-        
-        adj.all[ret.mem, ret.mem] <- adj.all[ret.mem, ret.mem] - ret.vaegt.2
-      }
-    }
-  }
-  ## Netværksobjektet skabes
-  net.all             <- graph.adjacency(adj.all, weighted = TRUE, diag = FALSE, mode = "undirected")
+  net.all                <- graph.adjacency(adj.all, weighted = TRUE, diag = FALSE, mode = "undirected")
   
+  
+  # Weighting of strong ties
   E(net.all)$weight.nolog        <- E(net.all)$weight
   over                           <- E(net.all)$weight > 1
   E(net.all)$weight[over]        <- log(E(net.all)$weight[over]) + 1
   E(net.all)$weight              <- 1/E(net.all)$weight
   
-  V(net.all)$weighted.memberships <- antal.medlemskaber
-  V(net.all)$memberships          <- medlemskaber
-  net.all$org.weight              <- org.weight
-  net.all$org.members             <- org.medlemmer
+  
+  # Attributes
+  V(net.all)$weighted.memberships   <- weighted.memberships
+  V(net.all)$memberships            <- memberships
+  net.all$affil.weight              <- affil.weight
+  net.all$affil.members             <- affil.members
   
   class(net.all) <- c("igraph", "elite.network")
   net.all
@@ -106,7 +81,7 @@ elite.network     <- function(rel.all = rel.all, sigma = 14, check.nested = TRUE
 #' Elite network for affiliations
 #'
 #' Construct a weighted elite network of affiliations
-#' @param rel.all an affiliation edge list in the\link{den} format.
+#' @param den an affiliation edge list in the\link{den} format.
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
 #' @return a elite network object
 #' @export

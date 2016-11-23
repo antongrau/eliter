@@ -221,13 +221,17 @@ eliteDB.connections <- function(pass = ""){
 #' Something something
 #' @export
 
-cvrDB.connections <- function(pass = "", database = "cvr"){
+cvrDB.connections <- function(pass = "", database = "bigdata"){
   # Affiliations matricen kan ikke komme ud.
+  library(curl)
+  library(httr)
+  set_config(config(ssl_verifypeer = 0L))
+  
   pass_string                     <- paste0("&password=", pass)
   
-  elite.db.connections            <- fromJSON(paste0("http://elitedb.ogtal.dk/exporter.php?type=connections&database=", database, pass_string))
-  elite.db.persons                <- fromJSON(paste0("http://elitedb.ogtal.dk/exporter.php?type=persons&database=", database, pass_string))
-  elite.db.affil                  <- fromJSON(paste0("http://elitedb.ogtal.dk/exporter.php?type=affiliations&database=", database, pass_string))
+  elite.db.connections            <- fromJSON(paste0("https://elitedb.ogtal.dk/exporter.php?type=connections&database=", database, pass_string))
+  elite.db.persons                <- fromJSON(paste0("https://elitedb.ogtal.dk/exporter.php?type=persons&database=", database, pass_string))
+  elite.db.affil                  <- fromJSON(paste0("https://elitedb.ogtal.dk/exporter.php?type=affiliations&database=", database, pass_string))
   
   connections                     <- elite.db.connections[order(elite.db.connections$cvr),]
   persons                         <- elite.db.persons[order(elite.db.persons$enhedsnummer),]

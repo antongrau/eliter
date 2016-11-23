@@ -20,7 +20,8 @@ Depends:
     grid,
     qlcMatrix,
     shiny,
-    knitr
+    knitr,
+    scales
 Imports:
     qlcMatrix
 License: GPL-3

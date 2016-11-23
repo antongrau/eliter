@@ -53,7 +53,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ### period
 * __as.period.den()__  
 * __summary.period.den()__: A list of tables with descriptives: Positions, tags, archived, roles, time, gender
-* __by.period()__  
+* __by.period()__:
 
 
 ### Variables
@@ -75,6 +75,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ### Search
 * __who()__: Find members matching a string
 * __what()__: Find affiliations matching a string
+* __described.as()__ : Find expressions in their descriptions
 
 ### Graph creation
 * __elite.network()__
@@ -118,6 +119,10 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __code.region()__  
 * __geographical.neighbours()__
 * __find.geoposition()__
+
+### Simulation
+* __increase.memberships()__
+
 
 ## Documentation
 ## Vignettes

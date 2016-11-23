@@ -59,6 +59,7 @@ is.den <- function(x){
 #' @param den a den-class object
 #' @param ... further arguments are ignored
 #' @return a markdown table with statistics
+#' @usage \method{print}{den}(x, ...)
 #' @method print den
 #' @export
 print.den      <- function(x, ...){

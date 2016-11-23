@@ -4,10 +4,10 @@
 \alias{elite.network}
 \title{Elite network}
 \usage{
-elite.network(rel.all = rel.all, sigma = 14, check.nested = TRUE)
+elite.network(den, sigma = 14)
 }
 \arguments{
-\item{rel.all}{an affiliation edge list, in the \link{den} format.}
+\item{den}{an affiliation edge list, in the \link{den} format.}
 
 \item{sigma}{the number of members in an affiliation above which all affiliations are weighted down}
 }
@@ -16,5 +16,10 @@ a elite network object
 }
 \description{
 Construct a weighted elite network
+}
+\examples{
+data(den)
+den.health <- has.tags(den, "Health", result = "den")
+elite.network(den.health)
 }
 

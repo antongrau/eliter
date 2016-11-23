@@ -46,8 +46,8 @@ who          <- function(name, den = "den", only.affiliations = TRUE, ignore.cas
   found.affil <- den$AFFILIATION[found]
   den.found   <- den[den$AFFILIATION %in% found.affil,]
   out         <- data.frame(Name = den.found$NAME, Affiliation = den.found$AFFILIATION, Role = den.found$ROLE)
-  if(identical(tags, TRUE)) out         <- data.frame(out, TAGS = den.found$TAGS)
-  if(identical(only.affiliations, TRUE)){
+  if (identical(tags, TRUE)) out         <- data.frame(out, TAGS = den.found$TAGS)
+  if (identical(only.affiliations, TRUE)) {
     out <- out[out$Name %in% found.names,]
     out <- out[duplicated(data.frame(out$Name, out$Affiliation)) == FALSE,]
   }
@@ -57,3 +57,8 @@ who          <- function(name, den = "den", only.affiliations = TRUE, ignore.cas
   noquote(out)
 }
 
+described.as <- function(x, den){
+  
+  
+  
+}
