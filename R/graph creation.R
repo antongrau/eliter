@@ -1,5 +1,45 @@
 # Graph creation ----
 
+#' Adjacency matrix for individuals
+#' 
+#' Create an adjacency matrix from an affilation list
+#' @param rel an affiliation list
+#' @return a sparse adjacency matrix of individual * individual
+#' @export
+
+adj.ind <- function(rel){
+  netmat <- droplevels(data.frame(rel$NAME, rel$AFFILIATION))
+  colnames(netmat) <- c("navn", "org")
+  
+  ### Nu laves netværksobjekterne
+  tabnet          <- table(netmat)
+  tabnet          <- Matrix(tabnet)
+  adj             <- tabnet %*% t(tabnet) # Individ*individ
+  return(adj)
+}
+
+#' Adjacency matrix for affiliations
+#' 
+#' Create an adjacency matrix from an affilation list
+#' @param rel an affiliation list
+#' @return a sparse adjacency matrix of affiliation * affiliation
+#' @seealso \link{adj.ind}, \link{two.mode}
+#' @export
+
+
+adj.org <- function(rel){
+  netmat <- droplevels(data.frame(rel$NAME, rel$AFFILIATION))
+  colnames(netmat) <- c("navn", "org")
+  
+  ### Nu laves netværksobjekterne
+  tabnet          <- table(netmat)
+  tabnet          <- as.matrix(tabnet)
+  adj             <- t(tabnet) %*% tabnet # Org*Org
+  return(adj)
+}
+
+
+
 #' Create a two-mode network from an affiliation list
 #' 
 #' @param den an affiliation list

@@ -49,6 +49,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __summary.den()__
 * __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class.
 * __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. 
+* __plot.den()__: Plot some descriptive distributions of a den object
 
 ### period
 * __as.period.den()__  
@@ -63,6 +64,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __members()___: Number of members.
 * __membership.vector()__: A vector with the names of all affiliation memberships.
 * __members.vector()___: A vector with the names of all members.
+* __name.id()___: Create a unique name id combination.
 
 ### Tags and sectors
 * __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
@@ -83,6 +85,11 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __two.mode()__ : perhaps we can also weight this one
 * __ego.two.mode()__:
 * __ego.network()__:
+* __adj.ind()__: From den to adjacency matrix
+
+### Connect
+* __eliteDB()__ : Connect to the eliteDB database
+* __CVRogtal()__: Connect to the CVR database
 
 ### Core identification
 * __proximity():___:  [Dysfunctional]
@@ -92,6 +99,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [Coded, Quality Checked, Documented, Examples]
 * __secondary.agents()__: Find secondary agents [Coded, Quality Checked, Documented, Examples]
 * __vertex.communities()__: A function that returns all the different memberships of a vertex [Coded, Quality Checked, Documented, Examples]
+* __level.of.power()__: Returns a categorical value for the level of power based on k-core decomposition.
 
 ### Centrality
 * __reach()__[Coded, Quality Checked, Documented, Examples]
@@ -99,6 +107,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __do.you.know()__: [Coded, Quality Checked, Documented, Examples]
 
 * __sector.degree()__: A matrix approach to do.you.know
+
 
 ### Layouts
 * __layout.cl()__
@@ -112,13 +121,15 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __dist.plot()__
 
 ### Themes
-* __standard.theme()__ 
+* __standard.theme()__
+* __dark.theme()__
 
 ### Data recoding
 * __code.gender()__  
 * __code.region()__  
-* __geographical.neighbours()__
 * __find.geoposition()__
+* __geographical.neighbours()__
+
 
 ### Simulation
 * __increase.memberships()__

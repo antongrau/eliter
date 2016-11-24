@@ -7,14 +7,18 @@
 \method{print}{den}(x, ...)
 }
 \arguments{
-\item{...}{further arguments are ignored}
+\item{x}{a den-class object}
 
-\item{den}{a den-class object}
+\item{...}{further arguments are ignored}
 }
 \value{
 a markdown table with statistics
 }
 \description{
 Essential statistics for the den-class. Mainly for interactive use, but is returned in rmarkdown format using kable and knitr for easy export.
+}
+\examples{
+data(den)
+as.den(den)
 }
 

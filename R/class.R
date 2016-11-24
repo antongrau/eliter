@@ -56,12 +56,15 @@ is.den <- function(x){
 #'
 #' Essential statistics for the den-class. Mainly for interactive use, but is returned in rmarkdown format using kable and knitr for easy export.
 #'
-#' @param den a den-class object
+#' @param x a den-class object
 #' @param ... further arguments are ignored
 #' @return a markdown table with statistics
-#' @usage \method{print}{den}(x, ...)
 #' @method print den
 #' @export
+#' @examples 
+#' data(den)
+#' as.den(den)
+
 print.den      <- function(x, ...){
   den          <- x 
   n.name       <- length(unique(den$NAME))
@@ -112,7 +115,7 @@ out            <- data.frame("Stats" = format(stats, big.mark = ",", justify = "
                              check.names = FALSE)
 out            <- cbind(out, end)
 
-kable(out, align = c("r", "c", "l", "r", "l", "l", "r"))
+print(kable(out, align = c("r", "c", "l", "r", "l", "l", "r")))
 }
 
 #' Summary statistics for den
@@ -120,7 +123,6 @@ kable(out, align = c("r", "c", "l", "r", "l", "l", "r"))
 #' @param x a den class object
 #'
 #' @return a list of markdown tables
-
 #' @export
 #' 
 #'
@@ -275,5 +277,29 @@ summary.den         <- function(x){
   
 }
 
-plot.den <- function(x){
+#' @method plot den
+#' @export
+
+plot.den <- function(x, ...){
+  # Facets with: Number of memberships, number of members, graph strength for individuals and affiliations
+  incidence     <- xtabs(~ NAME + AFFILIATION, data = x, sparse = TRUE)
+  members       <- Matrix::colSums(incidence)
+  memberships   <- Matrix::rowSums(incidence)
+  
+  t.memberships   <- table(memberships)
+  t.members       <- table(members)
+  
+  members         <- data.frame(value = sort(members, decreasing = TRUE), id = 1:length(members), var = "Members", row.names = NULL)
+  memberships     <- data.frame(value = sort(memberships, decreasing = TRUE), id = 1:length(memberships), var = "Memberships", row.names = NULL)
+  t.members       <- data.frame(value = as.numeric(t.members), id = names(t.members), var = "Frequency: Members", row.names = NULL)
+  t.memberships   <- data.frame(value = as.numeric(t.memberships), id = names(t.memberships), var = "Frequency: Memberships", row.names = NULL)
+  
+  t.members       <- t.members[cumsum(t.members$value) / sum(t.members$value) <= 0.95,]
+  
+  md              <- rbind(members, memberships, t.members, t.memberships, rownames = NULL)
+  
+  p     <- ggplot(md, aes(x = as.numeric(id), y = value, group = var)) + facet_wrap(~var, scales = "free")
+  p     <- p + geom_line(size = 0.5) + geom_point(size = 0.5) + theme_tufte() + geom_rangeframe()
+  p     <- p + xlab("") + ylab("")
+  print(p)
 }

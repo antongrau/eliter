@@ -285,3 +285,12 @@ vertex.communities <- function(graph, weight = 1/E(graph)$weight){
  cluster.frame
 }
 
+levels.of.power <- function(x){
+  
+  var           <- vector(length = length(x))
+  var[x == max(x)]                               <- "1. Power Elite"
+  var[x < max(x) & x >= 2/3 * max(x)]            <- "2. Higher levels of Power"
+  var[x < 2/3 * max(x) & x >= 1/3 * max(x)]      <- "3. Middle levels of Power"
+  var[x < 1/3 * max(x)]                          <- "4. Lower levels of Power"
+  as.factor(var)
+}

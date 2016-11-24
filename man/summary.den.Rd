@@ -4,7 +4,7 @@
 \alias{summary.den}
 \title{Summary statistics for den}
 \usage{
-summary.den(x)
+\method{summary}{den}(x)
 }
 \arguments{
 \item{x}{a den class object}
