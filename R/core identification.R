@@ -277,8 +277,8 @@ vertex.communities <- function(graph, weight = 1/E(graph)$weight){
 
  md                 <- melt(cluster.frame, id.vars = "Name")
  md$cluster         <- paste(md$variable, md$value)
- inc                <- xtabs(~Name + cluster, md, sparse = T)
- g                  <- graph.adjacency(inc %*% t(inc), mode = "undirected")
+ inc                <- xtabs(~Name + cluster, md, sparse = TRUE)
+ g                  <- graph.adjacency(inc %*% Matrix::t(inc), mode = "undirected")
  meta.louvain       <- membership(cluster_louvain(g))
 
  cluster.frame$"Meta louvain" <- meta.louvain

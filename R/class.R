@@ -96,7 +96,10 @@ print.den      <- function(x, ...){
                              "AFFILIATION" = format(den.samp[, 2]))
 
   # Top tags
-  if (any(colnames(den) == "TAGS")) {
+  tag.test              <- is.null(den$TAGS) == FALSE
+  if (tag.test) tag.test <- all(is.na(den$TAGS)) == FALSE
+  
+  if (tag.test) {
   tags         <- show.all.tags(den)
   tags         <- tags[order(tags[,2], decreasing = T), ]
   end          <- data.frame("Top tags" = rownames(tags),
@@ -128,20 +131,20 @@ print(kable(out, align = c("r", "c", "l", "r", "l", "l", "r")))
 #'
 #' @examples
 #' 
-summary.den         <- function(x){
+summary.den         <- function(x, ...){
   incidence         <- xtabs(~NAME + AFFILIATION, x, sparse = T) 
-  adj.ind           <- incidence %*% t(incidence)
+  adj.ind           <- incidence %*% Matrix::t(incidence)
   diag(adj.ind)     <- 0
   
-  adj.affil         <- t(incidence) %*% incidence
+  adj.affil         <- Matrix::t(incidence) %*% incidence
   diag(adj.affil)   <- 0
   
   out.list          <- list()
   
   # Descriptives for Individuals: Memberships (IQT), degree (IQT), positions held by linkers n og %, isolated individuals n og %, multiple ties n og %
-  memberships       <- rowSums(incidence)
+  memberships       <- Matrix::rowSums(incidence)
   memberships.iqr   <- quantile(memberships)
-  degree.ind        <- rowSums(adj.ind > 0)
+  degree.ind        <- Matrix::rowSums(adj.ind > 0)
   degree.ind.iqt    <- quantile(degree.ind)
 
   pos.by.linkers          <- format(sum(memberships[memberships > 1]), big.mark = ",")
@@ -174,10 +177,10 @@ summary.den         <- function(x){
   
   
   # Descriptives for affiliations: Members, degree, isolated affiliations, 
-  members             <- colSums(incidence)
+  members             <- Matrix::colSums(incidence)
   members.iqr         <- quantile(members)
   
-  degree.affil        <- rowSums(adj.affil > 0)  
+  degree.affil        <- Matrix::rowSums(adj.affil > 0)  
   degree.affil.iqr    <- quantile(degree.affil)
   
   isolates            <- format(sum(degree.affil == 0), big.mark = ",")
@@ -211,7 +214,10 @@ summary.den         <- function(x){
   
     
   # Descriptives for tags: Most common tags, top tag combinations, 
+  tag.test              <- is.null(x$TAGS) == FALSE
+  if (tag.test) tag.test <- all(is.na(x$TAGS)) == FALSE
   
+  if (tag.test) {
   x.unique            <- x[duplicated(x$AFFILIATION) == FALSE,]
   split.den           <- split(x = x.unique, f = x.unique$AFFILIATION)
   
@@ -223,8 +229,8 @@ summary.den         <- function(x){
   
   split.tag.edges     <- lapply(split.den, affil.to.tag.net)
   tag.edges           <- do.call(rbind, split.tag.edges)
-  tag.incidence       <- xtabs(~ AFFILIATION + TAG, tag.edges, sparse = T)
-  adj.tag             <- t(tag.incidence) %*% tag.incidence
+  tag.incidence       <- xtabs(~ AFFILIATION + TAG, tag.edges, sparse = TRUE)
+  adj.tag             <- Matrix::t(tag.incidence) %*% tag.incidence
   diag(adj.tag)       <- 0
   
   net.tag             <- graph.adjacency(adj.tag, weighted = TRUE, mode = "undirected")
@@ -233,10 +239,10 @@ summary.den         <- function(x){
   edges.tag           <- data.frame("Co-tag" = paste0(edges.tag[, 1], " - ", edges.tag[, 2]), "Affils" = edges.tag$Weight, check.names = FALSE, row.names = NULL)
   
   # Number of tags iqr
-  n.tags.iqr         <- quantile(rowSums(tag.incidence))
+  n.tags.iqr         <- quantile(Matrix::rowSums(tag.incidence))
   
   # Number of affiliations per tag iqr
-  n.affils.per.tag  <- quantile(colSums(tag.incidence))
+  n.affils.per.tag  <- quantile(Matrix::colSums(tag.incidence))
   
   iqts              <- data.frame("Tags per affil." = n.tags.iqr,
                                   "Affils per tag"  = n.affils.per.tag,
@@ -269,6 +275,7 @@ summary.den         <- function(x){
   
   out                 <- cbind(left, " " = "" , right)
   out.list$tags       <- kable(out)
+  }
   
   # Out
   

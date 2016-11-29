@@ -1,139 +1,5 @@
 # Connect to databases
 
-#' Create a den object from the elite database
-#' 
-#' Something something
-#' @export
-
-
-eliteDB.connections <- function(pass = ""){
-  # Måske skal der laves noget datarens - tjek fx for tomme navne og NA.
-  # Det ville nok også være sundt med nogle automatiske tests
-  # Det ser ud til at ikke alle affiliation ids kan findes i connections 
-  pass_string                     <- paste0("&password=", pass)
-  elite.db.connections            <- fromJSON(paste0("http://elitedb.ogtal.dk/exporter.php?type=connections&database=elite", pass_string))
-  elite.db.persons                <- fromJSON(paste0("http://elitedb.ogtal.dk/exporter.php?type=persons&database=elite", pass_string))
-  elite.db.affil                  <- fromJSON(paste0("http://elitedb.ogtal.dk/exporter.php?type=affiliations&database=elite", pass_string))
-  
-  connections                     <- elite.db.connections[order(elite.db.connections$affiliation_id),]
-  persons                         <- elite.db.persons[order(elite.db.persons$id),]
-  affiliations                    <- elite.db.affil[order(elite.db.affil$id),]
-  affiliations$id.x               <- affiliations$id
-  
-  persons$person_id               <- persons$id
-  
-  # Data rens
-  persons                         <- persons[is.na(persons$fullname)==FALSE,]
-  
-  # Navne dupletter
-  dup.navn                       <- persons$fullname[duplicated(persons$fullname)]
-  dup.id                         <- persons$person_id[duplicated(persons$fullname)]
-  persons$fullname_dup           <- persons$fullname
-  persons$fullname_dup[duplicated(persons$fullname)]           <- paste(dup.navn, dup.id)
-  
-  # Merge
-  
-  connections                     <- merge(connections, persons, by = "person_id", all.x = T, sort = TRUE)
-  connections                     <- merge(connections, affiliations, by.x = "affiliationname", by.y = "name", all.x = T, sort = TRUE)
-  
-  # Merge
-  gender                          <- find.gender(navne = connections$fullname)
-  levels(gender)                  <- c("Women", "Undefined", "Men")
-  
-  connections.den                 <- data.frame(NAME        = connections$fullname_dup,
-                                                AFFILIATION = connections$affiliationname,
-                                                ROLE        = connections$rolename,
-                                                GENDER      = gender,
-                                                DESCRIPTION = connections$description.x,
-                                                SOURCE      = connections$affiliationsector,
-                                                BIQ_LINK    = connections$biq,
-                                                CVR         = as.numeric(connections$cvr),
-                                                TAGS        = connections$tagnames,
-                                                MODIFIED    = as.Date(connections$modified_date.y, "%Y-%m-%d"),
-                                                CREATED     = as.Date(connections$created_date, "%Y-%m-%d"),
-                                                ARCHIVED    = as.Date(connections$archived_date.x, "%Y-%m-%d"),
-                                                PERSON_ID   = connections$person_id,
-                                                PERSON_CVR  = as.numeric(connections$cvrid),
-                                                DESCRIPTION_AFFILIATION = connections$description
-  )
-  connections.den
-}
-
-
-#' Create a den object from the elite cvr database
-#' 
-#' Something something
-#' @export
-
-cvrDB.connections <- function(pass = "", database = "bigdata"){
-  # Affiliations matricen kan ikke komme ud.
-  library(curl)
-  library(httr)
-  set_config(config(ssl_verifypeer = 0L))
-  
-  pass_string                     <- paste0("&password=", pass)
-  
-  elite.db.connections            <- fromJSON(paste0("https://elitedb.ogtal.dk/exporter.php?type=connections&database=", database, pass_string))
-  elite.db.persons                <- fromJSON(paste0("https://elitedb.ogtal.dk/exporter.php?type=persons&database=", database, pass_string))
-  elite.db.affil                  <- fromJSON(paste0("https://elitedb.ogtal.dk/exporter.php?type=affiliations&database=", database, pass_string))
-  
-  connections                     <- elite.db.connections[order(elite.db.connections$cvr),]
-  persons                         <- elite.db.persons[order(elite.db.persons$enhedsnummer),]
-  affiliations                    <- elite.db.affil[order(elite.db.affil$cvr),]
-  affiliations$id.x               <- affiliations$cvr
-  
-  persons$person_id               <- persons$enhedsnummer
-  connections$person_id           <- connections$enhedsnummer
-  
-  
-  # Navne dupletter
-  dup.navn                       <- persons$fullname[duplicated(persons$fullname)]
-  dup.id                         <- persons$person_id[duplicated(persons$fullname)]
-  persons$fullname_dup           <- persons$fullname
-  persons$fullname_dup[duplicated(persons$fullname)]           <- paste(dup.navn, dup.id)
-  
-  persons$gender                          <- find.gender(navne = persons$fullname_dup)
-  levels(persons$gender)                  <- c("Women", "Undefined", "Men")
-  
-  
-  
-  # Merge
-  connections                      <- merge(connections, persons, by = "person_id", all.x = T, sort = TRUE)
-  connections                      <- merge(connections, affiliations, by.x = "cvr", by.y = "cvr", all.x = T, sort = TRUE)
-  head(connections, 100)
-  # Merge
-  connections.den                 <- data.frame(NAME        = connections$fullname_dup,
-                                                AFFILIATION = connections$affiliationname,
-                                                ROLE        = as.factor(connections$role),
-                                                GENDER      = connections$gender,
-                                                SOURCE      = "CVR_udtræk",
-                                                CVR         = connections$cvr,
-                                                TAGS        = connections$hovedbranchenavn,
-                                                MODIFIED    = NA, #connections$modified_date.y,
-                                                CREATED     = NA, #connections$created_date,
-                                                ARCHIVED    = NA, #connections$archived_date.x,
-                                                PERSON_ID   = NA, #connections$person_id,
-                                                START_DATE  = as.Date(connections$startdate, "%Y-%m-%d"),
-                                                END_DATE    = as.Date(connections$enddate, "%Y-%m-%d"),
-                                                VALGFORM    = connections$valgform,
-                                                PERSON_ADRESSE = connections$adresse.x,
-                                                PERSON_POSTNR  = connections$postnummer.x,
-                                                PERSON_KOMMUNE = as.factor(connections$kommune.x),
-                                                PERSON_CVR  = connections$enhedsnummer.x,
-                                                VIRK_START  = as.Date(connections$livsforloebstart, "%Y-%m-%d"),
-                                                VIRK_SLUT   = as.Date(connections$livsforloebslut, "%Y-%m-%d"),
-                                                VIRK_KOMMUNE = as.factor(connections$kommune.y),
-                                                VIRK_ADRESSE_POSTNR = connections$postnummer.y,
-                                                VIRK_ADRESSE = connections$adresse.y,
-                                                VIRK_BRANCHE = connections$hovedbranchenavn,
-                                                VIRK_BRANCHEKODE = connections$hovedbranchekode,
-                                                stringsAsFactors = FALSE
-  )
-  connections.den
-}
-
-
-
 #' eliteDB_open
 #'
 #' Opret forbindelse til eliteDB
@@ -166,7 +32,7 @@ eliteDB_open <- function(user, pass, db = "elitedb"){
                                 dbname = db
   )
   
-  if (sysname != "Windows"){
+  if (sysname != "Windows") {
     DBI::dbGetQuery(connection, 'SET NAMES utf8;')
   }
   return(connection)
@@ -254,68 +120,32 @@ eliteDB_list_tables <- function(conn){
 #' @importFrom magrittr "%>%"
 #' @export
 #' @examples
-#' den        <- eliteDB_den(user, password)
+#' den        <- eliteDB_den(user = user, pass = password)
 #' den.active <- den[is.na(den$ARCHIVED),]
-eliteDB_den <- function(conn = NULL, user = NULL, pass = NULL) {
-  
-  if (is.null(conn)){
+eliteDB_den    <- function(conn = NULL, user = NULL, pass = NULL) {
+  if (is.null(conn)) {
     conn <- eliteR::eliteDB_open(user, pass)
   }
-  
-  den <- DBI::dbGetQuery(
-    conn,
-    "SELECT
-    c.id, c.person_id, c.affiliation_id, c.role_id, c.description, c.created_date, c.archived_date, p.cvrid, a.name, a.type, a.cvr, a.sector, a.last_checked
-    FROM Connections c
-    LEFT JOIN Persons p
-    ON c.person_id=p.id
-    LEFT JOIN Affiliations a
-    ON c.affiliation_id=a.id"
-  )
-  
-  tags <- DBI::dbGetQuery(
-    conn,
-    "SELECT
-    t.affiliation_id, GROUP_CONCAT(tl.tag) AS tagnames
-    FROM Tags t
-    LEFT JOIN Taglist tl
-    ON t.tag_id=tl.id
-    GROUP BY t.affiliation_id"
-  )
-  
+  den <- DBI::dbGetQuery(conn, "SELECT\n    c.id, c.person_id, c.affiliation_id, c.role_id, c.description, c.created_date, c.archived_date, p.cvrid, a.name, a.type, a.cvr, a.sector, a.last_checked\n    FROM Connections c\n    LEFT JOIN Persons p\n    ON c.person_id=p.id\n    LEFT JOIN Affiliations a\n    ON c.affiliation_id=a.id")
+  tags <- DBI::dbGetQuery(conn, "SELECT\n    t.affiliation_id, GROUP_CONCAT(tl.tag) AS tagnames\n    FROM Tags t\n    LEFT JOIN Taglist tl\n    ON t.tag_id=tl.id\n    GROUP BY t.affiliation_id")
   rolelist <- DBI::dbGetQuery(conn, "SELECT * FROM Rolelist")
-  
   persons <- DBI::dbGetQuery(conn, "SELECT p.id, p.alias FROM Persons p")
-  
-  # Provide all non-unique aliases with an id sufix
   persons$alias <- gsub("\\d", "", x = persons$alias) %>% stringr::str_trim()
-  dup <- duplicated(persons$alias) | duplicated(persons$alias, fromLast = TRUE)
+  dup <- duplicated(persons$alias) | duplicated(persons$alias, 
+                                                fromLast = TRUE)
   persons$alias[dup] <- paste(persons$alias[dup], persons$id[dup])
-  
   den <- merge(den, tags, by = "affiliation_id", all.x = TRUE)
-  den <- merge(den, persons, by.x = "person_id", by.y = "id", all.x = TRUE)
-  
-  den <- dplyr::transmute(
-    den,
-    ID = id,
-    NAME = alias,
-    AFFILIATION = name,
-    ROLE = rolelist$name[match(den$role_id, rolelist$id)],
-    TAGS = tagnames,
-    SECTOR = sector,
-    TYPE = type,
-    DESCRIPTION = description,
-    CREATED = lubridate::ymd_hms(created_date),
-    ARCHIVED = lubridate::ymd_hms(archived_date),
-    LAST_CHECKED = lubridate::ymd_hms(last_checked),
-    CVR_PERSON = as.integer(cvrid),
-    CVR_AFFILIATION = cvr,
-    PERSON_ID = person_id,
-    AFFILIATION_ID = affiliation_id
-  )
-  
-  return(den)
+  den <- merge(den, persons, by.x = "person_id", by.y = "id", 
+               all.x = TRUE)
+  den <- dplyr::transmute(den, ID = id, NAME = alias, AFFILIATION = name, 
+                          ROLE = rolelist$name[match(den$role_id, rolelist$id)], 
+                          TAGS = tagnames, SECTOR = sector, TYPE = type, DESCRIPTION = description, 
+                          CREATED = lubridate::ymd_hms(created_date), ARCHIVED = lubridate::ymd_hms(archived_date), 
+                          LAST_CHECKED = lubridate::ymd_hms(last_checked), CVR_PERSON = as.integer(cvrid), 
+                          CVR_AFFILIATION = cvr, PERSON_ID = person_id, AFFILIATION_ID = affiliation_id)
+  as.den(den)
 }
+
 
 
 #' eliteDB_cvr
@@ -329,16 +159,25 @@ eliteDB_den <- function(conn = NULL, user = NULL, pass = NULL) {
 #' @return Et komplet den-objekt, der både indeholder aktive og arkiverede forbindelser
 #' @export
 #' @examples
-#' den        <- eliteDB_cvr(user, password)
-eliteDB_cvr  <- function(conn = NULL, user = NULL, pass = NULL, db = "elitedb_cvr"){
+#' den        <- eliteDB_cvr(user = user, pass = password, cvr = c(10014107, 10013569))
+#' den        <- eliteDB_cvr(user = user, pass = password, cvr = c(10014107, 10013569), ownership = TRUE)
+#' den        <- eliteDB_cvr(user = user, pass = password, cvr = c(10014107, 10013569), employees = TRUE)
+eliteDB_cvr  <- function(conn = NULL, user = NULL, pass = NULL, db = "elitedb_bigdata", cvr = NULL, ownership = NULL, employees = NULL){
+
+  add.cvr.select <- function(sql, cvr){
+    cvr.sql           <- paste("(", paste(cvr, collapse = ", "), ")", collapse = "", sep = "")
+    sql               <- paste(sql, "WHERE a.cvr IN", cvr.sql, collapse = "")
+    sql
+  }
   
-  if (is.null(conn)){
+    
+  if (is.null(conn)) {
     conn <- eliteR::eliteDB_open(user, pass, db)
   }
   
-  den <- DBI::dbGetQuery(
-    conn,
-    "SELECT
+  # Select positions
+  
+  sql <- "SELECT
     c.cvr, c.enhedsnummer, c.role, c.valgform, c.startdate, c.enddate, 
     p.fullname, p. adresse, p.postnummer, p.kommune, 
     a.hovedbranchenavn, a.hovedbranchekode, a.virksomhedsformnavn, a.virksomhedsformkode, a.livsforloebstart, a.livsforloebslut, a.name, 
@@ -348,43 +187,73 @@ eliteDB_cvr  <- function(conn = NULL, user = NULL, pass = NULL, db = "elitedb_cv
     ON c.enhedsnummer=p.enhedsnummer
     LEFT JOIN Affiliations a
     ON c.cvr=a.cvr"
-  )
+
+if (is.null(cvr) == FALSE) sql <- add.cvr.select(sql, cvr)
+
+    den <- DBI::dbGetQuery(conn, sql)
   
-  persons <- DBI::dbGetQuery(conn, "SELECT p.enhedsnummer, p.fullname as alias FROM Persons p")
+  # Select persons  
+    
+  sql                <- "SELECT p.enhedsnummer, p.fullname as alias FROM Persons p"
+  cvr.sql            <- paste("(", paste(unique(den$enhedsnummer), collapse = ", "), ")", collapse = "", sep = "")
+  sql                <- paste(sql, "WHERE p.enhedsnummer IN", cvr.sql, collapse = "")
+  persons            <- DBI::dbGetQuery(conn, sql)
   
-  
-  persons$alias <- gsub("\\d", "", x = persons$alias) %>% stringr::str_trim()
-  dup <- duplicated(persons$alias) | duplicated(persons$alias, fromLast = TRUE)
+  # Unique names for duplicated names
+  persons$alias      <- gsub("\\d", "", x = persons$alias) %>% stringr::str_trim()
+  dup                <- duplicated(persons$alias) | duplicated(persons$alias, fromLast = TRUE)
   persons$alias[dup] <- paste(persons$alias[dup], persons$enhedsnummer[dup])
   
-  den <- merge(den, persons, by.x = "enhedsnummer", by.y = "enhedsnummer", all.x = TRUE)
+  den                <- merge(den, persons, by.x = "enhedsnummer", by.y = "enhedsnummer", all.x = TRUE)
   
-  den <- dplyr::transmute(
-    den,
-    ENHEDSNUMMER = enhedsnummer,
-    CVR = as.integer(cvr),
-    NAME = alias,
-    AFFILIATION = name,
-    ROLE = role,
-    VALGFORM = valgform,
-    PERSON_START = lubridate::ymd(startdate),
-    PERSON_END = lubridate::ymd(enddate),
-    AFFIL_START = lubridate::ymd(livsforloebstart),
-    AFFIL_END = lubridate::ymd(livsforloebslut),
-    PERSON_ADDRESS = adresse,
-    PERSON_POST = postnummer,
-    PERSON_KOMMUNE = kommune,
-    AFFIL_ADRESS = virk_adresse,
-    AFFIL_POST = virk_post,
-    AFFIL_KOMUNNE = virk_kommune,
-    AFFIL_BRANCHE = hovedbranchenavn,
-    AFFIL_BRANCHEKODE = hovedbranchekode,
-    AFFIL_FORM = virksomhedsformnavn,
-    AFFIL_FORMKODE = virksomhedsformkode,
-    LABEL = fullname
+  den                <- dplyr::transmute(
+                                         den,
+                                         ENHEDSNUMMER = enhedsnummer,
+                                         CVR          = as.integer(cvr),
+                                         NAME         = alias,
+                                         AFFILIATION  = name,
+                                         ROLE         = role,
+                                         VALGFORM     = valgform,
+                                         PERSON_START = lubridate::ymd(startdate),
+                                         PERSON_END   = lubridate::ymd(enddate),
+                                         AFFIL_START  = lubridate::ymd(livsforloebstart),
+                                         AFFIL_END    = lubridate::ymd(livsforloebslut),
+                                         PERSON_ADDRESS = adresse,
+                                         PERSON_POST  = postnummer,
+                                         PERSON_KOMMUNE = kommune,
+                                         AFFIL_ADRESS = virk_adresse,
+                                         AFFIL_POST   = virk_post,
+                                         AFFIL_KOMUNNE = virk_kommune,
+                                         AFFIL_BRANCHE = hovedbranchenavn,
+                                         AFFIL_BRANCHEKODE = hovedbranchekode,
+                                         AFFIL_FORM   = virksomhedsformnavn,
+                                         AFFIL_FORMKODE = virksomhedsformkode,
+                                         LABEL        = fullname
   )
   
-  return(den)
+  # Remove columns with all NA
+  den          <- den[, unlist(lapply(den, function(x) all(is.na(x)))) == FALSE]
+  den          <- as.den(den)
+  
+  # Select employer data
+  if (identical(employees, TRUE)) {
+    sql                <- "SELECT * FROM Affiliations_employees e"
+    cvr.sql            <- paste("(", paste(unique(den$CVR), collapse = ", "), ")", collapse = "", sep = "")
+    sql                <- paste(sql, "WHERE e.cvr IN", cvr.sql, collapse = "")
+    employees          <- DBI::dbGetQuery(conn, sql)
+    den                <- list(den, employees)
+  }
+  
+  
+  # Select ownership
+  if (identical(ownership, TRUE)) {
+    sql                <- "SELECT * FROM Affiliations_ownership o"
+    cvr.sql            <- paste("(", paste(unique(den$CVR), collapse = ", "), ")", collapse = "", sep = "")
+    sql                <- paste(sql, "WHERE o.cvr IN", cvr.sql, collapse = "")
+    ownership          <- DBI::dbGetQuery(conn, sql)
+    den                <- list(den, ownership)
+  }
+  den
 }
 
 
@@ -453,5 +322,3 @@ eliteDB_tag_rapport <- function(conn){
   
   return(tags)
 }
-
-

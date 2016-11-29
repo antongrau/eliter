@@ -126,8 +126,9 @@ tags.to.sectors <- function(den, sector.tags, other = "Other", silent = FALSE, m
   }
   
   # Out  
-  if (sector.membership == TRUE & mutually.exclusive == TRUE){
-  mem.out <-  data.frame("AFFILIATION" = rownames(incidence.sector), "Sector" = factor(membership.sector, levels = names(list.dens), ordered = TRUE)) 
+  if (sector.membership == TRUE & mutually.exclusive == TRUE) {
+  mem.out     <- data.frame("AFFILIATION" = rownames(incidence.sector), "Sector" = factor(membership.sector, levels = names(list.dens), ordered = TRUE)) 
+  mem.out     <- mem.out[order(mem.out$AFFILIATION), ]
   return(mem.out)
 
 }else{
@@ -163,7 +164,7 @@ standard.sectors <- function(sets = c("Danish", "English", "4 Sectors")){
   list.tags$"Kultur og medier"        <- c("Culture", "Design", "Media", "Journalists", "MEFO", "Libraries", "Language")
   list.tags$"Videnskab og uddannelse" <- c("Science", "Education", "Universities") 
   list.tags$Stat                      <- c("State administration", "Ministry", "State corporation", "Military", "Public leaders", "Commission", "Politics", "Parliament", "State business") # FEJL - State business
-  list.tags$Politik                   <- c("Politics", "Parliament")
+  list.tags$Politik                   <- c("Politics", "Parliament", "Political party", "City council")
   list.tags$Sundhed                   <- c("Health", "Patients", "MEDI", "Medicine", "Doctors")
   list.tags$Fritid                    <- c("Recreation and sports", "Sports", "Recreation")
   list.tags$Fonde                     <- c("Foundation", "Charity")
@@ -180,7 +181,7 @@ standard.sectors <- function(sets = c("Danish", "English", "4 Sectors")){
     list.tags$"Culture and media"       <- c("Culture", "Design", "Media", "Journalists", "MEFO", "Libraries", "Language")
     list.tags$"Science and education"   <- c("Science", "Education", "Universities", "Museums")
     list.tags$State                     <- c("State administration", "Ministry", "State corporation", "Military", "Public leaders", "Commission", "Politics", "Parliament", "State business") # FEJL - State business
-    list.tags$Politics                  <- c("Politics", "Parliament")
+    list.tags$Politics                  <- c("Politics", "Parliament","Political party", "City council")
     list.tags$Health                    <- c("Health", "Patients", "MEDI", "Medicine", "Doctors")
     list.tags$Recreation                <- c("Recreation and sports", "Sports", "Recreation")
     list.tags$Foundation                <- c("Foundation", "Charity")
@@ -191,7 +192,7 @@ standard.sectors <- function(sets = c("Danish", "English", "4 Sectors")){
   # 4 Sectors
     
     list.tags                           <- list()
-    list.tags$"State and politics"      <- c("State administration", "Ministry", "State corporation", "Military", "Public leaders", "Commission", "Politics", "Parliament", "State business", "Politics", "Parliament") # FEJL - State business
+    list.tags$"State and politics"      <- c("State administration", "Ministry", "State corporation", "Military", "Public leaders", "Commission", "Politics", "Parliament", "State business", "Politics", "Parliament","Political party", "City council") # FEJL - State business
     list.tags$"Business"                <- c("Corporation", "Business association", "Employers association")
     list.tags$"Unions"                  <- c("Unions", "Standsforening", "A-kasse", "Union controlled")
     list.tags$"Science and culture"     <- c("Culture", "Design", "Media", "Journalists", "MEFO", "Libraries", "Language", "Science", "Education", "Universities", "Museums")

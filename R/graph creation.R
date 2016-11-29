@@ -74,13 +74,13 @@ elite.network     <- function(den, sigma = 14){
   
   tabnet              <- xtabs(formula = ~., data = netmat, sparse = TRUE)
   
-  affil.members       <- colSums(tabnet)
-  memberships         <- rowSums(tabnet)
+  affil.members       <- Matrix::colSums(tabnet)
+  memberships         <- Matrix::rowSums(tabnet)
   
   # Occassions weight
   col.max             <- as.numeric(qlcMatrix::colMax(tabnet))
   
-  tabweight           <- t(t(tabnet) * (1 / col.max))
+  tabweight           <- Matrix::t(Matrix::t(tabnet) * (1 / col.max))
   dimnames(tabweight) <- dimnames(tabnet)
   
   # affil size weight
@@ -89,13 +89,13 @@ elite.network     <- function(den, sigma = 14){
   names(affil.weight)    <- colnames(tabnet)
   
   # Tildel en vægt til den
-  tb                     <- t(tabweight) * affil.weight
-  tb                     <- t(tb)
+  tb                     <- Matrix::t(tabweight) * affil.weight
+  tb                     <- Matrix::t(tb)
  
   # Adjacency matrix for individer
   tb                     <- Matrix(tb, sparse = TRUE)
-  adj.all                <- sqrt(tb) %*% sqrt(t(tb)) # Her kan vi speede op med tcrossprod()
-  weighted.memberships   <- diag(adj.all)
+  adj.all                <- sqrt(tb) %*% sqrt(Matrix::t(tb)) # Her kan vi speede op med tcrossprod()
+  weighted.memberships   <- Matrix::diag(adj.all)
   
   
   net.all                <- graph.adjacency(adj.all, weighted = TRUE, diag = FALSE, mode = "undirected")
@@ -126,18 +126,18 @@ elite.network     <- function(den, sigma = 14){
 #' @return a elite network object
 #' @export
 
-elite.network.org     <- function(den = den, sigma = 14){
+elite.network.affil      <- function(den = den, sigma = 14){
   
   ## Vægt baseret på størrelse af org
-  incidence              <- xtabs(formula = ~NAME + AFFILIATION, data = den, sparse = TRUE)
+  incidence              <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
   
   # Occassions weight
   col.max                <- as.numeric(qlcMatrix::colMax(incidence))
-  incidence              <- t(t(incidence) * (1 / col.max))
+  incidence              <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
   dimnames(incidence)    <- dimnames(incidence)
   
-  adj.org                <- crossprod(incidence)
-  org.medlemmer          <- diag(adj.org)
+  adj.org                <- Matrix::crossprod(incidence)
+  org.medlemmer          <- Matrix::diag(adj.org)
   
   # Org size weight
   org.weight             <- sqrt((sigma/org.medlemmer))
@@ -147,7 +147,7 @@ elite.network.org     <- function(den = den, sigma = 14){
   adj.org                <- adj.org * org.weight
   net.org                <- graph.adjacency(adj.org, weighted = TRUE, diag = FALSE, mode = "directed")
   V(net.org)$members     <- org.medlemmer
-  V(net.org)$weighted.members <- diag(adj.org)
+  V(net.org)$weighted.members <- Matrix::diag(adj.org)
   
   over                   <- E(net.org)$weight > 1
   E(net.org)$weight[over] <- log(E(net.org)$weight[over]) + 1
@@ -173,7 +173,7 @@ ego.two.mode <- function(name, den = den, n = Inf, text = "affil", member.of = p
   affil        <- as.character(den$AFFILIATION[ind])
   rel.affil    <- den[den$AFFILIATION %in% affil,]
   
-  if(n < Inf){
+  if (n < Inf) {
     net.elite    <- elite.network(rel.affil)
     ind.e        <- V(net.elite)$name %in% name
     dist.to.ind  <- net.elite[ind.e,]
@@ -205,7 +205,7 @@ ego.two.mode <- function(name, den = den, n = Inf, text = "affil", member.of = p
   E(net.two)$e.w <- e.w
   for (i in 1:length(aff))  E(net.two)[incident(net.two, aff[i])]$e.w <- org.w.ego[i]
   
-  if(identical(text, "affil")){
+  if (identical(text, "affil")) {
     text       <- V(net.two)$name
     text[type == "Individual"] <- NA
   }
@@ -278,7 +278,7 @@ ego.two.mode.affil <- function(name, den = den, text = "affil", member.of = pe13
   E(net.two)$weight <- rep(1, ecount(net.two))
   #   E(net.two)$e.w <- e.w
   
-  if(identical(text, "affil")){
+  if (identical(text, "affil")) {
     text       <- V(net.two)$name
     text[type == "Individual"] <- NA
   }
@@ -286,6 +286,6 @@ ego.two.mode.affil <- function(name, den = den, text = "affil", member.of = pe13
   # E(net.two)$weight <- E(net.two)$e.w
   
   p <- graph.plot.twomode(net.two, layout = layout_with_fr(graph, grid = "nogrid"),  text = text, vertex.fill =  member.of.TF, vertex.size = degree(net.two), edge.color = "black", vertex.shape = type, edge.size = 0.45, text.background = text.background, ...)
-  p <- p + scale_fill_manual(values = c("white", "black", "black"), guide = "none") + scale_shape_manual(values = c(21, -0x25C9, 23 ), guide = "none") + scale_alpha_continuous(range = c(0.08, 0.4), guide ="none") + scale_size_continuous(range = c(2, 4), guide = "none")
+  p <- p + scale_fill_manual(values = c("white", "black", "black"), guide = "none") + scale_shape_manual(values = c(21, -0x25C9, 23 ), guide = "none") + scale_alpha_continuous(range = c(0.08, 0.4), guide = "none") + scale_size_continuous(range = c(2, 4), guide = "none")
   p + ggtitle(name)
 }

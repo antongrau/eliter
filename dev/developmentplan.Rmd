@@ -91,6 +91,8 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __eliteDB()__ : Connect to the eliteDB database
 * __CVRogtal()__: Connect to the CVR database
 
+We lack quality controls - especially for empty Affiliations
+
 ### Core identification
 * __proximity():___:  [Dysfunctional]
 
