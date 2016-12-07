@@ -338,6 +338,39 @@ graph.plot.repel  <- function(graph, layout = layout_with_fr(graph, weight = E(g
             panel.grid.minor=element_blank(),plot.background=element_blank())  
 }
 
+# Graph annotation -----
+
+#' Density or height curves for graphs
+#'
+#' Height curves show where on a plot the concentration of points is largest.
+#' In the example below we are interested in where in the network women are concentrated.
+#' We compare the density curves of the women with that of the men and we see that men are slightly more concentrated in the core of the network.
+#'
+#' @param layout a matrix with coordinates often produced by \link{layout_with_fr}
+#' @param ... 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' data(den)
+#' den.health     <- has.tags(den, "Health", res = "den")
+#' graph.health   <- elite.network(den.health)
+#' graph.health   <- largest.component(graph.health)
+#' women          <- V(graph.health)$name %in% den.health$NAME[den.health$GENDER == "Women"]
+#' lay.health     <- layout_with_fr(graph.health, grid = "nogrid")
+#' p              <- graph.plot(graph.health, lay.health, vertex.fill = women, edge.color = "black", edge.size = 0.3)
+#' p              <- p + scale_fill_manual(values = c("white", "black"), name = "Women")
+#' p + add_density(lay.health[women,], color = "darkred")
+#' p + add_density(lay.health[women == FALSE,], color = "darkred")
+
+add_density <- function(layout, ...){
+  layout[, 1:2]           <- norm_coords(layout[, 1:2], xmin = 1, xmax = 10^10, ymin = 1, ymax = 10^10)
+  gd                      <- data.frame(x = layout[, 1], y = layout[, 2])
+  geom_density2d(mapping = aes(x = x, y = y), data = gd, ...)
+}
+
+
 
 #####################################################
 ### distribution plots

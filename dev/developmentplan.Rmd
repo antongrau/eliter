@@ -43,12 +43,12 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 
 ### den.class
 
-* __is.den()__: Is the object of class den.  
+* __is.den()__: Is the object of class den.  [DONE]
 * __plot.den()__  
 
-* __summary.den()__
-* __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class.
-* __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. 
+* __summary.den()__ [Alpha - slow and unsure about functionality]
+* __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class. [DONE]
+* __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. [Alpha]
 * __plot.den()__: Plot some descriptive distributions of a den object
 
 ### period
@@ -73,6 +73,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __standard.sectors__: A list of tags with the standard sectors. [Coded, Quality Checked, Documented, Examples]  
 * __show.all.tags()__: A list of all active tags within a den object.[Coded, Quality Checked, Documented, Examples]
 * __has.tags()__: Return den, members or affils with matchin tags. [Coded, Quality Checked, Documented, Examples]
+* __sectors.to.role()__: Check if a person has a specific role within a given sector.
 
 ### Search
 * __who()__: Find members matching a string
@@ -120,7 +121,8 @@ We lack quality controls - especially for empty Affiliations
 * __time.lines()__ : Plot one or several lines on a time scale
 * __graph.plot()__
 * __ego.two.mode()__
-* __dist.plot()__
+* __dist.plot()__ 
+* __add.density()__ [Coded, Quality Checked, Documented, Examples]
 
 ### Themes
 * __standard.theme()__

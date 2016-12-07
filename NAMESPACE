@@ -3,6 +3,7 @@
 S3method(plot,den)
 S3method(print,den)
 S3method(summary,den)
+export(add_density)
 export(adj.ind)
 export(adj.org)
 export(as.den)

@@ -47,8 +47,16 @@ as.den <- function(x){
   x
 }
 
+#' Is this object a den object?
+#'
+#' Check if it is a den class object
+#'
+#' @param x an R object
+#'
+#' @return
+#' @export
+
 is.den <- function(x){
-  # It is - or it could be.
   inherits(x, "den")
 }
 

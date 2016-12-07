@@ -322,3 +322,5 @@ eliteDB_tag_rapport <- function(conn){
   
   return(tags)
 }
+
+

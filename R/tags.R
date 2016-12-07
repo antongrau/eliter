@@ -205,6 +205,66 @@ standard.sectors <- function(sets = c("Danish", "English", "4 Sectors")){
 }
 
 
+
+#' Title
+#'
+#' @param den 
+#' @param list.dens 
+#' @param role 
+#' @param other 
+#' @param mutually.exclusive 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' data(den)
+#' den                 <- as.den(den)
+#' list.dens           <- tags.to.sectors(den, standard.sectors("Danish"))
+#' sectors.to.role(den, list.dens, mutually.exclusive = TRUE)
+sectors.to.role        <- function(den, list.dens, role = c("Chief executive", "Executive"), other = "Other", mutually.exclusive = FALSE){
+  
+  den.role             <- den[den$ROLE %in% role,]
+  list.dens            <- lapply(list.dens, function(x) droplevels(x[x$ROLE %in% role,]))
+  
+  # Other category
+  if (other != FALSE) {
+    affil.names             <- lapply(list.dens, getElement, "AFFILIATION")
+    affil.names             <- unique(unlist(affil.names, use.names = F))
+    other.affils            <- setdiff(unique(den.role$AFFILIATION), affil.names)
+    den.other               <- droplevels(den.role[den.role$AFFILIATION %in% other.affils,])
+    l                       <- length(list.dens)
+    list.dens[[l + 1]]      <- den.other
+    names(list.dens)[l + 1] <- other
+  }
+  
+  # Check for empty sectors
+  list.dens            <- list.dens[-which(sapply(list.dens, nrow) == 0)]
+  
+  # Mutually exclusive
+  ind.names                 <- lapply(list.dens, getElement, "NAME")
+  ind.names                 <- sort(as.character(unique(unlist(ind.names, use.names = FALSE))))
+  
+  sector.edge                 <- list()
+  for (i in 1:length(list.dens)) sector.edge[[i]]  <- data.frame("NAME" = unique(as.character(list.dens[[i]]$NAME)), "SECTOR" = names(list.dens[i]))
+  sector.edge                 <- do.call("rbind", sector.edge)
+  incidence.sector            <- xtabs(~ NAME + SECTOR, sector.edge, sparse = TRUE)
+  incidence.sector            <- incidence.sector[order(rownames(incidence.sector)),]
+  
+  membership.sector           <- vector(mode = "logical", length = nrow(incidence.sector))
+  for (i in 1:ncol(incidence.sector)) membership.sector[incidence.sector[, i] == 1] <- colnames(incidence.sector)[i]
+  
+  
+  if (identical(mutually.exclusive, FALSE)) { 
+    return(incidence.sector)  }else{
+  mem.out                    <- factor(membership.sector, levels = names(list.dens), ordered = TRUE)
+  names(mem.out)             <- rownames(incidence.sector)
+  
+  return(mem.out)
+  }
+}
+
+
 variables.to.tags <- function(den, variables){
   
 }
