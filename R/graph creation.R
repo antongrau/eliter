@@ -48,19 +48,52 @@ two.mode <- function(den){
   graph
 }
 
-#' Elite network
+
+#' Create a weighted network graph
+#'
+#' @param den a den class object, see \link{as.den}
+#' @param result the type of returned graph
+#' @param sigma the number of members in an affiliation above which all affiliations are weighted down
+#' @return a weighted graph
+#' @export
+#'
+#' @examples
+#' data(den)
+#' den.pol       <- has.tags(den, "Politics", result = "den")
+#' elite.network(den.pol)
+#' elite.network(den.pol, result = "affil")
+#' elite.network(den.pol, result = "two.mode")
+elite.network      <- function(den, result = c("ind", "affil", "two.mode"), sigma = 14){
+  
+  result.args      <- c("ind", "affil", "two.mode")
+  
+  if (match.arg(result, result.args) == "ind") {
+    graph          <- eliter:::elite.network.ind(den, sigma = sigma)
+  }
+  
+  if (match.arg(result, result.args) == "affil") {
+    graph          <- eliter:::elite.network.affil(den, sigma = sigma)
+  }
+  
+  if (match.arg(result, result.args) == "two.mode") {
+    graph          <- eliter:::elite.network.two.mode(den, sigma = sigma)
+  }
+  
+ graph 
+}
+
+#' Elite network for individuals
 #'
 #' Construct a weighted elite network
 #' @param den an affiliation edge list, in the \link{as.den} format.
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
 #' @return a weighted igraph graph
-#' @export
 #' @examples 
 #' data(den)
 #' den.health <- has.tags(den, "Health", result = "den")
 #' elite.network(den.health)
 
-elite.network     <- function(den, sigma = 14){
+elite.network.ind    <- function(den, sigma = 14){
   
   # Incidence matrix
   incidence               <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
@@ -109,37 +142,67 @@ elite.network     <- function(den, sigma = 14){
 #' @param den an affiliation edge list in the \link{as.den} format.
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
 #' @return a elite network object
-#' @export
 
 elite.network.affil      <- function(den = den, sigma = 14){
   
-  ## Vægt baseret på størrelse af org
   incidence              <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
   
   # Occassions weight
   col.max                <- as.numeric(qlcMatrix::colMax(incidence))
   incidence              <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
-  dimnames(incidence)    <- dimnames(incidence)
+
+  adj.affil              <- Matrix::crossprod(incidence)
+  affil.members          <- Matrix::diag(adj.affil)
   
-  adj.affil                <- Matrix::crossprod(incidence)
-  org.medlemmer          <- Matrix::diag(adj.affil)
+  # Affiliation size weight
+  affil.weight                     <- sqrt((sigma/affil.members))
+  affil.weight[affil.weight > 1]   <- 1
+  names(affil.weight)              <- colnames(incidence)
   
-  # Org size weight
-  org.weight             <- sqrt((sigma/org.medlemmer))
-  org.weight[org.weight > 1]      <- 1
-  names(org.weight)      <- colnames(incidence)
+  adj.affil                        <- adj.affil * affil.weight
+  graph                            <- graph.adjacency(adj.affil, weighted = TRUE, diag = FALSE, mode = "directed")
+  V(graph)$members                 <- affil.members
+  V(graph)$weighted.members        <- Matrix::diag(adj.affil)
   
-  adj.affil                <- adj.affil * org.weight
-  net.affil                <- graph.adjacency(adj.affil, weighted = TRUE, diag = FALSE, mode = "directed")
-  V(net.affil)$members     <- org.medlemmer
-  V(net.affil)$weighted.members <- Matrix::diag(adj.affil)
-  
-  over                   <- E(net.affil)$weight > 1
-  E(net.affil)$weight[over] <- log(E(net.affil)$weight[over]) + 1
-  E(net.affil)$weight      <- 1/E(net.affil)$weight
-  net.affil
+  over                             <- E(graph)$weight > 1
+  E(graph)$weight[over]            <- log(E(graph)$weight[over]) + 1
+  E(graph)$weight                  <- 1/E(graph)$weight
+  graph
 }
 
+
+#' A weighted two mode network
+#'
+#' @param den a den class object
+#' @param sigma the number of members in an affiliation above which all affiliations are weighted down
+#'
+#' @return an igraph graph
+elite.network.two.mode             <- function(den, sigma = 14){
+  
+  incidence                        <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
+  
+  # Occassions weight
+  col.max                          <- as.numeric(qlcMatrix::colMax(incidence))
+  
+  incidence                        <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
+  
+  # Size weight
+  affil.members                    <- Matrix::colSums(incidence)
+  affil.weight                     <- sqrt((sigma/affil.members))
+  affil.weight[affil.weight > 1]   <- 1
+  names(affil.weight)              <- colnames(incidence)
+  
+  incidence                        <- incidence * affil.weight
+
+  # Graph creation  
+  graph                            <- graph.incidence(incidence, weighted = TRUE, mode = "all")
+  
+  # Graph attributes
+  
+  # Edge reweighting
+  
+  graph
+}
 
 #' A report of the first neighborhood of an individiual
 #' @param name a single or several names
@@ -173,8 +236,8 @@ ego.two.mode <- function(name, den = den, n = Inf, text = "affil", member.of = p
   sp.ego       <- 1/sp.ego 
   sp.ego[name.in.net] <- 2
   sp.ego[name.in.net] <- max(sp.ego) + 1
-  org.w.ego    <- elite.net$org.weight
-  V(net.two)$ego.dist <- c(sp.ego, org.w.ego)
+  affil.w.ego    <- elite.net$affil.weight
+  V(net.two)$ego.dist <- c(sp.ego, affil.w.ego)
   
   
   type         <- V(net.two)$type
@@ -188,7 +251,7 @@ ego.two.mode <- function(name, den = den, n = Inf, text = "affil", member.of = p
   
   e.w <- rep(1, ecount(net.two))
   E(net.two)$e.w <- e.w
-  for (i in 1:length(aff))  E(net.two)[incident(net.two, aff[i])]$e.w <- org.w.ego[i]
+  for (i in 1:length(aff))  E(net.two)[incident(net.two, aff[i])]$e.w <- affil.w.ego[i]
   
   if (identical(text, "affil")) {
     text       <- V(net.two)$name

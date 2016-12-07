@@ -44,7 +44,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ### den.class
 
 * __is.den()__: Is the object of class den.  [DONE]
-* __plot.den()__  
+* __plot.den()__  [Alpha - slow and unsure about functionality]
 
 * __summary.den()__ [Alpha - slow and unsure about functionality]
 * __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class. [DONE]
@@ -81,9 +81,10 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __described.as()__ : Find expressions in their descriptions
 
 ### Graph creation
-* __elite.network()__
-* __elite.network.affil()__
-* __two.mode()__ : perhaps we can also weight this one
+* __elite.network()__ [Beta, needs better (scientific) documentation]
+* __elite.network.affil()__ Merges with elite.network [DONE]
+* __elite.network.two.mode()__ A weighted two.mode network with attributes [Alpha]
+* __two.mode()__: Create a simple two.mode network [DONE]
 * __ego.two.mode()__:
 * __ego.network()__:
 * __adj.ind()__: From den to adjacency matrix [DONE]

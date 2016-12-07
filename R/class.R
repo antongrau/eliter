@@ -314,7 +314,7 @@ plot.den <- function(x, ...){
   md              <- rbind(members, memberships, t.members, t.memberships, rownames = NULL)
   
   p     <- ggplot(md, aes(x = as.numeric(id), y = value, group = var)) + facet_wrap(~var, scales = "free")
-  p     <- p + geom_line(size = 0.5) + geom_point(size = 0.5) + theme_tufte() + geom_rangeframe()
+  p     <- p + geom_line(size = 0.5) + geom_point(size = 0.5) + ggthemes::theme_tufte() + ggthemes::geom_rangeframe()
   p     <- p + xlab("") + ylab("")
   print(p)
 }

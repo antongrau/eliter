@@ -2,24 +2,28 @@
 % Please edit documentation in R/graph creation.R
 \name{elite.network}
 \alias{elite.network}
-\title{Elite network}
+\title{Create a weighted network graph}
 \usage{
-elite.network(den, sigma = 14)
+elite.network(den, result = c("ind", "affil", "two.mode"), sigma = 14)
 }
 \arguments{
-\item{den}{an affiliation edge list, in the \link{as.den} format.}
+\item{den}{a den class object, see \link{as.den}}
+
+\item{result}{the type of returned graph}
 
 \item{sigma}{the number of members in an affiliation above which all affiliations are weighted down}
 }
 \value{
-a weighted igraph graph
+a weighted graph
 }
 \description{
-Construct a weighted elite network
+Create a weighted network graph
 }
 \examples{
 data(den)
-den.health <- has.tags(den, "Health", result = "den")
-elite.network(den.health)
+den.pol       <- has.tags(den, "Politics", result = "den")
+elite.network(den.pol)
+elite.network(den.pol, result = "affil")
+elite.network(den.pol, result = "two.mode")
 }
 

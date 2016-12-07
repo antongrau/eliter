@@ -24,7 +24,7 @@ has.tags       <- function(den, tags, result = c("affil", "name", "den") , silen
   
   # Remove white space noise
   tags                   <- trimws(tags)
-  tag.list               <- lapply(tag.list, trimws) 
+  # tag.list               <- lapply(tag.list, trimws)  This was extremely slow
   
   # Find tags
   sector.match           <- do.call("cbind", lapply(tags, find.in.tag.list, tag.list = tag.list))
