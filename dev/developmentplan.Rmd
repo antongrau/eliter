@@ -69,10 +69,10 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ### Tags and sectors
 * __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
 
-* __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive. [Coded, Quality Checked, Documented, Examples]
-* __standard.sectors__: A list of tags with the standard sectors. [Coded, Quality Checked, Documented, Examples]  
-* __show.all.tags()__: A list of all active tags within a den object.[Coded, Quality Checked, Documented, Examples]
-* __has.tags()__: Return den, members or affils with matchin tags. [Coded, Quality Checked, Documented, Examples]
+* __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive. [DONE]
+* __standard.sectors__: A list of tags with the standard sectors. [DONE]  
+* __show.all.tags()__: A list of all active tags within a den object.[DONE]
+* __has.tags()__: Return den, members or affils with matchin tags. [DONE]
 * __sectors.to.role()__: Check if a person has a specific role within a given sector.
 
 ### Search
@@ -97,18 +97,17 @@ We lack quality controls - especially for empty Affiliations
 ### Core identification
 * __proximity():___:  [Dysfunctional]
 
-* __largest.component()__ : Either the graph with the largest component or a vector with TRUE/FALSE [Coded, Quality Checked, Documented, Examples]
-* __betweenness.decomposition()__ : Either the graph with the betweenness core or a vector with the betweenness decomposition score for each vertex. [Coded, Quality Checked, Documented, Examples]
-* __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [Coded, Quality Checked, Documented, Examples]
-* __secondary.agents()__: Find secondary agents [Coded, Quality Checked, Documented, Examples]
-* __vertex.communities()__: A function that returns all the different memberships of a vertex [Coded, Quality Checked, Documented, Examples]
-* __level.of.power()__: Returns a categorical value for the level of power based on k-core decomposition.
+* __largest.component()__ : Either the graph with the largest component or a vector with TRUE/FALSE [DONE]
+* __betweenness.decomposition()__ : Either the graph with the betweenness core or a vector with the betweenness decomposition score for each vertex. [DONE]
+* __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [DONE]
+* __secondary.agents()__: Find secondary agents [DONE]
+* __vertex.communities()__: A function that returns all the different memberships of a vertex [DONE]
+* __level.of.power()__: Returns a categorical value for the level of power based on k-core decomposition. [DONE]
 
 ### Centrality
-* __reach()__[Coded, Quality Checked, Documented, Examples]
-* __vertex.measures()__: Combine vertex.measures and vertex.measures.directed[Coded, Quality Checked, Documented, Examples]
-* __do.you.know()__: [Coded, Quality Checked, Documented, Examples]
-
+* __reach()__[DONE]
+* __vertex.measures()__: Combine vertex.measures and vertex.measures.directed[DONE]
+* __do.you.know()__: [DONE]
 * __sector.degree()__: A matrix approach to do.you.know
 
 
@@ -122,7 +121,7 @@ We lack quality controls - especially for empty Affiliations
 * __graph.plot()__
 * __ego.two.mode()__
 * __dist.plot()__ 
-* __add.density()__ [Coded, Quality Checked, Documented, Examples]
+* __add.density()__ [DONE]
 
 ### Themes
 * __standard.theme()__
