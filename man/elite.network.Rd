@@ -7,12 +7,12 @@
 elite.network(den, sigma = 14)
 }
 \arguments{
-\item{den}{an affiliation edge list, in the \link{den} format.}
+\item{den}{an affiliation edge list, in the \link{as.den} format.}
 
 \item{sigma}{the number of members in an affiliation above which all affiliations are weighted down}
 }
 \value{
-a elite network object
+a weighted igraph graph
 }
 \description{
 Construct a weighted elite network

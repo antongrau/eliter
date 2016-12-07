@@ -4,15 +4,20 @@
 \alias{adj.ind}
 \title{Adjacency matrix for individuals}
 \usage{
-adj.ind(rel)
+adj.ind(den)
 }
 \arguments{
-\item{rel}{an affiliation list}
+\item{den}{an affiliation list}
 }
 \value{
 a sparse adjacency matrix of individual * individual
 }
 \description{
 Create an adjacency matrix from an affilation list
+}
+\examples{
+data(den)
+den.culture   <- has.tags(den, "Culture", result = "den")
+adj.ind(den.culture)
 }
 

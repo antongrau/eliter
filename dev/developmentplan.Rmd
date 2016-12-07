@@ -86,7 +86,8 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __two.mode()__ : perhaps we can also weight this one
 * __ego.two.mode()__:
 * __ego.network()__:
-* __adj.ind()__: From den to adjacency matrix
+* __adj.ind()__: From den to adjacency matrix [DONE]
+* __adj.affil()__: From den to adjacency matrix for affiliations [DONE]
 
 ### Connect
 * __eliteDB()__ : Connect to the eliteDB database

@@ -3,42 +3,37 @@
 #' Adjacency matrix for individuals
 #' 
 #' Create an adjacency matrix from an affilation list
-#' @param rel an affiliation list
+#' @param den an affiliation list
 #' @return a sparse adjacency matrix of individual * individual
 #' @export
+#' @examples 
+#' data(den)
+#' den.culture   <- has.tags(den, "Culture", result = "den")
+#' adj.ind(den.culture)
 
-adj.ind <- function(rel){
-  netmat <- droplevels(data.frame(rel$NAME, rel$AFFILIATION))
-  colnames(netmat) <- c("navn", "org")
-  
-  ### Nu laves netværksobjekterne
-  tabnet          <- table(netmat)
-  tabnet          <- Matrix(tabnet)
-  adj             <- tabnet %*% t(tabnet) # Individ*individ
-  return(adj)
+adj.ind <- function(den){
+  incidence       <- xtabs(~ NAME + AFFILIATION, data = den, sparse = TRUE)
+  adj             <- incidence %*% Matrix::t(incidence)
+  adj
 }
 
 #' Adjacency matrix for affiliations
 #' 
 #' Create an adjacency matrix from an affilation list
-#' @param rel an affiliation list
+#' @param den an affiliation list
 #' @return a sparse adjacency matrix of affiliation * affiliation
 #' @seealso \link{adj.ind}, \link{two.mode}
 #' @export
+#' data(den)
+#' den.culture   <- has.tags(den, "Culture", result = "den")
+#' adj.affil(den.culture)
 
 
-adj.org <- function(rel){
-  netmat <- droplevels(data.frame(rel$NAME, rel$AFFILIATION))
-  colnames(netmat) <- c("navn", "org")
-  
-  ### Nu laves netværksobjekterne
-  tabnet          <- table(netmat)
-  tabnet          <- as.matrix(tabnet)
-  adj             <- t(tabnet) %*% tabnet # Org*Org
-  return(adj)
+adj.affil <- function(den){
+  incidence       <- xtabs(~ NAME + AFFILIATION, data = den, sparse = TRUE)
+  adj             <- Matrix::t(incidence) %*% incidence
+  adj
 }
-
-
 
 #' Create a two-mode network from an affiliation list
 #' 
@@ -46,9 +41,8 @@ adj.org <- function(rel){
 #' @export
 
 two.mode <- function(den){
-  edgelist         <- droplevels(data.frame(den$NAME, den$AFFILIATION))
-  graph            <- graph.data.frame(edgelist)
-  V(graph)$type    <- V(graph)$name %in% edgelist[,2]
+  graph            <- graph.data.frame(den[, c("NAME", "AFFILIATION")])
+  V(graph)$type    <- V(graph)$name %in% unique(den$AFFILIATION)
   per              <- invPerm(order(V(graph)$type, V(graph)$name))
   graph            <- permute.vertices(graph, per)
   graph
@@ -57,9 +51,9 @@ two.mode <- function(den){
 #' Elite network
 #'
 #' Construct a weighted elite network
-#' @param den an affiliation edge list, in the \link{den} format.
+#' @param den an affiliation edge list, in the \link{as.den} format.
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
-#' @return a elite network object
+#' @return a weighted igraph graph
 #' @export
 #' @examples 
 #' data(den)
@@ -67,61 +61,52 @@ two.mode <- function(den){
 #' elite.network(den.health)
 
 elite.network     <- function(den, sigma = 14){
-  # Måske skal vi have et argument der tillader at man smider svage forbindelser?
   
-  ## Vægt baseret på størrelse af affil
-  netmat              <- droplevels(data.frame(den$NAME, den$AFFILIATION))
-  
-  tabnet              <- xtabs(formula = ~., data = netmat, sparse = TRUE)
-  
-  affil.members       <- Matrix::colSums(tabnet)
-  memberships         <- Matrix::rowSums(tabnet)
+  # Incidence matrix
+  incidence               <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
+  affil.members           <- Matrix::colSums(incidence)
+  memberships             <- Matrix::rowSums(incidence)
   
   # Occassions weight
-  col.max             <- as.numeric(qlcMatrix::colMax(tabnet))
+  col.max                 <- as.numeric(qlcMatrix::colMax(incidence))
+  incidence               <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
   
-  tabweight           <- Matrix::t(Matrix::t(tabnet) * (1 / col.max))
-  dimnames(tabweight) <- dimnames(tabnet)
+  # Affiliation size weight
+  affil.weight                    <- sqrt((sigma/affil.members))
+  affil.weight[affil.weight > 1]  <- 1
+  names(affil.weight)             <- colnames(incidence)
   
-  # affil size weight
-  affil.weight           <- sqrt((sigma/affil.members))
-  affil.weight[affil.weight > 1]      <- 1
-  names(affil.weight)    <- colnames(tabnet)
-  
-  # Tildel en vægt til den
-  tb                     <- Matrix::t(tabweight) * affil.weight
-  tb                     <- Matrix::t(tb)
+  incidence              <- Matrix::t(incidence) * affil.weight
+  incidence              <- Matrix::t(incidence)
  
-  # Adjacency matrix for individer
-  tb                     <- Matrix(tb, sparse = TRUE)
-  adj.all                <- sqrt(tb) %*% sqrt(Matrix::t(tb)) # Her kan vi speede op med tcrossprod()
+  # Adjacency matrix
+  adj.all                <- Matrix::tcrossprod(sqrt(incidence), sqrt(incidence))
+  #adj.all               <- sqrt(incidence) %*% sqrt(Matrix::t(incidence)) # Old version
   weighted.memberships   <- Matrix::diag(adj.all)
   
-  
-  net.all                <- graph.adjacency(adj.all, weighted = TRUE, diag = FALSE, mode = "undirected")
-  
+  # Graph creation
+  graph                  <- graph.adjacency(adj.all, weighted = TRUE, diag = FALSE, mode = "undirected")
   
   # Weighting of strong ties
-  E(net.all)$weight.nolog        <- E(net.all)$weight
-  over                           <- E(net.all)$weight > 1
-  E(net.all)$weight[over]        <- log(E(net.all)$weight[over]) + 1
-  E(net.all)$weight              <- 1/E(net.all)$weight
-  
+  E(graph)$weight.nolog           <- E(graph)$weight
+  over                            <- E(graph)$weight > 1
+  E(graph)$weight[over]           <- log(E(graph)$weight[over]) + 1
+  E(graph)$weight                 <- 1/E(graph)$weight
   
   # Attributes
-  V(net.all)$weighted.memberships   <- weighted.memberships
-  V(net.all)$memberships            <- memberships
-  net.all$affil.weight              <- affil.weight
-  net.all$affil.members             <- affil.members
+  V(graph)$weighted.memberships   <- weighted.memberships
+  V(graph)$memberships            <- memberships
+  graph$affil.weight              <- affil.weight
+  graph$affil.members             <- affil.members
   
-  class(net.all) <- c("igraph", "elite.network")
-  net.all
+  class(graph) <- c("igraph", "elite.network")
+  graph
 }
 
 #' Elite network for affiliations
 #'
 #' Construct a weighted elite network of affiliations
-#' @param den an affiliation edge list in the\link{den} format.
+#' @param den an affiliation edge list in the \link{as.den} format.
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
 #' @return a elite network object
 #' @export
@@ -136,23 +121,23 @@ elite.network.affil      <- function(den = den, sigma = 14){
   incidence              <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
   dimnames(incidence)    <- dimnames(incidence)
   
-  adj.org                <- Matrix::crossprod(incidence)
-  org.medlemmer          <- Matrix::diag(adj.org)
+  adj.affil                <- Matrix::crossprod(incidence)
+  org.medlemmer          <- Matrix::diag(adj.affil)
   
   # Org size weight
   org.weight             <- sqrt((sigma/org.medlemmer))
   org.weight[org.weight > 1]      <- 1
   names(org.weight)      <- colnames(incidence)
   
-  adj.org                <- adj.org * org.weight
-  net.org                <- graph.adjacency(adj.org, weighted = TRUE, diag = FALSE, mode = "directed")
-  V(net.org)$members     <- org.medlemmer
-  V(net.org)$weighted.members <- Matrix::diag(adj.org)
+  adj.affil                <- adj.affil * org.weight
+  net.affil                <- graph.adjacency(adj.affil, weighted = TRUE, diag = FALSE, mode = "directed")
+  V(net.affil)$members     <- org.medlemmer
+  V(net.affil)$weighted.members <- Matrix::diag(adj.affil)
   
-  over                   <- E(net.org)$weight > 1
-  E(net.org)$weight[over] <- log(E(net.org)$weight[over]) + 1
-  E(net.org)$weight      <- 1/E(net.org)$weight
-  net.org
+  over                   <- E(net.affil)$weight > 1
+  E(net.affil)$weight[over] <- log(E(net.affil)$weight[over]) + 1
+  E(net.affil)$weight      <- 1/E(net.affil)$weight
+  net.affil
 }
 
 
@@ -171,18 +156,18 @@ ego.two.mode <- function(name, den = den, n = Inf, text = "affil", member.of = p
   stopifnot("Wrong name" = any(ind))
   
   affil        <- as.character(den$AFFILIATION[ind])
-  rel.affil    <- den[den$AFFILIATION %in% affil,]
+  den.affil    <- den[den$AFFILIATION %in% affil,]
   
   if (n < Inf) {
-    net.elite    <- elite.network(rel.affil)
+    net.elite    <- elite.network(den.affil)
     ind.e        <- V(net.elite)$name %in% name
     dist.to.ind  <- net.elite[ind.e,]
     ind.e        <- V(net.elite)$name[dist.to.ind < n]
-    rel.affil    <- rel.affil[rel.affil$NAME %in% ind.e,]
+    den.affil    <- den.affil[den.affil$NAME %in% ind.e,]
   }
   
-  net.two      <- two.mode(rel.affil)
-  elite.net    <- elite.network(rel.affil)
+  net.two      <- two.mode(den.affil)
+  elite.net    <- elite.network(den.affil)
   name.in.net  <- which(V(elite.net)$name %in% name)
   sp.ego       <- shortest.paths(elite.net, v = name.in.net)
   sp.ego       <- 1/sp.ego 
@@ -230,8 +215,8 @@ ego.network      <- function(name, den, n = Inf){
   ind            <- den$NAME %in% name  
   stopifnot("Wrong name" = any(ind))
   affil          <- as.character(den$AFFILIATION[ind])
-  rel.affil      <- den[den$AFFILIATION %in% affil,]
-  net.elite      <- elite.network(rel.affil)
+  den.affil      <- den[den$AFFILIATION %in% affil,]
+  net.elite      <- elite.network(den.affil)
   ind.e          <- V(net.elite)$name %in% name
   dist.to.ind    <- net.elite[ind.e,]
   delete.them    <- which(dist.to.ind >= n & ind.e == FALSE)
@@ -262,9 +247,9 @@ ego.two.mode.affil <- function(name, den = den, text = "affil", member.of = pe13
   
   stopifnot("Wrong name" = any(aff))
   inds         <- as.character(den$NAME[aff])
-  rel.affil    <- den[den$NAME %in% inds,]  
+  den.affil    <- den[den$NAME %in% inds,]  
   
-  net.two      <- two.mode(rel.affil)
+  net.two      <- two.mode(den.affil)
   
   type         <- V(net.two)$type
   type[V(net.two)$name %in% name] <- "Ind"
