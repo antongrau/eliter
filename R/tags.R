@@ -20,7 +20,7 @@ has.tags       <- function(den, tags, result = c("affil", "name", "den") , silen
   
   result.args            <- c("affil", "name", "den")
   affil.name             <- as.character(den$AFFILIATION)
-  tag.list               <- strsplit(as.character(den$TAGS),  ",")
+  tag.list               <- strsplit(as.character(den$TAGS),  ", ")
   
   # Remove white space noise
   tags                   <- trimws(tags)

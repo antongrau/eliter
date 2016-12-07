@@ -195,11 +195,19 @@ elite.network.two.mode             <- function(den, sigma = 14){
   incidence                        <- incidence * affil.weight
 
   # Graph creation  
-  graph                            <- graph.incidence(incidence, weighted = TRUE, mode = "all")
+  graph                            <- graph.incidence(incidence, weighted = TRUE, mode = "all", multiple = FALSE)
   
   # Graph attributes
-  
-  # Edge reweighting
+  edge.vars           <- c("ROLE", "TAGS")
+  edge.vars           <-  edge.vars[edge.vars %in% colnames(den)]
+  if (length(edge.vars) >= 1) {
+    dups              <- which(duplicated(data.frame(den$NAME, den$AFFILIATION)))
+    edge.att          <- den[-dups, c("NAME", "AFFILIATION", edge.vars)]
+    graph.edges       <- get.edgelist(graph)
+    graph.edges       <- data.frame("NAME" = graph.edges[,1], "AFFILIATION" = graph.edges[,2], stringsAsFactors = FALSE)
+    joined            <- left_join(graph.edges, edge.att, by = c("NAME", "AFFILIATION"))
+    for (i in 1:length(edge.vars)) edge_attr(graph, edge.vars[i])  <- as.character(joined[, edge.vars[i]])
+  }
   
   graph
 }
