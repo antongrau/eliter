@@ -15,7 +15,7 @@
 a markdown table with statistics
 }
 \description{
-Essential statistics for the den-class. Mainly for interactive use, but is returned in rmarkdown format using kable and knitr for easy export.
+Essential statistics for the den-class. Mainly for interactive use, but results are returned in Rmarkdown format using kable and knitr for easy export.
 }
 \examples{
 data(den)

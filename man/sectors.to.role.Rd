@@ -2,24 +2,29 @@
 % Please edit documentation in R/tags.R
 \name{sectors.to.role}
 \alias{sectors.to.role}
-\title{Title}
+\title{Roles and position on the basis of sectors}
 \usage{
 sectors.to.role(den, list.dens, role = c("Chief executive", "Executive"),
   other = "Other", mutually.exclusive = FALSE)
 }
 \arguments{
-\item{den}{}
+\item{den}{a den class object, see \link{as.den} with a ROLE variable}
 
-\item{list.dens}{}
+\item{list.dens}{a list of den objects that corresponds to the sectors}
 
-\item{role}{}
+\item{role}{the set of roles}
 
-\item{other}{}
+\item{other}{either FALSE or the label for the "Other" category.}
 
-\item{mutually.exclusive}{}
+\item{mutually.exclusive}{if TRUE sectors are mututally exclusive}
+}
+\value{
+either a matrix or a named vector
 }
 \description{
-Title
+sectors.to.role constructs a role or position variable on the basis of sectors.
+If the sectors are mutually exclusive it constructs a single named vector.
+If a person has roles in more than one sector it is the last sector in the list of sectors that counts.
 }
 \examples{
 data(den)

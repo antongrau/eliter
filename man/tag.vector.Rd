@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables.R
 \name{tag.vector}
 \alias{tag.vector}
-\title{Create a vector of tags on the basis of a affiliations}
+\title{Create a vector of tags on the basis of affiliation}
 \usage{
 tag.vector(x, den)
 }
@@ -15,6 +15,6 @@ tag.vector(x, den)
 a vector of tags
 }
 \description{
-Create a vector of tags on the basis of a affiliations
+Create a vector of tags on the basis of affiliation
 }
 
