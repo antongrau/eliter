@@ -4,7 +4,8 @@
 \alias{betweenness.decomposition}
 \title{Betweenness decomposition}
 \usage{
-betweenness.decomposition(graph, max.path = 2, estimate.min = 1)
+betweenness.decomposition(graph, max.path = 2, estimate.min = 1,
+  silent = FALSE)
 }
 \arguments{
 \item{graph}{a network graph}

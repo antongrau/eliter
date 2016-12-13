@@ -48,7 +48,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 
 * __summary.den()__ [Alpha - slow and unsure about functionality]
 * __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class. [DONE]
-* __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. [Alpha]
+* __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. [Beta]
 * __plot.den()__: Plot some descriptive distributions of a den object
 
 ### period
@@ -60,20 +60,20 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 ### Variables
 * __affil.attributes()__: Create a data.frame with attributes for each affiliation.  
 * __member.attributes()__: Create a data.frame with attributes for each member.
-* __memberships()__: Number of memberships for each individual.
-* __members()___: Number of members.
-* __membership.vector()__: A vector with the names of all affiliation memberships.
-* __members.vector()___: A vector with the names of all members.
+* __memberships()__: Number of memberships for each individual. [What is the use case?]
+* __members()___: Number of members. [What is the use case?]
+* __membership.vector()__: A vector with the names of all affiliation memberships. [DONE]
+* __members.vector()___: A vector with the names of all members. [DONE]
+* __description.vector()__: A vector with all the descriptions of a person. [DONE]
 * __name.id()___: Create a unique name id combination.
 
 ### Tags and sectors
 * __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
-
 * __tags.to.sectors()__: Take a list of tags and turn into a list of den objects. Option for mutually exclusive. [DONE]
 * __standard.sectors__: A list of tags with the standard sectors. [DONE]  
 * __show.all.tags()__: A list of all active tags within a den object.[DONE]
 * __has.tags()__: Return den, members or affils with matchin tags. [DONE]
-* __sectors.to.role()__: Check if a person has a specific role within a given sector.
+* __sectors.to.role()__: Check if a person has a specific role within a given sector. [BETA : Test the results  - but mainly the problems are related to data quality]
 
 ### Search
 * __who()__: Find members matching a string
@@ -103,7 +103,7 @@ We lack quality controls - especially for empty Affiliations
 * __betweenness.decomposition()__ : Either the graph with the betweenness core or a vector with the betweenness decomposition score for each vertex. [DONE]
 * __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [DONE]
 * __secondary.agents()__: Find secondary agents [DONE]
-* __vertex.communities()__: A function that returns all the different memberships of a vertex [DONE]
+* __vertex.communities()__: A function that returns all the different memberships of a vertex [BETA]
 * __level.of.power()__: Returns a categorical value for the level of power based on k-core decomposition. [DONE]
 
 ### Centrality

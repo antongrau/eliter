@@ -67,7 +67,7 @@ has.tags       <- function(den, tags, result = c("affil", "name", "den") , silen
 
 show.all.tags   <- function(den){
   tags                <- as.character(den$TAGS)
-  tags.split          <- trimws(unlist(strsplit(tags, ",")))
+  tags.split          <- unlist(strsplit(tags, ", "))
   tags.positions      <- table(tags.split)
   tags.affiliations   <- tags[duplicated(den$AFFILIATION) == FALSE]
   tags.affiliations   <- table(trimws(unlist(strsplit(tags.affiliations, ","))))
@@ -206,15 +206,19 @@ standard.sectors <- function(sets = c("Danish", "English", "4 Sectors")){
 
 
 
-#' Title
+#' Roles and position on the basis of sectors
 #'
-#' @param den 
-#' @param list.dens 
-#' @param role 
-#' @param other 
-#' @param mutually.exclusive 
+#' sectors.to.role constructs a role or position variable on the basis of sectors.
+#' If the sectors are mutually exclusive it constructs a single named vector.
+#' If a person has roles in more than one sector it is the last sector in the list of sectors that counts.
 #'
-#' @return
+#' @param den a den class object, see \link{as.den} with a ROLE variable
+#' @param list.dens a list of den objects that corresponds to the sectors
+#' @param role the set of roles
+#' @param other either FALSE or the label for the "Other" category.
+#' @param mutually.exclusive if TRUE sectors are mututally exclusive
+#'
+#' @return either a matrix or a named vector
 #' @export
 #'
 #' @examples

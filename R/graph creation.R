@@ -121,8 +121,7 @@ elite.network.ind    <- function(den, sigma = 14){
   graph                  <- graph.adjacency(adj.all, weighted = TRUE, diag = FALSE, mode = "undirected")
   
   # Weighting of strong ties
-  E(graph)$weight.nolog           <- E(graph)$weight
-  over                            <- E(graph)$weight > 1
+  over                            <- which(E(graph)$weight > 1)
   E(graph)$weight[over]           <- log(E(graph)$weight[over]) + 1
   E(graph)$weight                 <- 1/E(graph)$weight
   

@@ -57,7 +57,7 @@ largest.component <- function(graph, cut.off = 1, result = c("graph", "vector"))
 #' data(pe13)
 #' betweenness.decomposition(net.elite)
 
-betweenness.decomposition <- function(graph, max.path = 2, estimate.min = 1){
+betweenness.decomposition <- function(graph, max.path = 2, estimate.min = 1, silent = FALSE){
   g                       <- graph
   layers                  <- list()
   i                       <- 1
@@ -69,9 +69,12 @@ betweenness.decomposition <- function(graph, max.path = 2, estimate.min = 1){
     g           <- g - kill
   }
 
+  if (identical(silent, TRUE)) {
   out           <- unlist(lapply(layers, length))
   names(out)    <- paste("Round:", seq_along(out))
   print(out)
+  }
+  
   g
 }
 

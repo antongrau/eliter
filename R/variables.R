@@ -10,13 +10,19 @@ name.id <- function(name, id){
 #' A vector of members in an affiliation
 #'
 #' @param x a character vector with names of affiliations
-#' @param den 
-#' @return a vector
+#' @param den a den class object with the affiliations in x
+#' @return a vector with names of the members seperated by " * "
 #' @export
-member.vector <- function(x, den){
-  den.x       <- droplevels(den[which(den$AFFILIATION %in% x),])
-  l.medlem    <- lapply(x, function(x, den.x) as.character(den.x$NAME)[den.x$AFFILIATION %in% x], den.x)
-  paste.names <- unlist(lapply(l.medlem, paste, collapse = " * "))
+#' @examples 
+#' data(den)
+#' den.culture   <- has.tags(den, "Culture", result = "den")
+#' graph.culture <- elite.network(den.culture, result = "affil")
+#' members.vector(V(graph.culture)$name, den)
+
+members.vector  <- function(x, den){
+  den.x         <- droplevels(den[which(den$AFFILIATION %in% x),])
+  l.medlem      <- lapply(x, function(x, den.x) as.character(den.x$NAME)[den.x$AFFILIATION %in% x], den.x)
+  paste.names   <- unlist(lapply(l.medlem, paste, collapse = " * "))
   paste.names
 }
 
@@ -27,6 +33,11 @@ member.vector <- function(x, den){
 #'
 #' @return a vector
 #' @export
+#' @examples 
+#' data(den)
+#' den.culture   <- has.tags(den, "Culture", result = "den")
+#' graph.culture <- elite.network(den.culture, result = "ind")
+#' membership.vector(V(graph.culture)$name, den)
 
 membership.vector <- function(x, den){
   den.x           <- droplevels(den[which(den$NAME %in% x),])
@@ -38,23 +49,27 @@ membership.vector <- function(x, den){
 #' A vector of descriptions for each individual
 #'
 #' @param x a character vector with names of individuals
-#' @param den 
+#' @param den a den class object with a DESCRIPTION variable, see \link{as.den}
 #'
-#' @return a vector
+#' @return a vector with descriptions where affiliations are seperated by "*"
 #' @export
+#' data(den)
+#' den.culture   <- has.tags(den, "Culture", result = "den")
+#' graph.culture <- elite.network(den.culture, result = "ind")
+#' description.vector(V(graph.culture)$name, den)[1]
 
-description.vector <- function(x, den){
-  den.x           <- droplevels(den[which(den$NAME %in% x),])
-  beskriv         <- function(x, den.x) {
-    dat             <- data.frame(affil = den.x$AFFILIATION, description = den.x$DESCRIPTION)[den.x$NAME %in% x,]
-    dat             <- dat[duplicated(dat$affil) == FALSE,]
+description.vector      <- function(x, den){
+  den.x                 <- droplevels(den[which(den$NAME %in% x),])
+  beskriv               <- function(x, den.x) {
+    dat                 <- data.frame(affil = den.x$AFFILIATION, description = den.x$DESCRIPTION)[den.x$NAME %in% x,]
+    dat                 <- dat[duplicated(dat$affil) == FALSE,]
     paste(dat$affil, ":",  dat$description, collapse = " * ")
   }
   sapply(x, beskriv, den.x = den.x)
 }
 
 
-#' Create a vector of tags on the basis of a affiliations
+#' Create a vector of tags on the basis of affiliation
 #'
 #' @param x a character vector of affiliation names
 #' @param den 
@@ -69,26 +84,14 @@ tag.vector    <- function(x, den){
   as.character(den.x$TAGS)
 }
 
-neighbors.vector <- function(x, graph){
+neighbors     <- function(x, graph){
   
   
   
 }
+
 
 # Data coding and recoding -----
-
-#' Combine descriptions
-#' 
-#' Combine all descriptions into a single character vector
-#' @param x the name of an individual
-#' @param rel.all an affiliation edge list
-#' @return a character vector
-
-beskrivelser <- function(x, rel.all = rel.all){
-  besk       <- rel.all$DESCRIPTION[rel.all$NAME == x]
-  org        <- rel.all$AFFILIATION[rel.all$NAME == x]
-  paste(org, ":", besk)
-}
 
 #' Search descriptions
 #' 
@@ -113,7 +116,6 @@ find.beskrivelse <- function(rel, soegeord, ignore.case=TRUE, ...){
   
   droplevels(rel[navne.ind,])
 }
-
 
 
 #' Find the gender by name

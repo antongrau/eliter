@@ -62,7 +62,7 @@ is.den <- function(x){
 
 #' Print den objects
 #'
-#' Essential statistics for the den-class. Mainly for interactive use, but is returned in rmarkdown format using kable and knitr for easy export.
+#' Essential statistics for the den-class. Mainly for interactive use, but results are returned in Rmarkdown format using kable and knitr for easy export.
 #'
 #' @param x a den-class object
 #' @param ... further arguments are ignored
@@ -142,10 +142,10 @@ print(kable(out, align = c("r", "c", "l", "r", "l", "l", "r")))
 summary.den         <- function(x, ...){
   incidence         <- xtabs(~NAME + AFFILIATION, x, sparse = T) 
   adj.ind           <- incidence %*% Matrix::t(incidence)
-  diag(adj.ind)     <- 0
+  Matrix::diag(adj.ind)     <- 0
   
   adj.affil         <- Matrix::t(incidence) %*% incidence
-  diag(adj.affil)   <- 0
+  Matrix::diag(adj.affil)   <- 0
   
   out.list          <- list()
   

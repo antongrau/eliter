@@ -9,10 +9,10 @@ description.vector(x, den)
 \arguments{
 \item{x}{a character vector with names of individuals}
 
-\item{den}{}
+\item{den}{a den class object with a DESCRIPTION variable, see \link{as.den}}
 }
 \value{
-a vector
+a vector with descriptions where affiliations are seperated by "*"
 }
 \description{
 A vector of descriptions for each individual
