@@ -66,6 +66,10 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __members.vector()___: A vector with the names of all members. [DONE]
 * __description.vector()__: A vector with all the descriptions of a person. [DONE]
 * __name.id()___: Create a unique name id combination.
+* __code.gender()__  [DONE]
+* __firstnames()__ [DONE]
+* __code.region()__  
+* __geographical.neighbours()__ [DONE]
 
 ### Tags and sectors
 * __variables.to.tags()__: Add a set of variables to the tag variable. This could be a set of sector variables.
@@ -114,7 +118,7 @@ We lack quality controls - especially for empty Affiliations
 
 
 ### Layouts
-* __layout.cl()__
+* __layout.cl()__ : Den skal laves om så vi arbejder med arbitrære klyngemedlemskaber. Det betyder at cl delen skal være sin egen funktion og at man skal have mere direkte adgang til parametrene.
 * __layout.isolates.in.box()__
 * __layout.elite()__
 
@@ -128,14 +132,10 @@ We lack quality controls - especially for empty Affiliations
 ### Themes
 * __standard.theme()__
 * __dark.theme()__
-
-### Data recoding
 * __code.gender()__  
 * __code.region()__  
 * __find.geoposition()__
 * __geographical.neighbours()__
-
-
 ### Simulation
 * __increase.memberships()__
 

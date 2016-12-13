@@ -1,4 +1,4 @@
-# # Middle levels of power -----
+# Middle levels of power -----
 # library(eliter)
 # data(den)
 # den           <- as.den(den)
@@ -65,10 +65,10 @@
 # p             <- ggplot(md, aes(x = Var1, y = value, color = Var2)) + geom_line()
 # p             <- p + facet_wrap(~Var2, scales = "free_y")
 # p + theme_bw() + xlab("Coreness") + ylab("Number of executives or chairmen")
-# 
-# 
-# 
-# 
+
+
+
+
 # # # # # DEN summary -----
 # # # #
 # # # den <- eliteDB.connections(pass )
@@ -134,86 +134,25 @@
 # # # #
 # # # #
 # # # # # # #####################################################################################
-# # # # # # # Geo - elite kodning
-# # # # # # library(ggmap)
-# # # # # # library(geosphere)
-# # # # # # library(soc.elite)
-# # # # # # library(igraph)
-# # # # # # data(den)
-# # # # # # data(pe13)
-# # # # # #
-# # # # # #
-# # # # # # lon                <- pe13$lon
-# # # # # # lat                <- pe13$lat
-# # # # # # x                  <- cbind(lon, lat)
-# # # # # # y                  <- cbind(lon, lat)
-# # # # # #
-# # # # # # afstande           <- distm(x, y)
-# # # # # # rownames(afstande) <- pe13$Name
-# # # # # # colnames(afstande) <- pe13$Name
-# # # # # #
-# # # # # # median(afstande, na.rm = T)
-# # # # # #
-# # # # # # afstande.adj <- afstande
-# # # # # # afstande.adj[is.na(afstande.adj)] <- 0
-# # # # # # #afstande.adj[afstande.adj >= 500] <- 0
-# # # # # #
-# # # # # # adjs          <- list()
-# # # # # # afs           <- seq(from = 100, to = 10000, by = 200)
-# # # # # # for( i in 1:length(afs)){
-# # # # # #   nif                                 <- afstande.adj
-# # # # # #   nif[afstande.adj >= afs[i]]         <- 0
-# # # # # #   adjs[[i]]                           <- nif
-# # # # # # }
-# # # # # #
-# # # # # # l.graphs      <- lapply(adjs, graph.adjacency, mode = "undirected", weighted = TRUE)
-# # # # # # l.plots       <- lapply(l.graphs, graph.plot, vertex.fill = pe13$region, edge.color = "black", edge.size = 0.3, text = pe13$postnummer)
-# # # # # # for(i in 1:length(l.plots)) l.plots[[i]] <- l.plots[[i]] + ggtitle(afs[i])
-# # # # # #
-# # # # # # coms <- lapply(l.graphs, components)
-# # # # # # els  <- sapply(coms, getElement, "no")
-# # # # # # plot(afs, els)
-# # # # # #
-# # # # # # pdf(file = "~/Desktop/geoafstande.pdf", height = 10, width = 10)
-# # # # # # l.plots
-# # # # # # dev.off()
-# # # # # #
-# # # # # # afstand.g <- afstande.adj
-# # # # # # afstand.g[afstande.adj >= 2000] <- 0
-# # # # # #
-# # # # # # graph.afstand <- graph.adjacency(afstand.g, mode = "undirected", weighted = TRUE)
-# # # # # # graph.plot(graph.afstand, vertex.fill = pe13$region, edge.color = "black", edge.size = 0.3, text = pe13$postnummer)
-# # # # # #
-# # # # # # sort(degree(graph.afstand))
-# # # # # # plot(table(degree(graph.afstand)))
-# # # # # #
-# # # # # # afstand.2km   <- afstande.adj
-# # # # # # afstand.10km  <- afstande.adj
-# # # # # # afstand.2km[afstande.adj >= 2000]    <- 0
-# # # # # # afstand.10km[afstande.adj >= 10000]  <- 0
-# # # # # #
-# # # # # # graph.2km     <- graph.adjacency(afstand.2km, mode = "undirected", weighted = TRUE)
-# # # # # # graph.10km    <- graph.adjacency(afstand.10km, mode = "undirected", weighted = TRUE)
-# # # # # #
-# # # # # # deg.afstand.2km  <- degree(graph.2km)
-# # # # # # deg.afstand.10km <- degree(graph.10km)
-# # # # # #
-# # # # # # as.matrix(table(deg.afstand.2km))
-# # # # # # as.matrix(table(deg.afstand.10km))
-# # # # # #
-# # # # # # social.geography <- deg.afstand.2km
-# # # # # # social.geography[deg.afstand.2km == 0 & deg.afstand.10km == 0] <- "Isolated at 10km"
-# # # # # # social.geography[deg.afstand.2km == 0 & deg.afstand.10km != 0] <- "Isolated at 2km"
-# # # # # # social.geography[deg.afstand.2km %in% 1:2]                     <- "1-2"
-# # # # # # social.geography[deg.afstand.2km %in% 3:6]                     <- "3-6"
-# # # # # # social.geography[deg.afstand.2km %in% 7:20]                    <- "7-20"
-# # # # # # social.geography[deg.afstand.2km %in% 21:30]                   <- "21-30"
-# # # # # # social.geography[deg.afstand.2km %in% 31:max(deg.afstand.2km)] <- "+30"
-# # # # # #
-# # # # # # as.matrix(table(social.geography))
-# # # # # #
-# # # # # # graph.plot(graph.afstand, vertex.fill = social.geography, edge.color = "black", edge.size = 0.3, text = pe13$postnummer)
-# # # # # #
+# Geo - elite kodning
+
+# # # # #
+# # # # # as.matrix(table(deg.afstand.2km))
+# # # # # as.matrix(table(deg.afstand.10km))
+# # # # #
+# # # # # social.geography <- deg.afstand.2km
+# # # # # social.geography[deg.afstand.2km == 0 & deg.afstand.10km == 0] <- "Isolated at 10km"
+# # # # # social.geography[deg.afstand.2km == 0 & deg.afstand.10km != 0] <- "Isolated at 2km"
+# # # # # social.geography[deg.afstand.2km %in% 1:2]                     <- "1-2"
+# # # # # social.geography[deg.afstand.2km %in% 3:6]                     <- "3-6"
+# # # # # social.geography[deg.afstand.2km %in% 7:20]                    <- "7-20"
+# # # # # social.geography[deg.afstand.2km %in% 21:30]                   <- "21-30"
+# # # # # social.geography[deg.afstand.2km %in% 31:max(deg.afstand.2km)] <- "+30"
+# # # # #
+# # # # # as.matrix(table(social.geography))
+# # # # #
+# # # # # graph.plot(graph.afstand, vertex.fill = social.geography, edge.color = "black", edge.size = 0.3, text = pe13$postnummer)
+# # # # #
 # # # #
 # # # # # ###############################################
 # # # # # # REACH ---

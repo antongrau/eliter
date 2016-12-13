@@ -5,7 +5,8 @@ Version: 1.0
 Date: 2014-09-19
 Author: Anton Grau Larsen, Christoph Ellersgaard, Ronnie Taarnborg
 Maintainer: Who to complain to <antongrau@gmail.com>
-Description: A set of tools for social network analysis with a focus on elites, core identification and affiliation networks.
+Description: A set of tools for social network analysis with a focus on elites,
+    core identification and affiliation networks.
 Depends:
     R (>= 3.0.0),
     Matrix,
@@ -26,4 +27,4 @@ Imports:
     qlcMatrix,
     ggthemes
 License: GPL-3
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 5.0.1

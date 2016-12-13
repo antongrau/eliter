@@ -2,22 +2,33 @@
 % Please edit documentation in R/layout.R
 \name{layout.cl}
 \alias{layout.cl}
-\title{Title}
+\title{Layout with Louvain clusters}
 \usage{
-layout.cl(graph, decompose = TRUE, n = 3, remove.isolates = FALSE, ...)
+layout.cl(graph, decompose = TRUE, n = 3, remove.isolates = FALSE,
+  isolates.distance = 0.2, isolates.cloud.size = 1.2, ...)
 }
 \arguments{
 \item{graph}{}
 
+\item{decompose}{}
+
+\item{n}{}
+
+\item{remove.isolates}{}
+
+\item{isolates.distance}{}
+
+\item{isolates.cloud.size}{}
+
 \item{...}{}
 }
 \description{
-Title
+Layout with Louvain clusters
 }
 \examples{
 data(den)
 den.culture   <- has.tags(den, "Culture", result = "den")
 graph         <- elite.network(den.culture, result = "affil")
-plot(layout.cl(graph, decompose = TRUE))
+plot(layout.cl(graph, decompose = TRUE, isolates.distance = 0.8, isolates.cloud.size = 1.5))
 }
 

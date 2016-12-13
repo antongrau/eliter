@@ -117,52 +117,61 @@ find.beskrivelse <- function(rel, soegeord, ignore.case=TRUE, ...){
   droplevels(rel[navne.ind,])
 }
 
-
-#' Find the gender by name
+#' Code gender by firstname in Denmark
 #' 
-#' Guesses the gender for a list of names by comparing it to the national distribution of first names.
-#' @param navne a character vector of full names
-#' @param names.gender a matrix with national distributions of first names
+#' Guesses the gender for a list of names by comparing it to the Danish national distribution of first names in 2013.
+#' @param x a character vector of full names
 #' @return a factor with a gender guess
 #' @export
+#' @examples 
+#' data(den)
+#' priest.names   <- has.tags(den, "Churches", result = "name")
+#' table(code.gender(priest.names))
 
-find.gender <- function(navne){
-  names.gender    <- soc.elite:::names.gender[, c(1,5)]
+code.gender <- function(x){
+  names.gender    <- eliter:::names.gender[, c("Navn", "Andel.mænd")]
   Encoding(names.gender$Navn) <- "UTF-8" 
-  n.list          <- strsplit(navne, " ")
-  fornavne        <- sapply(n.list, head, 1)
-  fornavne        <- data.frame(Navn = I(toupper(fornavne)))
-  koen            <- dplyr::left_join(fornavne, names.gender, by = "Navn")
+  first.x         <- firstnames(x)
+  first.x         <- data.frame(Navn = I(toupper(first.x)))
+  gender          <- dplyr::left_join(first.x, names.gender, by = "Navn")
   b               <- c(0, 0.2, 0.8, 1)
-  kategori        <- cut(koen[, 2], b, include.lowest=TRUE, labels=c("Women", "Binominal", "Men"))
-  kategori
+  out             <- cut(gender$"Andel.mænd", b, include.lowest = TRUE, labels = c("Women", "Binominal", "Men"))
+  out
 }
 
 #' Extract first names
 #' 
 #' Extract first names from full names
-#' @param navne a character vector of full nmaes
+#' @param x a character vector of full nmaes
 #' @return a character vector of first names
 #' @export
+#' @examples 
+#' data(den)
+#' first          <- table(firstnames(den$NAME))
+#' head(sort(first, decreasing = TRUE), 20)
 
-fornavne      <- function(navne){
-  navne           <- as.character(navne)
-  n.list          <- strsplit(navne, " ")
-  fornavne        <- sapply(n.list, head, 1)
-  fornavne
+firstnames        <- function(x){
+  x               <- as.character(x)
+  n.list          <- strsplit(x, " ")
+  first           <- sapply(n.list, head, 1)
+  first
 }
 
 #' Extract last names
 #' 
 #' Extract last names from full names
-#' @param navne a character vector of full nmaes
+#' @param x a character vector of full nmaes
 #' @return a character vector of last names
 #' @export
+#' @examples 
+#' data(den)
+#' last          <- table(lastnames(den$NAME))
+#' head(sort(last, decreasing = TRUE), 20)
 
-efternavne    <- function(navne){
-  navne           <- as.character(navne)
-  n.list          <- strsplit(navne, " ")
-  efternavne      <- sapply(n.list, tail, 1)
+lastnames         <- function(x){
+  x               <- as.character(x)
+  n.list          <- strsplit(x, " ")
+  x               <- sapply(n.list, tail, 1)
 }
 
 #' Categories from postal codes
@@ -171,18 +180,60 @@ efternavne    <- function(navne){
 #' @return a data.frame with various factors
 #' @export
 
-inddel.postnummer <- function(x){
-  postnumre <- postnumre[duplicated(postnumre$POSTNR)==FALSE,]
-  jx <- data.frame(POSTNR = x)
-  xm <- join(jx, postnumre, by = "POSTNR")
+code.region <- function(x){
+  postnumre <- eliter:::postnumre[duplicated(eliter:::postnumre$POSTNR) == FALSE,]
+  jx        <- data.frame(POSTNR = x)
+  xm        <- join(jx, postnumre, by = "POSTNR")
   xm
 }
 
 
-geographical.neighbours <- function(x){
-  
+#' Extract Danish postal codes from an adress string
+#'
+#' @param x a character vector with addresses
+#' @param check.valid if TRUE all invalid postal codes are set as NA. This affects postal codes for Greenland (3900:3992)
+#' @return a numeric vector
+#' @export
+#'
+#' @examples
+#' data(corp13)
+#' address            <- corp13$Adress
+#' plot(table(extract.postal.codes(address)))
+
+extract.postal.codes  <- function(x, check.valid = FALSE){
+  x                   <- as.character(x)
+  x                   <- str_extract(x, "[[:digit:]]{4}")
+  post                <- unique(eliter:::postnumre$POSTNR)
+  if (identical(check.valid, TRUE)) x[(x %in% post) == FALSE]   <- NA
+  x
 }
 
-find.geoposition <- function(x){
+
+#' Geoggraphical neighbours graph
+#'
+#' How many people do you live close to within a given distance in meters
+#'
+#' @param lon a numeric vector with longitudes
+#' @param lat a numeric vector with latitudes
+#' @param id a character vector with names
+#' @param distance maximum distance in meters
+#'
+#' @return a weighted graph with edge weights equal to the geographical distance
+#' @export
+#'
+#' @examples
+#' data(pe13)
+#' graph.neighbour       <- geographical.neighbours(lon = pe13$lon, lat = pe13$lat, id = pe13$Name, distance = 500)
+#' graph.plot(graph.neighbour)
+
+geographical.neighbours  <- function(lon, lat, id = 1:length(lon), distance = 500){
+  x                         <- cbind(lon, lat)
+  geodist                   <- distm(x, x)
+  dimnames(geodist)         <- list(id, id)
   
+  geodist[is.na(geodist)]     <- 0
+  geodist[geodist > distance] <- 0
+  
+  graph.adjacency(geodist, mode = "undirected", weighted = TRUE)
 }
+

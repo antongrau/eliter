@@ -2,9 +2,14 @@
 
 
 
-#' Title
+#' Layout with Louvain clusters
 #'
 #' @param graph 
+#' @param decompose 
+#' @param n 
+#' @param remove.isolates 
+#' @param isolates.distance 
+#' @param isolates.cloud.size 
 #' @param ... 
 #'
 #' @return
@@ -14,8 +19,8 @@
 #' data(den)
 #' den.culture   <- has.tags(den, "Culture", result = "den")
 #' graph         <- elite.network(den.culture, result = "affil")
-#' plot(layout.cl(graph, decompose = TRUE))
-layout.cl                      <- function(graph, decompose = TRUE, n = 3, remove.isolates = FALSE, ...){
+#' plot(layout.cl(graph, decompose = TRUE, isolates.distance = 0.8, isolates.cloud.size = 1.5))
+layout.cl                      <- function(graph, decompose = TRUE, n = 3, remove.isolates = FALSE, isolates.distance = 0.2, isolates.cloud.size = 1.2, ...){
     graph.out                     <- as.undirected(graph, mode = "collapse")
     graph.out                     <- largest.component(graph.out)
     g                             <- graph.out
@@ -83,7 +88,7 @@ layout.cl                      <- function(graph, decompose = TRUE, n = 3, remov
     lay                            <- layout_with_fr(graph.plot, coords = lay, niter = 4, start.temp = 15)
     
     if (identical(remove.isolates, FALSE)) {
-      lay.isolates                   <- add_isolates(graph, graph.out, lay = lay)
+      lay.isolates                   <- add_isolates(graph, graph.out, lay = lay, distance = isolates.distance, cloud.size = isolates.cloud.size)
       lay.isolates[, 1]              <- lay.isolates[, 1] * -1
       lay                            <- lay.isolates
     }
@@ -91,7 +96,7 @@ layout.cl                      <- function(graph, decompose = TRUE, n = 3, remov
     lay
 }
 
-add_isolates                    <- function(graph, graph.out, lay, stor = 1.1, afstand = 0.2){
+add_isolates                    <- function(graph, graph.out, lay, cloud.size = 1.1, distance = 0.2){
   
   lay.stjernen                   <- lay
   lay.stjernen                   <- norm_coords(lay.stjernen)
@@ -101,7 +106,7 @@ add_isolates                    <- function(graph, graph.out, lay, stor = 1.1, a
   
   lay.all                        <- norm_coords(lay.all.o)
   lay.all[ind,]                  <- lay.stjernen
-  lay.all[ind == FALSE,]         <- (lay.all[ind == FALSE,] * stor) + afstand
+  lay.all[ind == FALSE,]         <- (lay.all[ind == FALSE,] * cloud.size) + distance
   
   lay.all
 }
