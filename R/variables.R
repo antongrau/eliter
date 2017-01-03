@@ -106,10 +106,10 @@ neighbors     <- function(x, graph){
 find.beskrivelse <- function(rel, soegeord, ignore.case=TRUE, ...){
   
   beskrivelse <- as.character(rel$DESCRIPTION)
-  if(ignore.case==TRUE) beskrivelse <- tolower(beskrivelse)
+  if (ignore.case == TRUE) beskrivelse <- tolower(beskrivelse)
   
-  grep.soeg  <- paste(soegeord, collapse="|")
-  grep.fund <- grep(grep.soeg, beskrivelse, ignore.case=ignore.case, ...)  
+  grep.soeg  <- paste(soegeord, collapse = "|")
+  grep.fund <- grep(grep.soeg, beskrivelse, ignore.case = ignore.case, ...)  
   # grep.fund <- grep(grep.soeg, beskrivelse, ignore.case=ignore.case)  
   navne.fund <- levels(as.factor(rel$NAME[grep.fund]))
   navne.ind  <- which(rel$NAME %in% navne.fund)
@@ -179,6 +179,11 @@ lastnames         <- function(x){
 #' @param x a numeric vector with 4 digit danish postal codes
 #' @return a data.frame with various factors
 #' @export
+#' @examples 
+#' data(corp13)
+#' post      <- extract.postal.codes(corp13$Adress) 
+#' regions   <- code.region(post)
+#' table(regions$Type.of.Area)
 
 code.region <- function(x){
   postnumre <- eliter:::postnumre[duplicated(eliter:::postnumre$POSTNR) == FALSE,]

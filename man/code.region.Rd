@@ -15,4 +15,10 @@ a data.frame with various factors
 \description{
 Categories from postal codes
 }
+\examples{
+data(corp13)
+post      <- extract.postal.codes(corp13$Adress) 
+regions   <- code.region(post)
+table(regions$Type.of.Area)
+}
 

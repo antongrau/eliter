@@ -49,7 +49,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __summary.den()__ [Alpha - slow and unsure about functionality]
 * __as.den()__: Convert a matrix into a den.class object. Coerce variable names into strict format. Assign class. [DONE]
 * __print.den()__: Summary of class den. nrows, n.name, n.affil, is.periode, names of other variables, 10 random entries. [Beta]
-* __plot.den()__: Plot some descriptive distributions of a den object
+* __plot.den()__: Plot some descriptive distributions of a den object [BETA]
 
 ### period
 * __as.period.den()__  
@@ -58,8 +58,8 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 
 
 ### Variables
-* __affil.attributes()__: Create a data.frame with attributes for each affiliation.  
-* __member.attributes()__: Create a data.frame with attributes for each member.
+* __affil.attributes()__: Create a data.frame with attributes for each affiliation. [Is this just duplicated?]  
+* __member.attributes()__: Create a data.frame with attributes for each member. [Is this just duplicated?]
 * __memberships()__: Number of memberships for each individual. [What is the use case?]
 * __members()___: Number of members. [What is the use case?]
 * __membership.vector()__: A vector with the names of all affiliation memberships. [DONE]
@@ -68,7 +68,7 @@ For exports we rely on svglite and cairo. This might give some issues on Windows
 * __name.id()___: Create a unique name id combination.
 * __code.gender()__  [DONE]
 * __firstnames()__ [DONE]
-* __code.region()__  
+* __code.region()__ [DONE]
 * __geographical.neighbours()__ [DONE]
 
 ### Tags and sectors
@@ -108,11 +108,12 @@ We lack quality controls - especially for empty Affiliations
 * __find.core()__: Identify the core with k-core decomposition. Returns either the core or a vector with the coreness score. [DONE]
 * __secondary.agents()__: Find secondary agents [DONE]
 * __vertex.communities()__: A function that returns all the different memberships of a vertex [BETA]
+* __louvain_cluster()__: A cluster analysis with the louvain algorithm on a betweenness decomposed network.
 * __level.of.power()__: Returns a categorical value for the level of power based on k-core decomposition. [DONE]
 
 ### Centrality
 * __reach()__[DONE]
-* __vertex.measures()__: Combine vertex.measures and vertex.measures.directed[DONE]
+* __vertex.measures()__: Combine vertex.measures and vertex.measures.directed [DONE]
 * __do.you.know()__: [DONE]
 * __sector.degree()__: A matrix approach to do.you.know
 
@@ -132,10 +133,7 @@ We lack quality controls - especially for empty Affiliations
 ### Themes
 * __standard.theme()__
 * __dark.theme()__
-* __code.gender()__  
-* __code.region()__  
-* __find.geoposition()__
-* __geographical.neighbours()__
+
 ### Simulation
 * __increase.memberships()__
 

@@ -138,13 +138,14 @@ print(kable(out, align = c("r", "c", "l", "r", "l", "l", "r")))
 #' 
 #'
 #' @examples
-#' 
+#' data(den)
+#' summary(as.den(den))
 summary.den         <- function(x, ...){
-  incidence         <- xtabs(~NAME + AFFILIATION, x, sparse = T) 
-  adj.ind           <- incidence %*% Matrix::t(incidence)
-  Matrix::diag(adj.ind)     <- 0
+  incidence         <- xtabs(~NAME + AFFILIATION, x, sparse = TRUE) 
+  adj.ind           <- Matrix::tcrossprod(incidence, incidence)
+  Matrix::diag(adj.ind) <- 0
   
-  adj.affil         <- Matrix::t(incidence) %*% incidence
+  adj.affil         <- Matrix::crossprod(incidence, incidence)
   Matrix::diag(adj.affil)   <- 0
   
   out.list          <- list()

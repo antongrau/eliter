@@ -232,36 +232,19 @@ NULL
 # pe13          <- ind
 # save(pe13, net.elite, file = "~/soc.elite/data/pe13.rda")
 
-###########################################################################
-# Nested
-# 
-# indlejrede           <- read.csv("~/My Dropbox/Elite/Dataindsamling/Indlejrede organisationer.csv",
-#                                  fileEncoding="UTF-8", as.is = TRUE, na.strings="")
-# indlejrede           <- indlejrede[is.na(indlejrede$Kill) == TRUE & is.na(indlejrede$MATCH)==FALSE,]
-# nested               <- indlejrede
-# colnames(nested)     <- c("X", "X.1", "Nested.org", "Nested.in", "Overlap", 
-#                           "Org.id.nested", "Org.id.nested.in", "Same.org", "Kill", 
-#                           "Totally.nested.in.less.than.12", "Nested.in.more.than.12", 
-#                           "MATCH")
-# nested.latin         <- sapply(nested, iconv, from = "UTF-8", to = "latin1", sub = "byte")
-# nested.utf           <- sapply(nested.latin, iconv, from = "latin1", to = "UTF-8")
-# View(nested.latin)
-# View(nested)
-# table(is.na(nested))
-# table(is.na(nested.latin))
-# ###############################################################################
-# # # Names.gender
-# load("~/My Dropbox/R/Elite/Navne/names_gender")
+##########################################################################
+# # Names.gender
+# load("raw_data/names_gender")
 # 
 # ###############################################################################
 # # # Postnumre
-# postnumre <- read.csv("~/My Dropbox/R/Elite/Data/postnumre.csv", sep = ";", fileEncoding = "UTF-8")
+# postnumre <- read.csv("raw_data/postnumre.csv", sep = ";", fileEncoding = "UTF-8")
 # 
-# # 
-# # 
-# save(nested, names.gender, postnumre, file = "~/soc.elite/R/sysdata.rda")
-# # 
-# ###############################################################################
-# # Firmaets mænd - Directors 2008
+# #
+# #
+# save(names.gender, postnumre, file = "R/sysdata.rda")
+#
+###############################################################################
+# Firmaets mænd - Directors 2008
 # directors08 <- read.csv("~/My Dropbox/Elite/Data/Firmaets Mænd 2008/Data_directors_2008.csv", sep = ",", fileEncoding = "UTF-8", dec = ",")
 # save(directors08, file = "~/soc.elite/data/directors08.rda")

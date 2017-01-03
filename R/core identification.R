@@ -288,6 +288,14 @@ vertex.communities <- function(graph, weight = 1/E(graph)$weight){
  cluster.frame
 }
 
+between_louvain_cluster <- function(graph, max.path = 2, estimate.min = 1){
+  
+  
+  
+}
+
+
+
 #' Levels of power
 #'
 #' @param x a numeric vector with coreness scores produced by \link{find.core}

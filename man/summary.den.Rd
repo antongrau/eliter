@@ -16,6 +16,7 @@ a list of markdown tables
 Summary statistics for den
 }
 \examples{
-
+data(den)
+summary(as.den(den))
 }
 
