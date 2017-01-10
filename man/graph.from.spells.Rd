@@ -4,10 +4,14 @@
 \alias{graph.from.spells}
 \title{Create an igraph object from position spells}
 \usage{
-graph.from.spells(den)
+graph.from.spells(den, diagonal = FALSE, minimum.duration = 1)
 }
 \arguments{
 \item{den}{a den class object}
+
+\item{diagonal}{if TRUE self ties, sometimes called loops, are included}
+
+\item{minimum.duration}{the minimum edge duration in number of days}
 }
 \value{
 an igraph object

@@ -23,12 +23,15 @@ by.period          <- function(den){
 #' PERSON_START and PERSON_END has to be Date objects, see \link{as.Date} and \link{lubridate}.
 #' 
 #' @param den a den class object
+#' @param diagonal if TRUE self ties, sometimes called loops, are included
+#' @param minimum.duration the minimum edge duration in number of days
 #'   
 #' @return an igraph object
 #' @export
 #' 
 #' @examples
-graph.from.spells  <- function(den){
+
+graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1){
   
   # Checks and quality
   if (is.den(den) == FALSE) stop("den is not a den.class object")
@@ -37,15 +40,13 @@ graph.from.spells  <- function(den){
   
   if (lubridate:::is.Date(den$"PERSON_START") == FALSE) stop("PERSON_START is not in Date format")
   if (lubridate:::is.Date(den$"PERSON_END") == FALSE) stop("PERSON_END is not in Date format")
-  
-  
   den              <- droplevels(den[complete.cases(den[, c("PERSON_START", "PERSON_END")]),])
   
-  spell.edges  <- function(x){
+  spell.edges           <- function(x, diagonal, minimum.duration){
     x.intervals                     <- interval(x$PERSON_START, x$PERSON_END)
     o                               <- outer(x.intervals, x.intervals, intersect)
-    o[upper.tri(o, diag = FALSE)]   <- interval(NA, NA)
-    dur                             <- which(o@.Data <= as.numeric(ddays(1)))  
+    o[upper.tri(o, diag = diagonal)]   <- interval(NA, NA)
+    dur                             <- which(o@.Data <= as.numeric(ddays(minimum.duration)))  
     o[dur]                          <- interval(NA, NA) 
     
     d              <- as.data.frame( split(1:length(o), ceiling(seq_along(o)/length(x.intervals))) )
@@ -64,10 +65,14 @@ graph.from.spells  <- function(den){
     m[, c("ego", "alter", "start", "end", "position_id")]
   }
   
+  # Graph creation
+  
   den             <- group_by(.data = den, AFFILIATION)
-  spells          <- do(.data = den, spell.edges(.))
+  spells          <- do(.data = den, spell.edges(., diagonal = diagonal, minimum.duration = minimum.duration))
   el              <- as.matrix(spells[, c("ego", "alter")])
-  graph           <- graph_from_edgelist(el)
+  graph           <- graph_from_edgelist(el, directed = FALSE)
+  
+  # Edge attributes 
   
   E(graph)$start <- as.character(spells$start)
   E(graph)$end   <- as.character(spells$end)
