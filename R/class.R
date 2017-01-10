@@ -23,6 +23,14 @@ as.den <- function(x){
   ob.var       <- c("NAME", "AFFILIATION")
   if (all(ob.var %in% colnames(x)) == FALSE) stop("Either NAME or AFFILIATION is missing")
 
+  # All individuals and all affiliations should have names
+  remove       <- c(NA, "", " ")
+  remove       <- unique(which(x$NAME %in% remove | x$AFFILIATION %in% remove))
+  if (length(remove) > 0) x   <- x[-remove, ]
+  cat("\n", "Positions with no NAME or AFFILIATION :", length(remove), "\n")
+  
+  # Check that there is no overlap between NAME and AFFILIATION
+  
   # Make sure there is a ROLE variable
   if (is.null(x$ROLE)) x$ROLE                    <- NA
 
@@ -36,7 +44,7 @@ as.den <- function(x){
   a                                              <- c("NAME", "AFFILIATION", "ROLE", "TAGS", "POSITION_ID")
   col.order                                      <- c(a, setdiff(colnames(x), a))
   x                                              <- x[, col.order]
-
+  
   # Name and affiliations as character
   x$NAME              <- as.character(x$NAME)
   x$AFFILIATION       <- as.character(x$AFFILIATION)
