@@ -124,7 +124,7 @@ eliteDB_list_tables <- function(conn){
 #' den.active <- den[is.na(den$ARCHIVED),]
 eliteDB_den    <- function(conn = NULL, user = NULL, pass = NULL) {
   if (is.null(conn)) {
-    conn <- eliteR::eliteDB_open(user, pass)
+    conn <- eliter::eliteDB_open(user, pass)
   }
   den <- DBI::dbGetQuery(conn, "SELECT\n    c.id, c.person_id, c.affiliation_id, c.role_id, c.description, c.created_date, c.archived_date, p.cvrid, a.name, a.type, a.cvr, a.sector, a.last_checked\n    FROM Connections c\n    LEFT JOIN Persons p\n    ON c.person_id=p.id\n    LEFT JOIN Affiliations a\n    ON c.affiliation_id=a.id")
   tags <- DBI::dbGetQuery(conn, "SELECT\n    t.affiliation_id, GROUP_CONCAT(tl.tag) AS tagnames\n    FROM Tags t\n    LEFT JOIN Taglist tl\n    ON t.tag_id=tl.id\n    GROUP BY t.affiliation_id")
@@ -172,7 +172,7 @@ eliteDB_cvr  <- function(conn = NULL, user = NULL, pass = NULL, db = "elitedb_bi
   
     
   if (is.null(conn)) {
-    conn <- eliteR::eliteDB_open(user, pass, db)
+    conn <- eliter::eliteDB_open(user, pass, db)
   }
   
   # Select positions
@@ -202,6 +202,7 @@ if (is.null(cvr) == FALSE) sql <- add.cvr.select(sql, cvr)
   # Unique names for duplicated names
   persons$alias      <- gsub("\\d", "", x = persons$alias) %>% stringr::str_trim()
   dup                <- duplicated(persons$alias) | duplicated(persons$alias, fromLast = TRUE)
+  persons$dup <- dup
   persons$alias[dup] <- paste(persons$alias[dup], persons$enhedsnummer[dup])
   
   den                <- merge(den, persons, by.x = "enhedsnummer", by.y = "enhedsnummer", all.x = TRUE)
