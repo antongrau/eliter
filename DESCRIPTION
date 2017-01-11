@@ -22,7 +22,8 @@ Depends:
     qlcMatrix,
     shiny,
     knitr,
-    scales
+    scales,
+    lubridate
 Imports:
     qlcMatrix,
     ggthemes

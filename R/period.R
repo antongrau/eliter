@@ -38,16 +38,17 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1){
   if (is.null(den$"PERSON_START")) stop("den has no PERSON_START column")
   if (is.null(den$"PERSON_END")) stop("den has no PERSON_END column")
   
-  if (lubridate:::is.Date(den$"PERSON_START") == FALSE) stop("PERSON_START is not in Date format")
-  if (lubridate:::is.Date(den$"PERSON_END") == FALSE) stop("PERSON_END is not in Date format")
-  den              <- droplevels(den[complete.cases(den[, c("PERSON_START", "PERSON_END")]),])
+  if (lubridate::is.Date(den$"PERSON_START") == FALSE) stop("PERSON_START is not in Date format")
+  if (lubridate::is.Date(den$"PERSON_END") == FALSE) stop("PERSON_END is not in Date format")
+
+    den              <- droplevels(den[complete.cases(den[, c("PERSON_START", "PERSON_END")]),])
   
   spell.edges           <- function(x, diagonal, minimum.duration){
     x.intervals                     <- interval(x$PERSON_START, x$PERSON_END)
-    o                               <- outer(x.intervals, x.intervals, intersect)
+    o                               <- outer(x.intervals, x.intervals, lubridate::intersect)
     o[upper.tri(o, diag = diagonal)]   <- interval(NA, NA)
-    dur                             <- which(o@.Data <= as.numeric(ddays(minimum.duration)))  
-    o[dur]                          <- interval(NA, NA) 
+    dur                             <- which(o@.Data <= as.numeric(lubridate::ddays(minimum.duration)))  
+    o[dur]                          <- lubridate::interval(NA, NA) 
     
     d              <- as.data.frame( split(1:length(o), ceiling(seq_along(o)/length(x.intervals))) )
     rownames(d)    <- colnames(d)
@@ -58,8 +59,8 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1){
     levels(m$position_id) <- x$POSITION_ID
     levels(m$ego)   <- x$NAME
     levels(m$alter) <- x$NAME
-    m$start         <- int_start(o)
-    m$end           <- int_end(o)
+    m$start         <- lubridate::int_start(o)
+    m$end           <- lubridate::int_end(o)
     
     m               <- m[complete.cases(m),]
     m[, c("ego", "alter", "start", "end", "position_id")]
