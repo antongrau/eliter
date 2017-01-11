@@ -126,14 +126,19 @@ eliteDB_den    <- function(conn = NULL, user = NULL, pass = NULL) {
   if (is.null(conn)) {
     conn <- eliter::eliteDB_open(user, pass)
   }
-  den <- DBI::dbGetQuery(conn, "SELECT\n    c.id, c.person_id, c.affiliation_id, c.role_id, c.description, c.created_date, c.archived_date, p.cvrid, a.name, a.type, a.cvr, a.sector, a.last_checked\n    FROM Connections c\n    LEFT JOIN Persons p\n    ON c.person_id=p.id\n    LEFT JOIN Affiliations a\n    ON c.affiliation_id=a.id")
-  tags <- DBI::dbGetQuery(conn, "SELECT\n    t.affiliation_id, GROUP_CONCAT(tl.tag) AS tagnames\n    FROM Tags t\n    LEFT JOIN Taglist tl\n    ON t.tag_id=tl.id\n    GROUP BY t.affiliation_id")
-  rolelist <- DBI::dbGetQuery(conn, "SELECT * FROM Rolelist")
-  persons <- DBI::dbGetQuery(conn, "SELECT p.id, p.alias FROM Persons p")
+  den           <- DBI::dbGetQuery(conn, "SELECT\n    c.id, c.person_id, c.affiliation_id, c.role_id, c.description, c.created_date, c.archived_date, p.cvrid, a.name, a.type, a.cvr, a.sector, a.last_checked\n    FROM Connections c\n    LEFT JOIN Persons p\n    ON c.person_id=p.id\n    LEFT JOIN Affiliations a\n    ON c.affiliation_id=a.id")
+  tags          <- DBI::dbGetQuery(conn, "SELECT\n    t.affiliation_id, GROUP_CONCAT(tl.tag) AS tagnames\n    FROM Tags t\n    LEFT JOIN Taglist tl\n    ON t.tag_id=tl.id\n    GROUP BY t.affiliation_id")
+  rolelist      <- DBI::dbGetQuery(conn, "SELECT * FROM Rolelist")
+  persons       <- DBI::dbGetQuery(conn, "SELECT p.id, p.alias FROM Persons p")
   persons$alias <- gsub("\\d", "", x = persons$alias) %>% stringr::str_trim()
-  dup <- duplicated(persons$alias) | duplicated(persons$alias, 
+  dup           <- duplicated(persons$alias) | duplicated(persons$alias, 
                                                 fromLast = TRUE)
   persons$alias[dup] <- paste(persons$alias[dup], persons$id[dup])
+  
+  tags$tagnames <- gsub(pattern = ",", replacement = ", ", tags$tagnames)
+  den$cvrid[den$cvrid == ""] <- NA
+  
+  
   den <- merge(den, tags, by = "affiliation_id", all.x = TRUE)
   den <- merge(den, persons, by.x = "person_id", by.y = "id", 
                all.x = TRUE)
@@ -141,11 +146,10 @@ eliteDB_den    <- function(conn = NULL, user = NULL, pass = NULL) {
                           ROLE = rolelist$name[match(den$role_id, rolelist$id)], 
                           TAGS = tagnames, SECTOR = sector, TYPE = type, DESCRIPTION = description, 
                           CREATED = lubridate::ymd_hms(created_date), ARCHIVED = lubridate::ymd_hms(archived_date), 
-                          LAST_CHECKED = lubridate::ymd_hms(last_checked), CVR_PERSON = as.integer(cvrid), 
+                          LAST_CHECKED = lubridate::ymd_hms(last_checked), CVR_PERSON = as.numeric(cvrid), 
                           CVR_AFFILIATION = cvr, PERSON_ID = person_id, AFFILIATION_ID = affiliation_id)
   as.den(den)
 }
-
 
 
 #' eliteDB_cvr

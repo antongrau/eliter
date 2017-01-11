@@ -26,9 +26,10 @@ as.den <- function(x){
   # All individuals and all affiliations should have names
   remove       <- c(NA, "", " ")
   remove       <- unique(which(x$NAME %in% remove | x$AFFILIATION %in% remove))
-  if (length(remove) > 0) x   <- x[-remove, ]
+  if (length(remove) > 0) {
+  x   <- x[-remove, ]
   cat("\n", "Positions with no NAME or AFFILIATION :", length(remove), "\n")
-  
+  }
   # Check that there is no overlap between NAME and AFFILIATION
   
   # Make sure there is a ROLE variable
