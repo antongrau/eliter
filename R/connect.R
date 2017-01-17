@@ -206,7 +206,6 @@ if (is.null(cvr) == FALSE) sql <- add.cvr.select(sql, cvr)
   # Unique names for duplicated names
   persons$alias      <- gsub("\\d", "", x = persons$alias) %>% stringr::str_trim()
   dup                <- duplicated(persons$alias) | duplicated(persons$alias, fromLast = TRUE)
-  persons$dup <- dup
   persons$alias[dup] <- paste(persons$alias[dup], persons$enhedsnummer[dup])
   
   den                <- merge(den, persons, by.x = "enhedsnummer", by.y = "enhedsnummer", all.x = TRUE)
