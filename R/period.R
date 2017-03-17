@@ -50,10 +50,10 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1){
     dur                             <- which(o@.Data <= as.numeric(lubridate::ddays(minimum.duration)))  
     o[dur]                          <- lubridate::interval(NA, NA) 
     
-    d              <- as.data.frame( split(1:length(o), ceiling(seq_along(o)/length(x.intervals))) )
+    d              <- as.data.frame(split(1:length(o), ceiling(seq_along(o)/length(x.intervals))), check.names = FALSE )
     rownames(d)    <- colnames(d)
     m              <- melt(name_rows(d), id.vars = ".rownames", variable.name = "ego")
-    m$alter        <- factor(m$.rownames)
+    m$alter        <- factor(as.numeric(m$.rownames))
     m$position_id  <- factor(m$.rownames)
     
     levels(m$position_id) <- x$POSITION_ID
