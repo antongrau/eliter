@@ -1,85 +1,67 @@
 # # Spell graph - prior connection
 # library(eliter)
-# load("~/Dropbox/GNA/R/cbs 100/data/graph.spell.clean.Rda")
-# load("~/Dropbox/GNA/R/cbs 100/data/den.clean.Rda")
-# 
-# 
-# prior.connection <- function(graph.spell){
-# graph.prior     <- simplify(graph.spell, remove.multiple = FALSE, remove.loops = TRUE)
-# graph.prior     <- delete.edges(graph.prior, which(count_multiple(graph.prior) == 1))
-# graph.prior
-# 
-# 
-# e <- E(graph.prior)[[from = "Olaf Hentze Rasmussen"]]
-# 
-# 
-# 
-# # a <- cbind(start = c(1, 1, 4,8,9,11,16,17,23), end = c(3, 6, 5, 10, 15, 12, 18, 21, 25))
-# # sequences <- a 
-# 
-# E(graph.prior)["Olaf Hentze Rasmussen", "Bent Hentzer"]
+# load("~/Dropbox/GNA/R/dynacore_data/graph.spell.clean.Rda")
+# load("~/Dropbox/GNA/R/dynacore_data/den.clean.Rda")
 # 
 # 
 # 
 # 
-# find.inactive.months <- function(sequences){
-# active.months      <- unique(unlist(apply(sequences, 1, function(x) seq(from = x[1], to = x[2]))))
-# all.months         <- min(sequences):max(sequences) 
-# inactive.months    <- setdiff(all.months, active.months)
-# inactive.months
-# }
+# prior        <- prior.connections(graph.spell)
 # 
+# # Length of break
+# break.length <- sapply(prior, length)
+# plot(table(break.length))
+# prior[which(break.length == 318)]
 # 
-# participants <- get.edgelist(graph.prior)
-# participants <- paste(participants[, 1], participants[, 2], sep = " %--% ")
+# # Share of edges with a prior break
+# graph.simple         <- simplify(graph.spell)
+# length(prior)/ecount(graph.simple)
 # 
-# ed           <- data_frame(start = E(graph.prior)$start, end = E(graph.prior)$end, participants = participants, id = E(graph.prior)$position_id)
+# # Is consecutive?
+# is.consecutive.break <- function(x) any(var(diff(x)) > 0)
+# cons.break           <- sapply(prior, is.consecutive.break)
 # 
+# # 
 # 
+# table(cons.break)
 # 
-# # The reference month
-# reference.month <- strptime("1900-01-01")
-# 
-# elapsed_months <- function(end_date, start_date) {
-#   ed <- as.POSIXlt(end_date)
-#   sd <- as.POSIXlt(start_date)
-#   12 * (ed$year - sd$year) + (ed$mon - sd$mon)
-# }
-# 
-# ed$start     <- elapsed_months(ed$start, reference.month)
-# ed$end       <- elapsed_months(ed$end, reference.month)
-# 
-# # Find the inactive months
-# out          <- by(data = ed[, 1:2], INDICES = ed$participants, find.inactive.months)
-# 
-# # Remove does without inactive months
-# pause.length <- sapply(out, length)
-# out          <- out[pause.length >= 12]
-# out$`Aksel Groth %--% Anne Lise Ulla`
-# 
-# 
+# rle(diff(x))
+# inverse.rle(x)
 # 
 # # Debug
 # out[pause.length == 334]
 # table(pause.length)
 # 
-# x <- c(1:5, 8)
 # 
-# # 
+# # Active in this year
+# active.period <- interval(start = "2016-01-01", end = "2016-12-31")
+# edge.interval <- interval(start = E(graph.spell)$start, end = E(graph.spell)$end)
+# active.edges  <- int_overlaps(edge.interval, active.period)
+# graph.active  <- delete.edges(graph.spell, which(active.edges == FALSE))
+# graph.now     <- delete.vertices(graph.spell, degree(graph.active) == 0)
 # 
-# var(diff(x)) > 0
-# 
-# 
-# 
-# 
-#   s <- cbind(e$end, e$start) 
-# 
-# find.inactive.months(s)
-# 
-# graph.prior
+# prior.now     <- prior.connections(graph.now)
+# graph.simple         <- simplify(graph.now)
+# length(prior)/ecount(graph.simple)
 # 
 # 
-# }
+# 
+# simplify(graph.active)
+# graph.active
+# 
+# V(graph.spell) %in% V(graph.active)
+# summary(graph.now)
+# summary(graph.spell)
+# summary(graph.active)
+# end          <- head_of(graph.active, 1:10)
+# 
+# graph.active[1:10,1:10]
+# 
+# count_multiple(graph.active)
+#
+
+
+
 # 
 # # library(Matrix)
 # # diag(m) <- 0

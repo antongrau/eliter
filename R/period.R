@@ -25,13 +25,14 @@ by.period          <- function(den){
 #' @param den a den class object
 #' @param diagonal if TRUE self ties, sometimes called loops, are included
 #' @param minimum.duration the minimum edge duration in number of days
+#' @param reference.month all dates are converted to the number of months since the reference month. This is to save costly conversions between character and date formats.
 #'   
 #' @return an igraph object
 #' @export
 #' 
 #' @examples
 
-graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1){
+graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1, reference.month = strptime("1900-01-01", format = "%Y-%m-%d")){
   
   # Checks and quality
   if (is.den(den) == FALSE) stop("den is not a den.class object")
@@ -73,10 +74,77 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1){
   el              <- as.matrix(spells[, c("ego", "alter")])
   graph           <- graph_from_edgelist(el, directed = FALSE)
   
-  # Edge attributes 
+  # Reference month
+  elapsed_months <- function(end_date, start_date) {
+    ed <- as.POSIXlt(end_date)
+    sd <- as.POSIXlt(start_date)
+    12 * (ed$year - sd$year) + (ed$mon - sd$mon)
+  }
   
-  E(graph)$start <- as.character(spells$start)
-  E(graph)$end   <- as.character(spells$end)
+  spells$start     <- elapsed_months(spells$start, reference.month)
+  spells$end       <- elapsed_months(spells$end, reference.month)
+  
+  # Edge attributes
+  E(graph)$start <- spells$start
+  E(graph)$end   <- spells$end
   E(graph)$position_id   <- as.character(spells$position_id)
+  
+  # Graph attributes
+  graph$reference.month <- reference.month
+  
   graph
+}
+
+
+#' Title
+#'
+#' @param graph.spell 
+#' @param minimum.gap 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+prior.connections    <- function(graph.spell, minimum.gap = 12){
+  
+  # Remove loops, but keep multiple edges
+  graph.prior          <- simplify(graph.spell, remove.multiple = FALSE, remove.loops = TRUE)
+  # Count multiples and remove non-multiple
+  graph.prior          <- delete.edges(graph.prior, which(count_multiple(graph.prior) == 1))
+  
+  find.inactive.months <- function(sequences){
+    active.months        <- unique(unlist(apply(sequences, 1, function(x) seq(from = x[1], to = x[2]))))
+    all.months           <- min(sequences):max(sequences)
+    inactive.months      <- setdiff(all.months, active.months)
+    inactive.months
+  }
+  
+  # Create edge list
+  participants <- get.edgelist(graph.prior)
+  participants <- paste(participants[, 1], participants[, 2], sep = " %--% ")
+  ed           <- data_frame(start = E(graph.prior)$start, end = E(graph.prior)$end, participants = participants, id = E(graph.prior)$position_id)
+  
+  # Set dates according to the reference month
+  
+  elapsed_months <- function(end_date, start_date) {
+    ed <- as.POSIXlt(end_date)
+    sd <- as.POSIXlt(start_date)
+    12 * (ed$year - sd$year) + (ed$mon - sd$mon)
+  }
+  
+  reference.month <- graph.spell$reference.month
+  
+  ed$start     <- elapsed_months(ed$start, reference.month)
+  ed$end       <- elapsed_months(ed$end, reference.month)
+  
+  # Find the inactive months
+  out          <- by(data = ed[, 1:2], INDICES = ed$participants, find.inactive.months)
+  
+  # Remove all edges without gaps or with too short gaps
+  pause.length <- sapply(out, length)
+  out          <- out[pause.length >= minimum.gap]
+  
+  # Out
+  out
 }

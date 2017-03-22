@@ -4,7 +4,8 @@
 \alias{graph.from.spells}
 \title{Create an igraph object from position spells}
 \usage{
-graph.from.spells(den, diagonal = FALSE, minimum.duration = 1)
+graph.from.spells(den, diagonal = FALSE, minimum.duration = 1,
+  reference.month = strptime("1900-01-01", format = "\%Y-\%m-\%d"))
 }
 \arguments{
 \item{den}{a den class object}
@@ -12,6 +13,8 @@ graph.from.spells(den, diagonal = FALSE, minimum.duration = 1)
 \item{diagonal}{if TRUE self ties, sometimes called loops, are included}
 
 \item{minimum.duration}{the minimum edge duration in number of days}
+
+\item{reference.month}{all dates are converted to the number of months since the reference month. This is to save costly conversions between character and date formats.}
 }
 \value{
 an igraph object
