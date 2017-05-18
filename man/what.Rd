@@ -21,4 +21,3 @@ A matrix with names and affiliation
 \description{
 Returns the list of members of the affiliations. Names are matched via grep.
 }
-

@@ -26,4 +26,3 @@ data(pe13)
 graph.neighbour       <- geographical.neighbours(lon = pe13$lon, lat = pe13$lat, id = pe13$Name, distance = 500)
 graph.plot(graph.neighbour)
 }
-

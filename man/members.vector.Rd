@@ -23,4 +23,3 @@ den.culture   <- has.tags(den, "Culture", result = "den")
 graph.culture <- elite.network(den.culture, result = "affil")
 members.vector(V(graph.culture)$name, den)
 }
-

@@ -17,4 +17,3 @@ a vector with descriptions where affiliations are seperated by "*"
 \description{
 A vector of descriptions for each individual
 }
-

@@ -20,4 +20,3 @@ data(den)
 priest.names   <- has.tags(den, "Churches", result = "name")
 table(code.gender(priest.names))
 }
-

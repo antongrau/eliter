@@ -28,4 +28,3 @@ p              <- p + scale_fill_manual(values = c("white", "black"), name = "Wo
 p + add_density(lay.health[women,], color = "darkred")
 p + add_density(lay.health[women == FALSE,], color = "darkred")
 }
-

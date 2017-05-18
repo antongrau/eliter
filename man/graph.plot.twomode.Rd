@@ -19,4 +19,3 @@ a ggplot2 plot
 \description{
 Twomode graphs
 }
-

@@ -22,4 +22,3 @@ sectors$Danish
 
 standard.sectors("English")
 }
-

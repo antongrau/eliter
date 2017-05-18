@@ -12,4 +12,3 @@ two.mode(den)
 \description{
 Create a two-mode network from an affiliation list
 }
-

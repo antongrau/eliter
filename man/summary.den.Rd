@@ -19,4 +19,3 @@ Summary statistics for den
 data(den)
 summary(as.den(den))
 }
-

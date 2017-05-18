@@ -24,4 +24,3 @@ has.tags(den, tags = c("Youth", "Children"))
 has.tags(den, tags = c("Youth", "Children"), res = "name")
 has.tags(den, tags = c("Youth", "Children"), res = "den")
 }
-

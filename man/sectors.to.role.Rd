@@ -32,4 +32,3 @@ den                 <- as.den(den)
 list.dens           <- tags.to.sectors(den, standard.sectors("Danish"))
 sectors.to.role(den, list.dens, mutually.exclusive = TRUE)
 }
-

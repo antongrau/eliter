@@ -19,4 +19,3 @@ Displays a matrix with all the tags in den.
 data(den)
 show.all.tags(den)
 }
-

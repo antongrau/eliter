@@ -243,7 +243,7 @@ sectors.to.role        <- function(den, list.dens, role = c("Chief executive", "
   }
   
   # Check for empty sectors
-  list.dens            <- list.dens[-which(sapply(list.dens, nrow) == 0)]
+  list.dens            <- list.dens[!sapply(list.dens, nrow) == 0]
   
   # Mutually exclusive
   ind.names                 <- lapply(list.dens, getElement, "NAME")

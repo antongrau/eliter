@@ -22,4 +22,3 @@ data(corp13)
 address            <- corp13$Adress
 plot(table(extract.postal.codes(address)))
 }
-

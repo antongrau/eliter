@@ -20,4 +20,3 @@ data(den)
 last          <- table(lastnames(den$NAME))
 head(sort(last, decreasing = TRUE), 20)
 }
-

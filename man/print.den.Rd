@@ -21,4 +21,3 @@ Essential statistics for the den-class. Mainly for interactive use, but results 
 data(den)
 as.den(den)
 }
-

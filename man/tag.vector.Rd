@@ -17,4 +17,3 @@ a vector of tags
 \description{
 Create a vector of tags on the basis of affiliation
 }
-

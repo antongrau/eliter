@@ -17,4 +17,3 @@ an igraph graph
 \description{
 A weighted two mode network
 }
-

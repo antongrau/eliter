@@ -14,4 +14,3 @@ prior.connections(graph.spell, minimum.gap = 12)
 \description{
 Title
 }
-

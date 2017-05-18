@@ -17,4 +17,3 @@ a matrix with a lot of descriptives
 \description{
 Descriptive statistics for each vertex
 }
-

@@ -20,4 +20,3 @@ data(den)
 den.culture   <- has.tags(den, "Culture", result = "den")
 adj.ind(den.culture)
 }
-

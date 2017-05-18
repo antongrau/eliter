@@ -4,7 +4,7 @@
 \alias{elite.network.ind}
 \title{Elite network for individuals}
 \usage{
-elite.network.ind(den, sigma = 14)
+elite.network.ind(den, sigma = 14, base = exp(1))
 }
 \arguments{
 \item{den}{an affiliation edge list, in the \link{as.den} format.}
@@ -22,4 +22,3 @@ data(den)
 den.health <- has.tags(den, "Health", result = "den")
 elite.network(den.health)
 }
-

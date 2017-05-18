@@ -32,4 +32,3 @@ sectors        <- standard.sectors("Danish")
 tags.to.sectors(den, sectors)
 tags.to.sectors(den, sectors, mutually.exclusive = TRUE, sector.membership = TRUE)
 }
-

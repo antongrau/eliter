@@ -17,4 +17,3 @@ a matrix with descriptives
 \description{
 Splits a network by a variable and returns matrix of descriptive values
 }
-

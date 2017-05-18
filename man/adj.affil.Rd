@@ -18,4 +18,3 @@ Create an adjacency matrix from an affilation list
 \seealso{
 \link{adj.ind}, \link{two.mode}
 }
-

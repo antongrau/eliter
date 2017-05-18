@@ -17,4 +17,3 @@ a data.frame with vertex coordinates
 \description{
 Convienience funcion for streamlining vertex.coordinates
 }
-

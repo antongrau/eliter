@@ -31,4 +31,3 @@ den.culture   <- has.tags(den, "Culture", result = "den")
 graph         <- elite.network(den.culture, result = "affil")
 plot(layout.cl(graph, decompose = TRUE, isolates.distance = 0.8, isolates.cloud.size = 1.5))
 }
-

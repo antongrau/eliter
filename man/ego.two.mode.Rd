@@ -26,4 +26,3 @@ a ggplot ego.plot
 \description{
 A report of the first neighborhood of an individiual
 }
-

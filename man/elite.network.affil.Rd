@@ -4,7 +4,7 @@
 \alias{elite.network.affil}
 \title{Elite network for affiliations}
 \usage{
-elite.network.affil(den = den, sigma = 14)
+elite.network.affil(den = den, sigma = 14, base = exp(1))
 }
 \arguments{
 \item{den}{an affiliation edge list in the \link{as.den} format.}
@@ -17,4 +17,3 @@ a elite network object
 \description{
 Construct a weighted elite network of affiliations
 }
-

@@ -83,4 +83,3 @@ p             <- graph.plot(net.org, layout = lay.org, vertex.size = V(net.org)$
 p             <- p + scale_fill_continuous(low = "white", high = "magenta") + scale_size_continuous(range = c(3, 10))
 p + scale_alpha_continuous(range = c(0,1))
 }
-

@@ -45,4 +45,3 @@ tail(sort(r))
 \seealso{
 ego, ego_size, degree, vertex.measures
 }
-

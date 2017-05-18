@@ -7,4 +7,3 @@
 \description{
 Variables like Sector.Børsen, Turnover are from 2010.
 }
-

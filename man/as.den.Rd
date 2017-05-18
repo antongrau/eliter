@@ -21,4 +21,3 @@ Common variables include: ROLE, TAGS, PERSON_ID, DESCRIPTION, GENDER
 data(den)
 as.den(den)
 }
-

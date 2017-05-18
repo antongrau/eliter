@@ -24,4 +24,3 @@ Makes a graph from a den object with time spells e.g. a row looks like this;
 NAME = Sam Samsen, AFFILIATION = Samson affiliates, PERSON_START = "2009-08-03", PERSON_END = "2009-12-02".
 PERSON_START and PERSON_END has to be Date objects, see \link{as.Date} and \link{lubridate}.
 }
-

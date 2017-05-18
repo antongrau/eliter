@@ -32,4 +32,3 @@ net.health    <- elite.network(den.health)
 measures      <- data.frame(degree = degree(net.health, normalized = TRUE), betweenness = betweenness(net.health, normalized = TRUE))
 line.plot(measures)
 }
-

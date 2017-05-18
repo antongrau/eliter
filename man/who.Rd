@@ -26,4 +26,3 @@ A matrix with names and affiliation
 \description{
 Returns the affiliation memberships of an individual, or all direct contacts. Names are matched with grep.
 }
-

@@ -15,4 +15,3 @@ a factor with 4 levels
 \description{
 Levels of power
 }
-

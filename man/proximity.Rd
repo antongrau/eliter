@@ -33,4 +33,3 @@ graph.health     <- elite.network(den.health)
 graph.health     <- betweenness.decomposition(graph.health)
 proximity(graph.health)
 }
-

@@ -25,4 +25,3 @@ rownames(mat)        <- as.character(pe13$Name)
 adj.mat              <- t(as.matrix(mat[1:20,]))
 tile.plot(adj.mat)
 }
-

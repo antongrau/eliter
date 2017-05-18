@@ -12,4 +12,3 @@ a ggplot2 plot
 \description{
 An ego network of individuals
 }
-

@@ -24,4 +24,3 @@ Hent et komplet den-objekt fra eliteDB
 den        <- eliteDB_den(user = user, pass = password)
 den.active <- den[is.na(den$ARCHIVED),]
 }
-

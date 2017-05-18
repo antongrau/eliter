@@ -25,4 +25,3 @@ den.health   <- has.tags(den, "Health", res = "relations")
 graph.health <- elite.network(den.health)
 largest.component(graph.health)
 }
-

@@ -39,4 +39,3 @@ do.you.know(graph, you, people, how.well = 2)
 \seealso{
 reach, vertex.measures, graph.strength, degree
 }
-

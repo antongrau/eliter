@@ -21,4 +21,3 @@ a affiliation edgelist
 \description{
 Find specifik search terms in all descriptions
 }
-

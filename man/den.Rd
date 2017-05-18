@@ -7,4 +7,3 @@
 \description{
 A affiliation network
 }
-

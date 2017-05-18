@@ -17,4 +17,3 @@ an edge list as a matrix with coordinates of the start and end vertices for each
 \description{
 Generates coordinates as a data.frame suitable for ggplot2's \link{geom_segment}. This function is not super efficient and should be upgraded.
 }
-

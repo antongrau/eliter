@@ -19,4 +19,3 @@ Få et overblik over tags i eliteDB. Funktionen returnerer en data.frame,
 conn <- eliteDB_open(user, pass)
 tags <- eliteDB_tag_rapport(conn)
 }
-

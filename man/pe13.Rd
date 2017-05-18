@@ -7,4 +7,3 @@
 \description{
 A propopographic dataset on the Danish power elite in 2013
 }
-

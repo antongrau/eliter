@@ -63,16 +63,16 @@ two.mode <- function(den){
 #' elite.network(den.pol)
 #' elite.network(den.pol, result = "affil")
 #' elite.network(den.pol, result = "two.mode")
-elite.network      <- function(den, result = c("ind", "affil", "two.mode"), sigma = 14){
+elite.network      <- function(den, result = c("ind", "affil", "two.mode"), sigma = 14, base = exp(1)){
   
   result.args      <- c("ind", "affil", "two.mode")
   
   if (match.arg(result, result.args) == "ind") {
-    graph          <- eliter:::elite.network.ind(den, sigma = sigma)
+    graph          <- eliter:::elite.network.ind(den, sigma = sigma, base = base)
   }
   
   if (match.arg(result, result.args) == "affil") {
-    graph          <- eliter:::elite.network.affil(den, sigma = sigma)
+    graph          <- eliter:::elite.network.affil(den, sigma = sigma, base = base)
   }
   
   if (match.arg(result, result.args) == "two.mode") {
@@ -93,7 +93,7 @@ elite.network      <- function(den, result = c("ind", "affil", "two.mode"), sigm
 #' den.health <- has.tags(den, "Health", result = "den")
 #' elite.network(den.health)
 
-elite.network.ind    <- function(den, sigma = 14){
+elite.network.ind    <- function(den, sigma = 14, base = exp(1)){
   
   # Incidence matrix
   incidence               <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
@@ -122,7 +122,7 @@ elite.network.ind    <- function(den, sigma = 14){
   
   # Weighting of strong ties
   over                            <- which(E(graph)$weight > 1)
-  E(graph)$weight[over]           <- log(E(graph)$weight[over]) + 1
+  E(graph)$weight[over]           <- log(E(graph)$weight[over], base = base) + 1
   E(graph)$weight                 <- 1/E(graph)$weight
   
   # Attributes
@@ -142,7 +142,7 @@ elite.network.ind    <- function(den, sigma = 14){
 #' @param sigma the number of members in an affiliation above which all affiliations are weighted down
 #' @return a elite network object
 
-elite.network.affil      <- function(den = den, sigma = 14){
+elite.network.affil      <- function(den = den, sigma = 14, base = exp(1)){
   
   incidence              <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
   
@@ -164,7 +164,7 @@ elite.network.affil      <- function(den = den, sigma = 14){
   V(graph)$weighted.members        <- Matrix::diag(adj.affil)
   
   over                             <- E(graph)$weight > 1
-  E(graph)$weight[over]            <- log(E(graph)$weight[over]) + 1
+  E(graph)$weight[over]            <- log(E(graph)$weight[over], base = base) + 1
   E(graph)$weight                  <- 1/E(graph)$weight
   graph
 }
@@ -343,4 +343,50 @@ ego.two.mode.affil <- function(name, den = den, text = "affil", member.of = pe13
   p <- graph.plot.twomode(net.two, layout = layout_with_fr(graph, grid = "nogrid"),  text = text, vertex.fill =  member.of.TF, vertex.size = degree(net.two), edge.color = "black", vertex.shape = type, edge.size = 0.45, text.background = text.background, ...)
   p <- p + scale_fill_manual(values = c("white", "black", "black"), guide = "none") + scale_shape_manual(values = c(21, -0x25C9, 23 ), guide = "none") + scale_alpha_continuous(range = c(0.08, 0.4), guide = "none") + scale_size_continuous(range = c(2, 4), guide = "none")
   p + ggtitle(name)
+}
+
+
+
+
+#' Create a reduced graph from a list of den objects
+#'
+#' Creates a reduced graph on the basis of odds-ratios. Note that if the den objects are not mutually exclusive it may influence the interpretation of the odds-ratio edges.
+#'
+#' @param list.dens a list of den objects, like those created by \link{tags.to.sectors}.
+#'
+#' @return an igraph object with additional attributes
+#' @export
+#'
+#' @examples
+
+reduced.sector.graph    <- function(list.dens){
+  sector.names          <- names(list.dens)
+  
+  edge.klynge           <- list()
+  for(i in 1:length(sector.names)) edge.klynge[[i]] <- data.frame(NAME = unique(list.dens[[i]]$NAME), AFFILIATION = sector.names[i])
+  edge.klynge           <- do.call("rbind", edge.klynge)
+  incidence             <- xtabs(~NAME + AFFILIATION, edge.klynge, sparse = TRUE)
+  adj                   <- Matrix::crossprod(incidence)
+  
+  r                     <- adj / diag(adj)
+  a                     <- adj
+  diag(a)               <- 0
+  network.size          <- sum(a)/2
+  
+  odds.mat              <- (a / network.size) * sum(1:ncol(adj)-1)
+  diag(odds.mat)        <- NA
+  adj.klynge.pp         <- odds.mat
+  
+  adj.klynge.pp         <- as.data.frame(as.matrix(adj.klynge.pp))
+  colnames(adj.klynge.pp) <- rownames(adj.klynge.pp)
+  
+  adj.klynge.pp[adj.klynge.pp < 1] <- 0
+  reduced.graph         <- graph.adjacency(as.matrix(adj.klynge.pp), diag = FALSE, weighted = TRUE)
+  
+  E(reduced.graph)$size          <- adj[reduced.graph[,] != 0]
+  reduced.graph$original.matrix  <- adj
+  reduced.graph$odds.matrix      <- odds.mat
+  
+  reduced.graph
+  
 }

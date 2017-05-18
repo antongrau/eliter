@@ -27,4 +27,3 @@ com             <- membership(walktrap.community(graph.culture))
 lay             <- layout.community(graph.culture, com, 2, cloud.size = 1.5)
 graph.plot(graph.culture, layout = lay, vertex.fill = as.factor(com)) + scale_fill_discrete(guide = "none")
 }
-

@@ -33,4 +33,3 @@ a ggplot2
 \description{
 Creates a sorted line plot
 }
-

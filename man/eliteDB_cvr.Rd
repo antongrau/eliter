@@ -29,4 +29,3 @@ den        <- eliteDB_cvr(user = user, pass = password, cvr = c(10014107, 100135
 den        <- eliteDB_cvr(user = user, pass = password, cvr = c(10014107, 10013569), ownership = TRUE)
 den        <- eliteDB_cvr(user = user, pass = password, cvr = c(10014107, 10013569), employees = TRUE)
 }
-

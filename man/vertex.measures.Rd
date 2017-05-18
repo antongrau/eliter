@@ -23,4 +23,3 @@ reach, betweenness and Burts constraint. This function is useful when you want t
 data(pe13)
 vertex.measures(net.elite)
 }
-

@@ -21,4 +21,3 @@ post      <- extract.postal.codes(corp13$Adress)
 regions   <- code.region(post)
 table(regions$Type.of.Area)
 }
-

@@ -26,4 +26,3 @@ sp.health     <- shortest.paths(graph.health)
 core.health   <- find.core(sp.health)
 table(core.health)
 }
-

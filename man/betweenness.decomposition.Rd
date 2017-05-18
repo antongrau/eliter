@@ -26,4 +26,3 @@ If you choose a relatively high minimum betweenness estimate then it can serve a
 data(pe13)
 betweenness.decomposition(net.elite)
 }
-

@@ -24,4 +24,3 @@ eliteDB_close(conn)
     \code{\link{eliteDB_close}} 
     \code{\link{eliteDB_read_table}}
 }
-

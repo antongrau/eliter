@@ -12,4 +12,3 @@ is.den(x)
 \description{
 Check if it is a den class object
 }
-

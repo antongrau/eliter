@@ -18,4 +18,3 @@ sector.connections(graph, you = V(graph)$name, sectors, how.well = 2)
 \description{
 Title
 }
-

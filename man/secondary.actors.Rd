@@ -24,4 +24,3 @@ Consider betweenness decomposition as it is a more general solution to the same 
 example(find.core)
 secondary.actors(core.health, den.health)
 }
-

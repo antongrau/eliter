@@ -26,4 +26,3 @@ vc              <- vertex.communities(graph.corp)
 head(vc)
 table(table(vc$"Meta louvain"))
 }
-

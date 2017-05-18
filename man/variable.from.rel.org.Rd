@@ -19,4 +19,3 @@ a character vector
 \description{
 Create an organisation variable from relations matrix
 }
-
