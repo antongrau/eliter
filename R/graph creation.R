@@ -368,7 +368,7 @@ reduced.sector.graph    <- function(list.dens){
   incidence             <- xtabs(~NAME + AFFILIATION, edge.klynge, sparse = TRUE)
   adj                   <- Matrix::crossprod(incidence)
   
-  r                     <- adj / diag(adj)
+  r                     <- adj / Matrix::diag(adj)
   a                     <- adj
   diag(a)               <- 0
   network.size          <- sum(a)/2
@@ -383,7 +383,7 @@ reduced.sector.graph    <- function(list.dens){
   adj.klynge.pp[adj.klynge.pp < 1] <- 0
   reduced.graph         <- graph.adjacency(as.matrix(adj.klynge.pp), diag = FALSE, weighted = TRUE)
   
-  E(reduced.graph)$size          <- adj[reduced.graph[,] != 0]
+  E(reduced.graph)$size          <- suppressMessages(adj[reduced.graph[,] != 0])
   reduced.graph$original.matrix  <- adj
   reduced.graph$odds.matrix      <- odds.mat
   

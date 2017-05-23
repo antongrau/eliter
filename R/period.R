@@ -148,3 +148,34 @@ prior.connections    <- function(graph.spell, minimum.gap = 12){
   # Out
   out
 }
+
+#' Title
+#'
+#' @param end_date 
+#' @param start_date 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+elapsed_months <- function(end_date, start_date) {
+  ed <- as.POSIXlt(end_date)
+  sd <- as.POSIXlt(start_date)
+  12 * (ed$year - sd$year) + (ed$mon - sd$mon)
+}
+
+#' Title
+#'
+#' @param spell.graph 
+#' @param period 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+period.graph <- function(spell.graph, start, end){
+  del        <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
+  g          <- delete.edges(spell.graph, del)
+  simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb = "ignore")
+}
