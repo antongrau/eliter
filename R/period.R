@@ -133,14 +133,14 @@ prior.connections    <- function(graph.spell, minimum.gap = 12){
     12 * (ed$year - sd$year) + (ed$mon - sd$mon)
   }
   
-  reference.month <- graph.spell$reference.month
-  
-  ed$start     <- elapsed_months(ed$start, reference.month)
-  ed$end       <- elapsed_months(ed$end, reference.month)
-  
-  # Find the inactive months
+  # Her har jeg lidt hurtigt smidt de her linjer ud, men output ser ok ud.
+  # reference.month <- graph.spell$reference.month
+  # ed$start     <- elapsed_months(ed$start, reference.month)
+  # ed$end       <- elapsed_months(ed$end, reference.month)
+  # 
+  # # Find the inactive months
   out          <- by(data = ed[, 1:2], INDICES = ed$participants, find.inactive.months)
-  
+  # 
   # Remove all edges without gaps or with too short gaps
   pause.length <- sapply(out, length)
   out          <- out[pause.length >= minimum.gap]
