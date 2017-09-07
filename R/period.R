@@ -179,3 +179,78 @@ period.graph <- function(spell.graph, start, end){
   g          <- delete.edges(spell.graph, del)
   simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb = "ignore")
 }
+
+
+weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance.weight = distance.weight, decay = decay){
+  
+  del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
+  g            <- delete.edges(spell.graph, del)
+  
+  period       <- start:end
+  adj.cum      <- get.adjacency(period.graph(g, start = period[1], end = period[1]))
+  pb           <- txtProgressBar(min = 2, max = length(period), style = 3)
+  for (i in 2:length(period)) {
+    t            <- period[i]
+    adj.t        <- get.adjacency(period.graph(g, start = t, end = t))
+    adj.cum      <- adj.cum + adj.t
+    sv.cum       <- as(adj.cum, Class = "sparseVector")
+    sv.t         <- as(adj.t, Class = "sparseVector")
+    set          <- sv.cum@i %in% sv.t@i
+    sv.cum@x[!set]   <- decay(sv.cum@x[!set])
+    adj.cum@x        <- sv.cum@x
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+  
+  if(identical(to.distance, TRUE))  adj.cum@x <- distance.weight(adj.cum@x) 
+  
+  graph_from_adjacency_matrix(adj.cum, mode = "undirected", weighted = TRUE)
+}
+
+decay <- function(value){
+  
+  value[value >= 180] <- 179.9
+  
+  xfun <- function(y, L, k) {(y - 60) - log(L / y - 1) / k}
+  b    <- xfun(value, 180, -0.05)
+  
+  yfun <- function(x, L, k, x0) {L / (1 + exp(-k * (x - x0)))}
+  yfun(b + 1, 180, -0.05, value - 60)
+}
+
+distance.weight <- function(value){
+  x <- log(value, base = 10)
+  x[x < 0]    <- 0
+  x           <- 1/x
+  x[x == Inf] <- 0
+  x
+}
+
+weighted.adjacency.list <- function(spell.graph, start, end){
+  
+  del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
+  g            <- delete.edges(spell.graph, del)
+  
+  period       <- start:end
+  adj.cum      <- get.adjacency(period.graph(g, start = period[1], end = period[1]))
+  pb           <- txtProgressBar(min = 2, max = length(period), style = 3)
+  
+  adj.list       <- list()
+  adj.list[[1]]  <- adj.cum
+  
+  for (i in 2:length(period)) {
+    t            <- period[i]
+    adj.t        <- get.adjacency(period.graph(g, start = t, end = t))
+    adj.cum      <- adj.cum + adj.t
+    sv.cum       <- as(adj.cum, Class = "sparseVector")
+    sv.t         <- as(adj.t, Class = "sparseVector")
+    set          <- sv.cum@i %in% sv.t@i
+    sv.cum@x[!set]   <- decay(sv.cum@x[!set])
+    adj.cum@x        <- sv.cum@x
+    adj.list[[i]]    <- adj.cum
+    setTxtProgressBar(pb, i)
+  }
+  close(pb)
+  
+  adj.list
+}

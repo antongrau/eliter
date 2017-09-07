@@ -311,3 +311,62 @@ levels.of.power <- function(x){
   var[x < 1/3 * max(x)]                          <- "4. Lower levels of Power"
   as.factor(var)
 }
+
+
+
+
+#' K-shell decomposition
+#'
+#' @param graph a graph from igraph
+#' @param start.level the decomposition process starts at this level or minimum degree
+#' @param verbose if TRUE shows the progress
+#'
+#' @return a numeric vector
+#' @export
+#'
+#' @examples
+k.shell   <- function(graph, start.level = 0, verbose = FALSE){
+  
+  E(graph)$weight <- 1/E(graph)$weight
+  E(graph)$weight <- E(graph)$weight / mean(E(graph)$weight)
+  norm            <- E(graph)$weight / min(E(graph)$weight)
+  rnorm           <- round(norm, digits = 0)
+  E(graph)$weight <- rnorm
+  
+  adj             <- get.adjacency(graph, attr = "weight")
+  
+  level.down     <- function(x, level){
+    g            <- x
+    #gs           <- graph.strength(g)
+    gs           <- rowSums(g)
+    
+    while (any(gs <= level)){
+      delete      <- which(gs <= level)
+      g            <- g[-delete, -delete]
+      gs           <- rowSums(g)  
+    }
+    setdiff(rownames(x), rownames(g))
+  }
+  
+  g               <- adj
+  k.score         <- 0
+  k.vector        <- rep(Inf, vcount(graph)) 
+  gs              <- rowSums(adj)
+  minimum.degree  <- start.level
+  
+  while (k.score <= minimum.degree & nrow(g) != 0) {
+    #while (vcount(g) > 0){
+    candidate.names <- level.down(g, level = minimum.degree)
+    candidates      <- which(V(graph)$name %in% candidate.names)
+    k.vector[candidates] <- k.score
+    k.score         <- k.score + 1
+    delete          <- which(rownames(g) %in% candidate.names)
+    g               <- g[-delete, -delete]
+    if (nrow(g) == 0) break
+    gs              <- rowSums(g)
+    minimum.degree  <- min(gs)
+    if (identical(verbose, TRUE)) cat("Minimum degree: ", minimum.degree, "Removed: ", length(candidate.names), "Remain: ", nrow(g), "\n")
+  }
+  
+  k.vector + start.level
+}

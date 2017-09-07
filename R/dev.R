@@ -1,25 +1,25 @@
-# # Spell graph - Weighted network
-# library(eliter)
-# #load("~/Dropbox/GNA/R/dynacore_data/graph.spell.clean.Rda")
-# load("~/Dropbox/GNA/R/dynacore_data/den.clean.Rda")
-# # match <- read.csv("~/Dropbox/GNA/Til DST/match_cvr.csv", sep = ",")
-# #
-# # match$nchar <- nchar(match$ENHEDSNUMMER)
-# #
-# # View(match[ year(match$PERSON_END) == 2016 & match$nchar == 10,])
-# # set <- match[ year(match$PERSON_END) == 2016 & match$nchar == 10,]
-# # table(set$PERSON_KOMMUNE)
-# #
-# # View(set)
-# # den.sample <- as.den(den.clean[order(den.clean$NAME),][1:10000,])
-# 
-# # den.sample  <- as.den(den.clean[,])
-# #
-# 
-# # spell.graph <- graph.from.spells(as.den(den.clean))
-# # save(spell.graph, file = "~/Desktop/spell.Rda")
+# Spell graph - Weighted network
+#library(eliter)
+#load("~/Dropbox/GNA/R/dynacore_data/graph.spell.clean.Rda")
+#load("~/Dropbox/GNA/R/dynacore_data/den.clean.Rda")
+# match <- read.csv("~/Dropbox/GNA/Til DST/match_cvr.csv", sep = ",")
+#
+# match$nchar <- nchar(match$ENHEDSNUMMER)
+#
+# View(match[ year(match$PERSON_END) == 2016 & match$nchar == 10,])
+# set <- match[ year(match$PERSON_END) == 2016 & match$nchar == 10,]
+# table(set$PERSON_KOMMUNE)
+#
+# View(set)
+# den.sample <- as.den(den.clean[order(den.clean$NAME),][1:10000,])
+
+# den.sample  <- as.den(den.clean[,])
+#
+
+# spell.graph <- graph.from.spells(as.den(den.clean))
+# save(spell.graph, file = "~/Desktop/spell.Rda")
 # load("~/Desktop/spell.Rda")
-# 
+# spell.graph <- 
 # start <- 1391 - 120
 # end   <- 1391
 # max(E(spell.graph)$start)
@@ -28,9 +28,22 @@
 # ref %m+% months(start)
 # ref %m+% months(end)
 # 
+# samp         <- sample(1:vcount(spell.graph), size = vcount(spell.graph)*0.9)
+# gs            <- delete.vertices(spell.graph, v =  samp)
+# 
+# g <- weighted.graph(gs, start, end, to.distance = F)
+# summary(E(g)$weight)
+# 
+# table(E(g)$weight <= 1)
+
+##############################################################
+# OLD
+##############################################################
 # weighted.graph <- function(spell.graph, start, end){
 # 
-#   decay        <- function(x) x * 0.95
+#   decay           <- function(x) x * 0.95
+#   #distance.weight <- 
+#   
 # 
 #   del        <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
 #   g          <- delete.edges(spell.graph, del)
@@ -142,7 +155,7 @@
 # # #
 # # #
 # samp         <- sample(1:vcount(spell.graph), size = vcount(spell.graph)*0.8)
-# graph.spell  <- delete.vertices(spell.graph, v =  samp) 
+# graph.spell  <- delete.vertices(spell.graph, v =  samp)
 # prior        <- prior.connections(graph.spell)
 # 
 # # Length of break
