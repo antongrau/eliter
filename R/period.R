@@ -181,6 +181,19 @@ period.graph <- function(spell.graph, start, end){
 }
 
 
+#' Title
+#'
+#' @param spell.graph 
+#' @param start 
+#' @param end 
+#' @param to.distance 
+#' @param distance.weight 
+#' @param decay 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance.weight = distance.weight, decay = decay){
   
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
@@ -207,6 +220,14 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
   graph_from_adjacency_matrix(adj.cum, mode = "undirected", weighted = TRUE)
 }
 
+#' Title
+#'
+#' @param value 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 decay <- function(value){
   
   value[value >= 180] <- 179.9
@@ -218,6 +239,14 @@ decay <- function(value){
   yfun(b + 1, 180, -0.05, value - 60)
 }
 
+#' Title
+#'
+#' @param value 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 distance.weight <- function(value){
   x <- log(value, base = 10)
   x[x < 0]    <- 0
@@ -226,7 +255,21 @@ distance.weight <- function(value){
   x
 }
 
-weighted.adjacency.list <- function(spell.graph, start, end){
+#' Create a list af weighted adjacency matrices
+#' 
+#' A more efficient way of creating time series of \link{weighted.graph}
+#'
+#' @param spell.graph a spell.graph
+#' @param start 
+#' @param end 
+#' @param to.distance if TRUE weights are recalculated with \link{distance.weight}, otherwise weighted months
+#'
+#' @return
+#' @export
+#'
+#' @examples
+
+weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE){
   
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g            <- delete.edges(spell.graph, del)
@@ -252,5 +295,7 @@ weighted.adjacency.list <- function(spell.graph, start, end){
   }
   close(pb)
   
+  if (identical(to.distance, TRUE))  adj.list <- llply(adj.list, function(x){ x@x <- distance.weight(x@x)
+                                                                         x})
   adj.list
 }
