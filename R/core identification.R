@@ -333,12 +333,12 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   rnorm           <- round(norm, digits = 0)
   E(graph)$weight <- rnorm
   
-  adj             <- get.adjacency(graph, attr = "weight")
+  adj             <- get.adjacency(graph, attr = "weight", sparse = TRUE)
   
   level.down     <- function(x, level){
     g            <- x
     #gs           <- graph.strength(g)
-    gs           <- rowSums(g)
+    gs           <- Matrix::rowSums(g)
     
     while (any(gs <= level)){
       delete      <- which(gs <= level)
@@ -351,7 +351,7 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   g               <- adj
   k.score         <- 0
   k.vector        <- rep(Inf, vcount(graph)) 
-  gs              <- rowSums(adj)
+  gs              <- Matrix::rowSums(adj)
   minimum.degree  <- start.level
   
   while (k.score <= minimum.degree & nrow(g) != 0) {
@@ -363,7 +363,7 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
     delete          <- which(rownames(g) %in% candidate.names)
     g               <- g[-delete, -delete]
     if (nrow(g) == 0) break
-    gs              <- rowSums(g)
+    gs              <- Matrix::rowSums(g)
     minimum.degree  <- min(gs)
     if (identical(verbose, TRUE)) cat("Minimum degree: ", minimum.degree, "Removed: ", length(candidate.names), "Remain: ", nrow(g), "\n")
   }
