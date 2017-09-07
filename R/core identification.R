@@ -343,7 +343,7 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
     while (any(gs <= level)){
       delete      <- which(gs <= level)
       g            <- g[-delete, -delete]
-      gs           <- rowSums(g)  
+      gs           <- Matrix::rowSums(g)  
     }
     setdiff(rownames(x), rownames(g))
   }
