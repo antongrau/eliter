@@ -327,11 +327,21 @@ levels.of.power <- function(x){
 #' @examples
 k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   
-  E(graph)$weight <- 1/E(graph)$weight
-  E(graph)$weight <- E(graph)$weight / mean(E(graph)$weight)
-  norm            <- E(graph)$weight / min(E(graph)$weight)
-  rnorm           <- round(norm, digits = 0)
-  E(graph)$weight <- rnorm
+  # E(graph)$weight <- 1/E(graph)$weight
+  # E(graph)$weight <- E(graph)$weight / mean(E(graph)$weight)
+  # norm            <- E(graph)$weight / min(E(graph)$weight)
+  # rnorm           <- round(norm, digits = 0)
+  # E(graph)$weight <- rnorm
+  
+  rnormalize      <- function(x){
+    x               <- 1/x
+    x               <- x/mean(x)
+    x               <- x/min(x)
+    x               <- round(x, digits = 0)
+    x
+  }
+  
+  E(graph)$weight <- rnormalize(E(graph)$weight)
   
   adj             <- get.adjacency(graph, attr = "weight", sparse = TRUE)
   

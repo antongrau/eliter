@@ -247,11 +247,12 @@ decay <- function(value){
 #' @export
 #'
 #' @examples
-distance.weight <- function(value){
-  x <- log(value, base = 10)
-  x[x < 0]    <- 0
-  x           <- 1/x
-  x[x == Inf] <- 0
+distance.weight <- function(value, max.cut = 0.75){
+  x <- log(value, base = 12)
+  x[x < 0]     <- 0
+  x            <- 1/x
+  x[x == Inf]  <- 0
+  x[x <= max.cut] <- max.cut
   x
 }
 
