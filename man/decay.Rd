@@ -4,7 +4,7 @@
 \alias{decay}
 \title{Title}
 \usage{
-decay(value)
+decay(value, max.months = 60)
 }
 \arguments{
 \item{value}{}
