@@ -228,9 +228,9 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
 #' @export
 #'
 #' @examples
-decay <- function(value){
+decay <- function(value, max.months = 60){
   
-  value[value >= 180] <- 179.9
+  value[value >= max.months] <- max.months - 0.1
   
   xfun <- function(y, L, k) {(y - 60) - log(L / y - 1) / k}
   b    <- xfun(value, 180, -0.05)
