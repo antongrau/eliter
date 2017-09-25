@@ -2,9 +2,9 @@
 #library(eliter)
 #load("~/Dropbox/GNA/R/dynacore_data/graph.spell.clean.Rda")
 #load("~/Dropbox/GNA/R/dynacore_data/den.clean.Rda")
-# match <- read.csv("~/Dropbox/GNA/Til DST/match_cvr.csv", sep = ",")
-#
-# match$nchar <- nchar(match$ENHEDSNUMMER)
+#match <- read.csv("~/Dropbox/GNA/Til DST/match_cvr.csv", sep = ",")
+
+#match$nchar <- nchar(match$ENHEDSNUMMER)
 #
 # View(match[ year(match$PERSON_END) == 2016 & match$nchar == 10,])
 # set <- match[ year(match$PERSON_END) == 2016 & match$nchar == 10,]

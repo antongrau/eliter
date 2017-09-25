@@ -67,27 +67,29 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1, refe
     m[, c("ego", "alter", "start", "end", "position_id")]
   }
   
-  # Graph creation
-  
+  # Spells
   den             <- group_by(.data = den, AFFILIATION)
   spells          <- do(.data = den, spell.edges(., diagonal = diagonal, minimum.duration = minimum.duration))
-  el              <- as.matrix(spells[, c("ego", "alter")])
-  graph           <- graph_from_edgelist(el, directed = FALSE)
   
-  # Reference month
+  # Edge attributes
   elapsed_months <- function(end_date, start_date) {
     ed <- as.POSIXlt(end_date)
     sd <- as.POSIXlt(start_date)
     12 * (ed$year - sd$year) + (ed$mon - sd$mon)
   }
   
-  spells$start     <- elapsed_months(spells$start, reference.month)
-  spells$end       <- elapsed_months(spells$end, reference.month)
+  spells$start        <- elapsed_months(spells$start, reference.month)
+  spells$end          <- elapsed_months(spells$end, reference.month)
+  spells$position_id  <- as.character(spells$position_id) 
   
-  # Edge attributes
-  E(graph)$start <- spells$start
-  E(graph)$end   <- spells$end
-  E(graph)$position_id   <- as.character(spells$position_id)
+  # Vertex attributes
+  end.ego             <- spells %>% group_by(., ego) %>% summarize(end.ego = max(end))
+  end.alter           <- spells %>% group_by(., alter) %>%  summarize(end.alter = max(end))
+  vm                  <- full_join(end.ego, end.alter, c("ego" = "alter")) %>% group_by(ego) %>% summarize(retire = pmax(end.ego, end.alter))
+  
+  # Graph creation
+  spells          <- spells %>% select(ego, alter, everything())
+  graph           <- graph_from_data_frame(spells, directed = FALSE, vertices = vm)
   
   # Graph attributes
   graph$reference.month <- reference.month
@@ -215,9 +217,17 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
   }
   close(pb)
   
-  if(identical(to.distance, TRUE))  adj.cum@x <- distance.weight(adj.cum@x) 
+  if (identical(to.distance, TRUE))  adj.cum@x <- distance.weight(adj.cum@x) 
   
-  graph_from_adjacency_matrix(adj.cum, mode = "undirected", weighted = TRUE)
+  
+  
+  graph         <- graph_from_adjacency_matrix(adj.cum, mode = "undirected", weighted = TRUE)
+
+  # Remove the retired
+  retired                 <- V(spell.graph)$retire < end
+  if (any(retired)) graph <-  delete.edges(graph, E(graph)[.inc(which(retired))])
+  
+  graph
 }
 
 #' Title
@@ -284,13 +294,21 @@ weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE)
   
   for (i in 2:length(period)) {
     t            <- period[i]
-    adj.t        <- get.adjacency(period.graph(g, start = t, end = t))
+    gp           <- period.graph(g, start = t, end = t)
+    adj.t        <- get.adjacency(gp)
     adj.cum      <- adj.cum + adj.t
     sv.cum       <- as(adj.cum, Class = "sparseVector")
     sv.t         <- as(adj.t, Class = "sparseVector")
     set          <- sv.cum@i %in% sv.t@i
     sv.cum@x[!set]   <- decay(sv.cum@x[!set])
     adj.cum@x        <- sv.cum@x
+    
+    # Remove the retired
+    retired      <- V(gp)$retire == (t - 1) # Did they retire the previous month?
+    adj.cum[retired, ] <- adj.cum[retired,] * 0
+    adj.cum[, retired] <- adj.cum[, retired] * 0
+    adj.cum      <- drop0(adj.cum, tol = 0.5) # Here we reduce the data-size - and drop all weak ties
+    
     adj.list[[i]]    <- adj.cum
     setTxtProgressBar(pb, i)
   }
