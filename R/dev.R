@@ -11,7 +11,7 @@
 # table(set$PERSON_KOMMUNE)
 #
 # View(set)
-# den.sample <- as.den(den.clean[order(den.clean$NAME),][1:10000,])
+# den.sample <- as.den(den.clean[order(den.clean$NAME),][1:100000,])
 
 # den.sample  <- as.den(den.clean[,])
 #

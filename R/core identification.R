@@ -362,7 +362,11 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   k.score         <- 0
   k.vector        <- rep(Inf, vcount(graph)) 
   gs              <- Matrix::rowSums(adj)
+  
+  if (start.level < min(gs)) start.level <- min(gs)
+  
   minimum.degree  <- start.level
+  
   
   while (k.score <= minimum.degree & nrow(g) != 0) {
     #while (vcount(g) > 0){
