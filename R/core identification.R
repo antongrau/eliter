@@ -350,7 +350,7 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
     #gs           <- graph.strength(g)
     gs           <- Matrix::rowSums(g)
     
-    while (any(gs <= level)){
+    while (any(gs <= level) & length(gs) > level) {
       delete      <- which(gs <= level)
       g            <- g[-delete, -delete]
       gs           <- Matrix::rowSums(g)  
