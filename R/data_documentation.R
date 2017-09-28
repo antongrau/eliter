@@ -237,8 +237,12 @@ NULL
 # 
 # add_layout_(graph = net.elite, lay[,-1])
 # 
-# net.elite$layout <- cbind(x = lay[, 2], y = lay[, 3])
+#  
+# V(net.elite)$layout.x <- lay[,2]
+# V(net.elite)$layout.y <- lay[,3]
 # 
+# net.elite$layout <- cbind(x = lay[, 2], y = lay[, 3])
+#  
 # save(pe13, net.elite, file = "~/eliter/data/pe13.rda")
 
 ##########################################################################
