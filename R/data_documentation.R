@@ -197,27 +197,27 @@ NULL
 # 
 # # Order of levels in Sector_cat
 # oo              <- c(
-#   "Business: Top 200", 
+#   "Business: Top 200",
 #   "Business: Multiposition",
 #   "Business: Medium-small",
-#   "Business: Investment and Pensions", 
-#   
+#   "Business: Investment and Pensions",
+# 
 #   "Interest groups: Employers and business",
 #   "Interest groups: Unions",
-#   
+# 
 #   "Interest groups: Farming",
 #   "Interest groups: Consumers",
-#   
-#   "State and politics: Royal court", 
+# 
+#   "State and politics: Royal court",
 #   "State and politics: Politics",
-#   "State and politics: Public Officials", 
-#   
+#   "State and politics: Public Officials",
+# 
 #   "Science and education: University leaders",
-#   "Science and education: Economists and political scientists", 
-#   "Science and education: Other scientists", 
+#   "Science and education: Economists and political scientists",
+#   "Science and education: Other scientists",
 #   "Science and education: Education",
-#   
-#   "Culture and law: Culture and charities" , 
+# 
+#   "Culture and law: Culture and charities" ,
 #   "Culture and law: Law"
 # )
 # 
@@ -230,7 +230,16 @@ NULL
 # 
 # # Save
 # pe13          <- ind
-# save(pe13, net.elite, file = "~/soc.elite/data/pe13.rda")
+# 
+# # get coordinates 
+# 
+# load(file = "~/Dropbox/R/politiken/outputs_politiken/SAVE/layout.Rda")
+# 
+# add_layout_(graph = net.elite, lay[,-1])
+# 
+# net.elite$layout <- cbind(x = lay[, 2], y = lay[, 3])
+# 
+# save(pe13, net.elite, file = "~/eliter/data/pe13.rda")
 
 ##########################################################################
 # # Names.gender
