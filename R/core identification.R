@@ -325,6 +325,14 @@ levels.of.power <- function(x){
 #' @export
 #'
 #' @examples
+#' data(den)
+#' graph.all <- elite.network(den)
+#' graph.com <- largest.component(graph.all)
+#' sp        <- distances(graph.com)
+#' sp[sp >= 2.1] <- 0
+#' graph.reach     <- graph_from_adjacency_matrix(Matrix(sp), mode = "undirected", weighted = TRUE)
+#' k.shell(graph.reach, start.level = 0, verbose = TRUE)
+
 k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   
   # E(graph)$weight <- 1/E(graph)$weight
@@ -369,7 +377,6 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   
   
   while (k.score <= minimum.degree & nrow(g) != 0) {
-    #while (vcount(g) > 0){
     candidate.names <- level.down(g, level = minimum.degree)
     candidates      <- which(V(graph)$name %in% candidate.names)
     k.vector[candidates] <- k.score
