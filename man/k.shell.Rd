@@ -19,3 +19,13 @@ a numeric vector
 \description{
 K-shell decomposition
 }
+\examples{
+data(den)
+graph.all <- elite.network(den)
+graph.com <- largest.component(graph.all)
+sp        <- distances(graph.com)
+sp[sp >= 2.1] <- 0
+graph.reach     <- graph_from_adjacency_matrix(Matrix(sp), mode = "undirected", weighted = TRUE)
+shell <- k.shell(graph.reach, start.level = 0, verbose = TRUE)
+table(shell)
+}

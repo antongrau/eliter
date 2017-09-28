@@ -331,7 +331,8 @@ levels.of.power <- function(x){
 #' sp        <- distances(graph.com)
 #' sp[sp >= 2.1] <- 0
 #' graph.reach     <- graph_from_adjacency_matrix(Matrix(sp), mode = "undirected", weighted = TRUE)
-#' k.shell(graph.reach, start.level = 0, verbose = TRUE)
+#' shell <- k.shell(graph.reach, start.level = 0, verbose = TRUE)
+#' table(shell)
 
 k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   
@@ -379,15 +380,23 @@ k.shell   <- function(graph, start.level = 0, verbose = FALSE){
   while (k.score <= minimum.degree & nrow(g) != 0) {
     candidate.names <- level.down(g, level = minimum.degree)
     candidates      <- which(V(graph)$name %in% candidate.names)
-    k.vector[candidates] <- k.score
+    
     k.score         <- k.score + 1
     delete          <- which(rownames(g) %in% candidate.names)
     g               <- g[-delete, -delete]
+    
     if (nrow(g) == 0) break
     gs              <- Matrix::rowSums(g)
+    
+    if (minimum.degree >= min(gs)) break
+    
     minimum.degree  <- min(gs)
+    
+    k.vector[candidates] <- k.score
     if (identical(verbose, TRUE)) cat("Minimum degree: ", minimum.degree, "Removed: ", length(candidate.names), "Remain: ", nrow(g), "\n")
   }
+  
+  k.vector[is.infinite(k.vector)] <- k.score 
   
   k.vector + start.level
 }
