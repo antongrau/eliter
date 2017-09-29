@@ -4,7 +4,7 @@
 \alias{do.you.know}
 \title{Do you know?}
 \usage{
-do.you.know(graph, you, people, how.well = 1)
+\method{do}{you.know}(graph, you, people, how.well = 1)
 }
 \arguments{
 \item{graph}{a igraph network object created with the \link{elite.network}
