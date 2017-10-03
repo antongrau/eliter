@@ -12,7 +12,6 @@ Depends:
     Matrix,
     ggplot2,
     igraph,
-    plyr,
     dplyr,
     reshape2,
     stringr,
@@ -26,6 +25,7 @@ Depends:
     lubridate
 Imports:
     qlcMatrix,
-    ggthemes
+    ggthemes,
+    plyr
 License: GPL-3
 RoxygenNote: 6.0.1
