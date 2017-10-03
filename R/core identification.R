@@ -61,22 +61,26 @@ betweenness.decomposition <- function(graph, max.path = 2, estimate.min = 1, sil
   g                       <- graph
   layers                  <- list()
   i                       <- 1
-
-  while (any(betweenness.estimate(g, cutoff = max.path) < estimate.min)) {
-    kill        <- which(betweenness.estimate(g, cutoff = max.path) < estimate.min)
+  
+  if (is.function(estimate.min) == FALSE) min.fun <- function(x) estimate.min
+  if (is.function(estimate.min)) min.fun <- estimate.min
+  
+  while (any(betweenness.estimate(g, cutoff = max.path) < min.fun(g))) {
+    kill        <- which(betweenness.estimate(g, cutoff = max.path) < min.fun(g))
     layers[[i]] <- V(g)[kill]
     i           <- i + 1
     g           <- g - kill
   }
-
+  
   if (identical(silent, TRUE)) {
-  out           <- unlist(lapply(layers, length))
-  names(out)    <- paste("Round:", seq_along(out))
-  print(out)
+    out           <- unlist(lapply(layers, length))
+    names(out)    <- paste("Round:", seq_along(out))
+    print(out)
   }
   
   g
 }
+
 
 
 
