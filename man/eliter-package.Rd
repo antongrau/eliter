@@ -4,8 +4,7 @@
 \name{eliter-package}
 \alias{eliter}
 \alias{eliter-package}
-\title{eliter: Contains the Danish Elite Network for 2012-2013 with analytical functions}
+\title{eliter: Contains the Danish Elite Network for 2012-2013 with analytical functions.}
 \description{
-A set of tools for social network analysis with a focus on elites,
-core identification and affiliation networks.
+Here we collect and develop a set of tools for the analysis of affiliation networks. Currently it contains functions for weighting networks, temporal affiliation networks, k-shell decomposition, betweenness decomposition and a ton of convience and plotting functions. Furthermore this package contains data and code from published works on elites.
 }

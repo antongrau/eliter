@@ -118,9 +118,12 @@ prior.connections    <- function(graph.spell, minimum.gap = 12){
   find.inactive.months <- function(sequences){
     active.months        <- unique(unlist(apply(sequences, 1, function(x) seq(from = x[1], to = x[2]))))
     all.months           <- min(sequences):max(sequences)
-    inactive.months      <- setdiff(all.months, active.months)
-    inactive.months
+    out                  <- all.months %in% active.months
+    attributes(out)$start      <- min(active.months)
+    attributes(out)$end        <- max(active.months)
+    out
   }
+  
   
   # Create edge list
   participants <- get.edgelist(graph.prior)
@@ -129,22 +132,18 @@ prior.connections    <- function(graph.spell, minimum.gap = 12){
   
   # Set dates according to the reference month
   
-  elapsed_months <- function(end_date, start_date) {
-    ed <- as.POSIXlt(end_date)
-    sd <- as.POSIXlt(start_date)
-    12 * (ed$year - sd$year) + (ed$mon - sd$mon)
-  }
-  
   # Her har jeg lidt hurtigt smidt de her linjer ud, men output ser ok ud.
   # reference.month <- graph.spell$reference.month
   # ed$start     <- elapsed_months(ed$start, reference.month)
   # ed$end       <- elapsed_months(ed$end, reference.month)
   # 
   # # Find the inactive months
+  
+  
   out          <- by(data = ed[, 1:2], INDICES = ed$participants, find.inactive.months)
   # 
   # Remove all edges without gaps or with too short gaps
-  pause.length <- sapply(out, length)
+  pause.length <- sapply(out, function(x) sum(x == FALSE))
   out          <- out[pause.length >= minimum.gap]
   
   # Out
@@ -238,7 +237,7 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
 #' @export
 #'
 #' @examples
-decay <- function(value, max.months = 60){
+decay <- function(value, max.months = 96){
   
   value[value >= max.months] <- max.months - 0.1
   
@@ -257,14 +256,20 @@ decay <- function(value, max.months = 60){
 #' @export
 #'
 #' @examples
-distance.weight <- function(value, max.cut = 0.75){
-  x <- log(value, base = 12)
-  x[x < 0]     <- 0
-  x            <- 1/x
-  x[x == Inf]  <- 0
-  x[x <= max.cut] <- max.cut
-  x
+# distance.weight <- function(value, max.cut = 0.75){
+#   x <- log(value, base = 12)
+#   x[x < 0]     <- 0
+#   x            <- 1/x
+#   x[x == Inf]  <- 0
+#   x[x <= max.cut] <- max.cut
+#   x
+# }
+
+distance.weight <- function(value, two = 96){
+  value/(two/2)  
 }
+
+
 
 #' Create a list af weighted adjacency matrices
 #' 

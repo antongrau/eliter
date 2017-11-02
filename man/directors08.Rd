@@ -26,9 +26,8 @@ The directors dataset is prosopographical data collected from a wide
  including investors, rather than executives, a minimum of 500 employees was 
  also required, excluding 12 firms. Companies acting only as subsidiaries 
  were also excluded. Data is for public use  and no author permission is 
- needed, but we would love to hear from you if you find the data useful. The 
- following example is based on the analysis from the article: "A Very 
- Economic Elite: The Case of the Danish Top CEOs".
+ needed, but we would love to hear from you if you find the data useful. 
+ You can find an analysis of this dataset in the \link{soc.ca} package.
 }
 \references{
 Ellersgaard, Christoph, Anton Grau Larsen, og Martin D. Munk. 
