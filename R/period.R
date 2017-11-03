@@ -266,7 +266,7 @@ decay <- function(value, max.months = 96){
 # }
 
 distance.weight <- function(value, two = 96){
-  value/(two/2)  
+  1/(value/(two/2))
 }
 
 

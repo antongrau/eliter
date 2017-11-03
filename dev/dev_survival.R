@@ -52,12 +52,12 @@ p
 
 reference.month <- spell.graph$reference.month
 reference.month + months(1392)
-reference.month + months(1200)
+reference.month + months(1100)
 
 end.month <- 1392
 
 gs          <- delete.edges(spell.graph, edges = which(E(spell.graph)$end >= end.month))
-gs          <- delete.edges(gs, edges = which(E(gs)$end <= 1200)) # Her capper vi fra bunden - nok ikke nødvendigt, men det gør vi for computerens skyld.
+gs          <- delete.edges(gs, edges = which(E(gs)$end <= 1100)) # Her capper vi fra bunden - nok ikke nødvendigt, men det gør vi for computerens skyld.
 gs          <- simplify(gs, remove.multiple = FALSE, remove.loops = TRUE)
 
 # Data for the ties without reemergence -----
@@ -68,6 +68,12 @@ data.no.reemergence <- data.frame(remergence     = FALSE,
                                   break.duration = end.month - E(gs.no.reemergence)$end 
                                   )
 
+gender.a <- code.gender(firstnames(head_of(gs.no.reemergence, E(gs.no.reemergence))$name))
+gender.b <- code.gender(firstnames(tail_of(gs.no.reemergence, E(gs.no.reemergence))$name))
+
+data.no.reemergence$gender.similarity <- gender.a == gender.b
+
+
 # Data for the ties that reemerge ----
 prior        <- prior.connections(gs)
 prior.rle    <- lapply(prior, function(x) rle(as.vector(x)))
@@ -76,6 +82,16 @@ prior.end    <- sapply(prior, function(x) attributes(x)$end)
 
 prior.dat   <- list()
 
+
+x <- names(prior)[1]
+
+
+x <- str_split(x, " %--% ")[[1]]
+
+
+
+
+
 for (i in 1:length(prior.rle)) {
   
   # Add the length of the final break
@@ -83,13 +99,20 @@ for (i in 1:length(prior.rle)) {
   x                <- prior.rle[[i]]
   x$lengths[l + 1] <- end.month - prior.end[i]
   x$values[l + 1]  <- FALSE 
-  
+
+  # Gender
+  n                <- names(prior.rle)[i]
+  n                <- unlist(str_split(n, pattern = " %--% ", n = 2))
+  n                <- firstnames(n)
+  n                <- as.character(code.gender(n))
+  n[is.na(n)]      <- "FALSE"
+  n                <- n[1] == n[2]
   
   # Collect
   out       <- data.frame(remergence     = TRUE,
                           duration       = x$lengths[x$values],
-                          break.duration = x$lengths[x$values == FALSE]
-                          )  
+                          break.duration = x$lengths[x$values == FALSE],
+                          gender.similarity = n)  
   # The final break does not remerge
   out$remergence[nrow(out)]   <- FALSE
   
@@ -101,6 +124,7 @@ data.reemergence <- bind_rows(prior.dat)
 data.all         <- rbind(data.reemergence, data.no.reemergence)
 
 data.all$remergence <- as.numeric(data.all$remergence)
+data.all$gender.similarity <- as.numeric(data.all$gender.similarity)
 
 write.csv(data.all, file = "~/Dropbox/GNA/R/survival/data/survival.csv")
 
