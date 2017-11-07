@@ -15,7 +15,8 @@ graph.plot(graph, layout = layout_with_fr(graph, weight = E(graph)$weight^2,
   text.alpha = 1, legend = "side", text.vjust = 1.5,
   text.family = "Times", midpoints = FALSE, midpoint.arrow = arrow(angle =
   20, length = unit(0.33, "cm"), ends = "last", type = "closed"),
-  edge.text = FALSE, edge.text.size = 3, edge.text.alpha = 0.9)
+  edge.text = FALSE, edge.text.size = 3, edge.text.alpha = 0.9,
+  norm.coords = TRUE)
 }
 \arguments{
 \item{graph}{a \link{igraph} network object}
@@ -65,6 +66,8 @@ graph.plot(graph, layout = layout_with_fr(graph, weight = E(graph)$weight^2,
 \item{edge.text.size}{a single value or a vector of the same length and order as the edges in graph.}
 
 \item{edge.text.alpha}{a single value or a vector of the same length and order as the edges in graph.}
+
+\item{norm.coords}{if TRUE layout coordinates are normalized}
 }
 \value{
 a \link{ggplot2} plot

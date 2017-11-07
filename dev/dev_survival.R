@@ -131,6 +131,13 @@ write.csv(data.all, file = "~/Dropbox/GNA/R/survival/data/survival.csv")
 Surv(time  = data.all$break.duration, time2 = data.all$duration)
 
 
+nif <- read.csv(file = "~/Dropbox/GNA/R/survival/data/survival.csv")
+
+
+
+summary(nif$duration)
+
+quantile(nif$duration, probs = (1:100)/100)
 
 # LM ----
 colnames(data.all)

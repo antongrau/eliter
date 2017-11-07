@@ -25,6 +25,7 @@
 #' @param edge.text if not FALSE, then a vector with the labels for each edge.
 #' @param edge.text.size a single value or a vector of the same length and order as the edges in graph.
 #' @param edge.text.alpha a single value or a vector of the same length and order as the edges in graph.
+#' @param norm.coords if TRUE layout coordinates are normalized
 #' @return a \link{ggplot2} plot
 #' @export
 #' @examples
@@ -42,11 +43,12 @@ graph.plot  <- function(graph, layout = layout_with_fr(graph, weight = E(graph)$
                         vertex.color = "black", vertex.fill = "grey60", vertex.shape = 21, vertex.size = 3, vertex.alpha = 1, vertex.order = FALSE, vertex.background = "white",
                         edges = TRUE, edge.color = "darkblue", edge.alpha = E(graph)$weight, edge.size = 1, edge.line = "solid", edge.order = FALSE,
                         text = FALSE, text.background = NULL, text.background.alpha = 0.4, text.background.border = 0, text.size = 3, text.color = "black", text.alpha = 1, legend = "side", text.vjust = 1.5, text.family = "Times", midpoints = FALSE,
-                        midpoint.arrow = arrow(angle = 20, length = unit(0.33, "cm"), ends = "last", type = "closed"), edge.text = FALSE, edge.text.size = 3, edge.text.alpha = 0.9){
+                        midpoint.arrow = arrow(angle = 20, length = unit(0.33, "cm"), ends = "last", type = "closed"), edge.text = FALSE, edge.text.size = 3, edge.text.alpha = 0.9, norm.coords = TRUE){
   
-  layout[, 1:2]           <- norm_coords(layout[, 1:2], xmin = 1, xmax = 10^10, ymin = 1, ymax = 10^10)
+  if (identical(norm.coords, TRUE))  layout[, 1:2]           <- norm_coords(layout[, 1:2], xmin = 1, xmax = 10^10, ymin = 1, ymax = 10^10)
+ 
   vertex.coords           <- as.data.frame(vertex.coord(graph, layout))
-  vertex.l                <- list(color=vertex.color, fill=vertex.fill, shape=vertex.shape, size=vertex.size, alpha=vertex.alpha)
+  vertex.l                <- list(color=vertex.color, fill = vertex.fill, shape=vertex.shape, size=vertex.size, alpha=vertex.alpha)
   v.i                     <- unlist(lapply(vertex.l, length)) == 1
   vertex.attributes       <- vertex.l[v.i]
   vertex.aes              <- vertex.l[v.i == FALSE]

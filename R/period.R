@@ -197,6 +197,11 @@ period.graph <- function(spell.graph, start, end){
 #' @examples
 weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance.weight = distance.weight, decay = decay){
   
+  start.boost <- function(x, boost = 12){
+    x[x <= boost] <- boost
+    x
+  }
+  
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g            <- delete.edges(spell.graph, del)
   
@@ -209,8 +214,9 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
     adj.cum      <- adj.cum + adj.t
     sv.cum       <- as(adj.cum, Class = "sparseVector")
     sv.t         <- as(adj.t, Class = "sparseVector")
-    set          <- sv.cum@i %in% sv.t@i
+    set          <- sv.cum@i %in% sv.t@i # The active set of ties
     sv.cum@x[!set]   <- decay(sv.cum@x[!set])
+    sv.cum@x[set]    <- start.boost(sv.cum@x[set], boost = 12)
     adj.cum@x        <- sv.cum@x
     setTxtProgressBar(pb, i)
   }
@@ -256,21 +262,19 @@ decay <- function(value, max.months = 96){
 #' @export
 #'
 #' @examples
-# distance.weight <- function(value, max.cut = 0.75){
+# distance.weight2 <- function(value, max.cut = 0.75){
 #   x <- log(value, base = 12)
 #   x[x < 0]     <- 0
 #   x            <- 1/x
 #   x[x == Inf]  <- 0
 #   x[x <= max.cut] <- max.cut
 #   x
-# }
+#}
 
 distance.weight <- function(value, two = 96){
   1/(value/(two/2))
 }
-
-
-
+  
 #' Create a list af weighted adjacency matrices
 #' 
 #' A more efficient way of creating time series of \link{weighted.graph}
@@ -286,6 +290,12 @@ distance.weight <- function(value, two = 96){
 #' @examples
 
 weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE){
+  
+  start.boost <- function(x, boost = 12){
+    x[x <= boost] <- boost
+    x
+  }
+  
   
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g            <- delete.edges(spell.graph, del)
@@ -306,6 +316,7 @@ weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE)
     sv.t         <- as(adj.t, Class = "sparseVector")
     set          <- sv.cum@i %in% sv.t@i
     sv.cum@x[!set]   <- decay(sv.cum@x[!set])
+    sv.cum@x[set]    <- start.boost(sv.cum@x[set], boost = 12)
     adj.cum@x        <- sv.cum@x
     
     # Remove the retired
