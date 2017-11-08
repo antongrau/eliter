@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 weighted.graph(spell.graph, start, end, to.distance = TRUE,
-  distance.weight = distance.weight, decay = decay)
+  distance.weight = distance.weight, decay = decay, m = 38)
 }
 \arguments{
 \item{spell.graph}{}

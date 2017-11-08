@@ -65,7 +65,8 @@ gs.no.reemergence   <- delete.edges(gs, which(count_multiple(gs) > 1))
  
 data.no.reemergence <- data.frame(remergence     = FALSE,
                                   duration       = E(gs.no.reemergence)$end - E(gs.no.reemergence)$start,
-                                  break.duration = end.month - E(gs.no.reemergence)$end 
+                                  break.duration = end.month - E(gs.no.reemergence)$end,
+                                  start.month    = E(gs.no.reemergence)$start
                                   )
 
 gender.a <- code.gender(firstnames(head_of(gs.no.reemergence, E(gs.no.reemergence))$name))
@@ -75,7 +76,7 @@ data.no.reemergence$gender.similarity <- gender.a == gender.b
 
 
 # Data for the ties that reemerge ----
-prior        <- prior.connections(gs)
+prior        <- prior.connections(gs, minimum.gap = 0)
 prior.rle    <- lapply(prior, function(x) rle(as.vector(x)))
 prior.start  <- sapply(prior, function(x) attributes(x)$start)
 prior.end    <- sapply(prior, function(x) attributes(x)$end)
@@ -84,13 +85,7 @@ prior.dat   <- list()
 
 
 x <- names(prior)[1]
-
-
 x <- str_split(x, " %--% ")[[1]]
-
-
-
-
 
 for (i in 1:length(prior.rle)) {
   
@@ -112,7 +107,8 @@ for (i in 1:length(prior.rle)) {
   out       <- data.frame(remergence     = TRUE,
                           duration       = x$lengths[x$values],
                           break.duration = x$lengths[x$values == FALSE],
-                          gender.similarity = n)  
+                          gender.similarity = n,
+                          start.month    = as.numeric(prior.start[i]))  
   # The final break does not remerge
   out$remergence[nrow(out)]   <- FALSE
   

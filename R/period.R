@@ -195,7 +195,7 @@ period.graph <- function(spell.graph, start, end){
 #' @export
 #'
 #' @examples
-weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance.weight = distance.weight, decay = decay){
+weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance.weight = distance.weight, decay = decay, m = 38){
   
   start.boost <- function(x, boost = 12){
     x[x <= boost] <- boost
@@ -224,8 +224,6 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
   
   if (identical(to.distance, TRUE))  adj.cum@x <- distance.weight(adj.cum@x) 
   
-  
-  
   graph         <- graph_from_adjacency_matrix(adj.cum, mode = "undirected", weighted = TRUE)
 
   # Remove the retired
@@ -243,16 +241,26 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
 #' @export
 #'
 #' @examples
-decay <- function(value, max.months = 96){
-  
-  value[value >= max.months] <- max.months - 0.1
-  
-  xfun <- function(y, L, k) {(y - 60) - log(L / y - 1) / k}
-  b    <- xfun(value, 180, -0.05)
-  
-  yfun <- function(x, L, k, x0) {L / (1 + exp(-k * (x - x0)))}
-  yfun(b + 1, 180, -0.05, value - 60)
+# decay <- function(value, max.months = 96){
+#   
+#   value[value >= max.months] <- max.months - 0.1
+#   
+#   xfun <- function(y, L, k) {(y - 60) - log(L / y - 1) / k}
+#   b    <- xfun(value, 180, -0.05)
+#   
+#   yfun <- function(x, L, k, x0) {L / (1 + exp(-k * (x - x0)))}
+#   yfun(b + 1, 180, -0.05, value - 60)
+# }
+
+decay <- function(x, m = 38){
+  x[x > m * 2]       <- m * 2
+  b  <-  m / 2       # m is the median, b is the lowest point
+  t  <-  m * 2     # t is twice the median and therefore the top
+  decay.rate       <- (b/t)^(1/b) # The rate by which x decays in order to reach b after b months
+  x * decay.rate
 }
+
+
 
 #' Title
 #'
@@ -271,8 +279,9 @@ decay <- function(value, max.months = 96){
 #   x
 #}
 
-distance.weight <- function(value, two = 76){
-  1/(value/(two/2))
+distance.weight <- function(x, m = 38){
+  x[x > m*2]    <- m * 2
+  1/(x/(m))
 }
   
 #' Create a list af weighted adjacency matrices
@@ -289,7 +298,7 @@ distance.weight <- function(value, two = 76){
 #'
 #' @examples
 
-weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE){
+weighted.adjacency.list <- function(spell.graph, start, end, m = 38, to.distance = TRUE){
   
   start.boost <- function(x, boost = 12){
     x[x <= boost] <- boost
@@ -315,7 +324,8 @@ weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE)
     sv.cum       <- as(adj.cum, Class = "sparseVector")
     sv.t         <- as(adj.t, Class = "sparseVector")
     set          <- sv.cum@i %in% sv.t@i
-    sv.cum@x[!set]   <- decay(sv.cum@x[!set])
+    
+    sv.cum@x[!set]   <- decay(sv.cum@x[!set], m = m)
     sv.cum@x[set]    <- start.boost(sv.cum@x[set], boost = 12)
     adj.cum@x        <- sv.cum@x
     
@@ -330,7 +340,7 @@ weighted.adjacency.list <- function(spell.graph, start, end, to.distance = TRUE)
   }
   close(pb)
   
-  if (identical(to.distance, TRUE))  adj.list <- llply(adj.list, function(x){ x@x <- distance.weight(x@x)
+  if (identical(to.distance, TRUE))  adj.list <- llply(adj.list, function(x){ x@x <- distance.weight(x@x, m = m)
                                                                          x})
   adj.list
 }
