@@ -295,6 +295,7 @@ distance.weight <- function(x, m = 38){
 #' @export
 #'
 #' @examples
+
 accumulation.thresholds   <- function(x, boost = 12, max = 76){
   x[x < boost] <- boost
   x[x > max]   <- max
@@ -358,3 +359,88 @@ weighted.adjacency.list <- function(spell.graph, start, end, m = 38, to.distance
                                                                          x})
   adj.list
 }
+
+
+#' Turn a spell.graph into a dataset suitable for survival analysis
+#'
+#' Note that this code is slow.
+#' 
+#' @param spell.graph 
+#' @param end.month an integer for the end month. The end month is the end point for all non-reoccuring ties that are broken.
+#'
+#' @return a data.frame
+#' @export
+#'
+#' @examples
+
+from.spell.graph.to.survival <- function(spell.graph, end.month = 1392){
+  
+  # reference.month <- spell.graph$reference.month
+  # reference.month + months(1392)
+  # reference.month + months(1100)
+  
+  gs          <- delete.edges(spell.graph, edges = which(E(spell.graph)$end >= end.month))
+  gs          <- simplify(gs, remove.multiple = FALSE, remove.loops = TRUE)
+  
+  # Data for the ties without reemergence -----
+  gs.no.reemergence   <- delete.edges(gs, which(count_multiple(gs) > 1))
+  
+  data.no.reemergence <- data.frame(remergence     = FALSE,
+                                    duration       = E(gs.no.reemergence)$end - E(gs.no.reemergence)$start,
+                                    break.duration = end.month - E(gs.no.reemergence)$end,
+                                    start.month    = E(gs.no.reemergence)$start
+  )
+  
+  gender.a <- code.gender(firstnames(head_of(gs.no.reemergence, E(gs.no.reemergence))$name))
+  gender.b <- code.gender(firstnames(tail_of(gs.no.reemergence, E(gs.no.reemergence))$name))
+  
+  data.no.reemergence$gender.similarity <- gender.a == gender.b
+  
+  # Data for the ties that reemerge ----
+  prior        <- prior.connections(gs, minimum.gap = 0)
+  prior.rle    <- lapply(prior, function(x) rle(as.vector(x)))
+  prior.start  <- sapply(prior, function(x) attributes(x)$start)
+  prior.end    <- sapply(prior, function(x) attributes(x)$end)
+  
+  prior.dat   <- list()
+  
+  pb           <- txtProgressBar(min = 1, max = length(prior.rle), style = 3)
+  for (i in 1:length(prior.rle)) {
+    
+    # Add the length of the final break
+    l                <- length(prior.rle[[i]]$lengths)
+    x                <- prior.rle[[i]]
+    x$lengths[l + 1] <- end.month - prior.end[i]
+    x$values[l + 1]  <- FALSE 
+    
+    # Gender
+    n                <- names(prior.rle)[i]
+    n                <- unlist(str_split(n, pattern = " %--% ", n = 2))
+    n                <- firstnames(n)
+    n                <- as.character(code.gender(n))
+    n[is.na(n)]      <- "FALSE"
+    n                <- n[1] == n[2]
+    
+    # Collect
+    out       <- data.frame(remergence     = TRUE,
+                            duration       = x$lengths[x$values],
+                            break.duration = x$lengths[x$values == FALSE],
+                            start.month    = as.numeric(prior.start[i]),
+                            gender.similarity = n)  
+    # The final break does not remerge
+    out$remergence[nrow(out)]   <- FALSE
+    
+    prior.dat[[i]] <- out
+    setTxtProgressBar(pb = pb, value = i)
+  } 
+  
+  data.reemergence <- bind_rows(prior.dat)
+  
+  data.all         <- rbind(data.reemergence, data.no.reemergence)
+  
+  data.all$remergence <- as.numeric(data.all$remergence)
+  data.all$gender.similarity <- as.numeric(data.all$gender.similarity)
+  
+  data.all
+}
+

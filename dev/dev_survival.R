@@ -1,8 +1,9 @@
 # Spell graph example -----
 load("~/Desktop/spell.Rda")
 library(eliter)
-# samp         <- sample(1:vcount(spell.graph), size = vcount(spell.graph)*0.9)
-# gs            <- delete.vertices(spell.graph, v =  samp)
+samp         <- sample(1:vcount(spell.graph), size = vcount(spell.graph)*0.9)
+spell.graph  <- delete.vertices(spell.graph, v =  samp)
+
 
 prior        <- prior.connections(spell.graph)
 prior.rle    <- lapply(prior, rle)
@@ -50,14 +51,14 @@ p
 # Tie duration
 # Break duration - hvis de aldrig genopstår skal den være fra break til 01-01-2016
 
-reference.month <- spell.graph$reference.month
-reference.month + months(1392)
-reference.month + months(1100)
 
-end.month <- 1392
+from.spell.graph.to.survival <- function(spell.graph, end.month = 1392){
+
+# reference.month <- spell.graph$reference.month
+# reference.month + months(1392)
+# reference.month + months(1100)
 
 gs          <- delete.edges(spell.graph, edges = which(E(spell.graph)$end >= end.month))
-gs          <- delete.edges(gs, edges = which(E(gs)$end <= 1100)) # Her capper vi fra bunden - nok ikke nødvendigt, men det gør vi for computerens skyld.
 gs          <- simplify(gs, remove.multiple = FALSE, remove.loops = TRUE)
 
 # Data for the ties without reemergence -----
@@ -74,7 +75,6 @@ gender.b <- code.gender(firstnames(tail_of(gs.no.reemergence, E(gs.no.reemergenc
 
 data.no.reemergence$gender.similarity <- gender.a == gender.b
 
-
 # Data for the ties that reemerge ----
 prior        <- prior.connections(gs, minimum.gap = 0)
 prior.rle    <- lapply(prior, function(x) rle(as.vector(x)))
@@ -83,10 +83,7 @@ prior.end    <- sapply(prior, function(x) attributes(x)$end)
 
 prior.dat   <- list()
 
-
-x <- names(prior)[1]
-x <- str_split(x, " %--% ")[[1]]
-
+pb           <- txtProgressBar(min = 1, max = length(prior.rle), style = 3)
 for (i in 1:length(prior.rle)) {
   
   # Add the length of the final break
@@ -107,12 +104,13 @@ for (i in 1:length(prior.rle)) {
   out       <- data.frame(remergence     = TRUE,
                           duration       = x$lengths[x$values],
                           break.duration = x$lengths[x$values == FALSE],
-                          gender.similarity = n,
-                          start.month    = as.numeric(prior.start[i]))  
+                          start.month    = as.numeric(prior.start[i]),
+                          gender.similarity = n)  
   # The final break does not remerge
   out$remergence[nrow(out)]   <- FALSE
   
   prior.dat[[i]] <- out
+  setTxtProgressBar(pb = pb, value = i)
 } 
 
 data.reemergence <- bind_rows(prior.dat)
@@ -122,10 +120,11 @@ data.all         <- rbind(data.reemergence, data.no.reemergence)
 data.all$remergence <- as.numeric(data.all$remergence)
 data.all$gender.similarity <- as.numeric(data.all$gender.similarity)
 
+data.all
+}
+
+
 write.csv(data.all, file = "~/Dropbox/GNA/R/survival/data/survival.csv")
-
-Surv(time  = data.all$break.duration, time2 = data.all$duration)
-
 
 nif <- read.csv(file = "~/Dropbox/GNA/R/survival/data/survival.csv")
 
