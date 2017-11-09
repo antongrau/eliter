@@ -283,6 +283,24 @@ distance.weight <- function(x, m = 38){
   x[x > m*2]    <- m * 2
   1/(x/(m))
 }
+
+
+#' Title
+#'
+#' @param x 
+#' @param boost 
+#' @param max 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+accumulation.thresholds   <- function(x, boost = 12, max = 76){
+  x[x < boost] <- boost
+  x[x > max]   <- max
+  x
+}
+
   
 #' Create a list af weighted adjacency matrices
 #' 
@@ -300,12 +318,6 @@ distance.weight <- function(x, m = 38){
 
 weighted.adjacency.list <- function(spell.graph, start, end, m = 38, to.distance = TRUE){
   
-  start.boost <- function(x, boost = 12){
-    x[x <= boost] <- boost
-    x
-  }
-  
-  
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g            <- delete.edges(spell.graph, del)
   
@@ -321,21 +333,23 @@ weighted.adjacency.list <- function(spell.graph, start, end, m = 38, to.distance
     gp           <- period.graph(g, start = t, end = t)
     adj.t        <- get.adjacency(gp)
     adj.cum      <- adj.cum + adj.t
-    sv.cum       <- as(adj.cum, Class = "sparseVector")
-    sv.t         <- as(adj.t, Class = "sparseVector")
-    set          <- sv.cum@i %in% sv.t@i
-    
-    sv.cum@x[!set]   <- decay(sv.cum@x[!set], m = m)
-    sv.cum@x[set]    <- start.boost(sv.cum@x[set], boost = 12)
-    adj.cum@x        <- sv.cum@x
     
     # Remove the retired
     retired      <- V(gp)$retire == (t - 1) # Did they retire the previous month?
     adj.cum[retired, ] <- adj.cum[retired,] * 0
     adj.cum[, retired] <- adj.cum[, retired] * 0
-    adj.cum      <- drop0(adj.cum, tol = 0.5) # Here we reduce the data-size - and drop all weak ties
+    adj.cum      <- drop0(adj.cum, tol = 0.1) # Here we reduce the data-size - and drop all weak ties
     
+    sv.cum       <- as(adj.cum, Class = "sparseVector")
+    sv.t         <- as(adj.t, Class = "sparseVector")
+    set          <- sv.cum@i %in% sv.t@i
+    
+    sv.cum@x[!set]   <- decay(sv.cum@x[!set], m = m)
+    adj.cum@x        <- sv.cum@x
     adj.list[[i]]    <- adj.cum
+    
+    adj.list[[i]]@x[set] <- accumulation.thresholds(sv.cum@x[set], boost = 12, max = m*2)
+    
     setTxtProgressBar(pb, i)
   }
   close(pb)
