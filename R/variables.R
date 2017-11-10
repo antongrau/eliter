@@ -188,7 +188,7 @@ lastnames         <- function(x){
 code.region <- function(x){
   postnumre <- eliter:::postnumre[duplicated(eliter:::postnumre$POSTNR) == FALSE,]
   jx        <- data.frame(POSTNR = x)
-  xm        <- join(jx, postnumre, by = "POSTNR")
+  xm        <- dplyr::left_join(jx, postnumre, by = "POSTNR")
   xm
 }
 
