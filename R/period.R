@@ -43,6 +43,14 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1, refe
   if (lubridate::is.Date(den$"PERSON_END") == FALSE) stop("PERSON_END is not in Date format")
 
     den              <- droplevels(den[complete.cases(den[, c("PERSON_START", "PERSON_END")]),])
+    
+    # You can't make ties between egos and alters in affiliations with a single member
+    # Therefore we remove them
+    
+    ts                  <- stack(table(den$AFFILIATION))
+    empty.affils        <- as.character(ts$ind)[ts == 1]
+    den                 <- den.set[(den$AFFILIATION %in% empty.affils) == FALSE,]
+    
   
   spell.edges           <- function(x, diagonal, minimum.duration){
     x.intervals                     <- interval(x$PERSON_START, x$PERSON_END)
