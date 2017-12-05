@@ -63,7 +63,7 @@
 # # Spell graph - Weighted network
 # #library(eliter)
 # #load("~/Dropbox/GNA/R/dynacore_data/graph.spell.clean.Rda")
-# #load("~/Dropbox/GNA/R/dynacore_data/den.clean.Rda")
+#load("~/Dropbox/GNA/R/dynacore_data/den.clean.Rda")
 # #match <- read.csv("~/Dropbox/GNA/Til DST/match_cvr.csv", sep = ",")
 # 
 # #match$nchar <- nchar(match$ENHEDSNUMMER)

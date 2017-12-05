@@ -317,7 +317,7 @@ accumulation.thresholds   <- function(x, boost = 12, max = 76){
 #'
 #' @examples
 
-weighted.adjacency.list <- function(spell.graph, start, end, m = 38, to.distance = TRUE){
+weighted.adjacency.list <- function(spell.graph, start, end, m = 38, boost = m, to.distance = TRUE){
   
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g            <- delete.edges(spell.graph, del)
@@ -349,7 +349,7 @@ weighted.adjacency.list <- function(spell.graph, start, end, m = 38, to.distance
     adj.cum@x        <- sv.cum@x
     adj.list[[i]]    <- adj.cum
     
-    adj.list[[i]]@x[set] <- accumulation.thresholds(sv.cum@x[set], boost = 12, max = m*2)
+    adj.list[[i]]@x[set] <- accumulation.thresholds(sv.cum@x[set], boost = boost, max = m*2)
     
     setTxtProgressBar(pb, i)
   }
