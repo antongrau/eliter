@@ -4,7 +4,8 @@
 \alias{weighted.adjacency.list}
 \title{Create a list af weighted adjacency matrices}
 \usage{
-weighted.adjacency.list(spell.graph, start, end, m = 38, to.distance = TRUE)
+weighted.adjacency.list(spell.graph, start, end, m = 38, boost = m,
+  to.distance = TRUE)
 }
 \arguments{
 \item{spell.graph}{a spell.graph}

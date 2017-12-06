@@ -49,7 +49,7 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1, refe
     
     ts                  <- stack(table(den$AFFILIATION))
     empty.affils        <- as.character(ts$ind)[ts == 1]
-    den                 <- den.set[(den$AFFILIATION %in% empty.affils) == FALSE,]
+    den                 <- den[(den$AFFILIATION %in% empty.affils) == FALSE,]
     
   
   spell.edges           <- function(x, diagonal, minimum.duration){
