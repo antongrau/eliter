@@ -91,13 +91,13 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1, refe
   spells$position_id  <- as.character(spells$position_id) 
   
   # Vertex attributes
-  end.ego             <- spells %>% group_by(., ego) %>% summarize(end.ego = max(end))
-  end.alter           <- spells %>% group_by(., alter) %>%  summarize(end.alter = max(end))
-  vm                  <- full_join(end.ego, end.alter, c("ego" = "alter")) %>% group_by(ego) %>% summarize(retire = pmax(end.ego, end.alter))
+  end.ego             <- spells %>% dplyr::group_by(., ego) %>% dplyr::summarize(end.ego = max(end))
+  end.alter           <- spells %>% dplyr::group_by(., alter) %>% dplyr::summarize(end.alter = max(end))
+  vm                  <- dplyr::full_join(end.ego, end.alter, c("ego" = "alter")) %>% dplyr::group_by(ego) %>% dplyr::summarize(retire = pmax(end.ego, end.alter))
   
   # Graph creation
-  spells          <- spells %>% select(ego, alter, everything())
-  graph           <- graph_from_data_frame(spells, directed = FALSE, vertices = vm)
+  spells              <- spells %>% dplyr::select(ego, alter, everything())
+  graph               <- graph_from_data_frame(spells, directed = FALSE, vertices = vm)
   
   # Graph attributes
   graph$reference.month <- reference.month
