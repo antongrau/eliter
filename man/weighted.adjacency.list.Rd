@@ -5,7 +5,7 @@
 \title{Create a list af weighted adjacency matrices}
 \usage{
 weighted.adjacency.list(spell.graph, start, end, m = 38, boost = m,
-  to.distance = TRUE)
+  max.terms = 3, to.distance = TRUE)
 }
 \arguments{
 \item{spell.graph}{a spell.graph}

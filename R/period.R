@@ -260,11 +260,11 @@ weighted.graph <- function(spell.graph, start, end, to.distance = TRUE, distance
 #   yfun(b + 1, 180, -0.05, value - 60)
 # }
 
-decay <- function(x, m = 38){
-  x[x > m * 2]       <- m * 2
+decay <- function(x, m = 38, max.terms = 2){
+   x[x > m * 2]       <- m * max.terms
   b  <-  m / 2       # m is the median, b is the lowest point
-  t  <-  m * 2     # t is twice the median and therefore the top
-  decay.rate       <- (b/t)^(1/b) # The rate by which x decays in order to reach b after b months
+  t  <-  m * 2     # t is twice the median and therefore the top # not after max.terms
+  decay.rate       <- (b/t)^(1/b) # The rate by which t decays in order to reach b after b months
   x * decay.rate
 }
 
@@ -287,8 +287,8 @@ decay <- function(x, m = 38){
 #   x
 #}
 
-distance.weight <- function(x, m = 38){
-  x[x > m*2]    <- m * 2
+distance.weight <- function(x, m = 38, max.terms = 2){
+  x[x > m*max.terms]    <- m * max.terms
   1/(x/(m))
 }
 
@@ -325,7 +325,7 @@ accumulation.thresholds   <- function(x, boost = 12, max = 76){
 #'
 #' @examples
 
-weighted.adjacency.list <- function(spell.graph, start, end, m = 38, boost = m, to.distance = TRUE){
+weighted.adjacency.list <- function(spell.graph, start, end, m = 38, boost = m, max.terms = 3, to.distance = TRUE){
   
   del          <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g            <- delete.edges(spell.graph, del)
@@ -353,17 +353,17 @@ weighted.adjacency.list <- function(spell.graph, start, end, m = 38, boost = m, 
     sv.t         <- as(adj.t, Class = "sparseVector")
     set          <- sv.cum@i %in% sv.t@i
     
-    sv.cum@x[!set]   <- decay(sv.cum@x[!set], m = m)
+    sv.cum@x[!set]   <- decay(sv.cum@x[!set], m = m, max.terms = max.terms)
     adj.cum@x        <- sv.cum@x
     adj.list[[i]]    <- adj.cum
     
-    adj.list[[i]]@x[set] <- accumulation.thresholds(sv.cum@x[set], boost = boost, max = m*2)
+    adj.list[[i]]@x[set] <- accumulation.thresholds(sv.cum@x[set], boost = boost, max = m * max.terms)
     
     setTxtProgressBar(pb, i)
   }
   close(pb)
   
-  if (identical(to.distance, TRUE))  adj.list <- llply(adj.list, function(x){ x@x <- distance.weight(x@x, m = m)
+  if (identical(to.distance, TRUE))  adj.list <- llply(adj.list, function(x){ x@x <- distance.weight(x@x, m = m, max.terms = max.terms)
                                                                          x})
   adj.list
 }

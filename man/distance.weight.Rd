@@ -4,7 +4,7 @@
 \alias{distance.weight}
 \title{Title}
 \usage{
-distance.weight(x, m = 38)
+distance.weight(x, m = 38, max.terms = 2)
 }
 \arguments{
 \item{value}{}

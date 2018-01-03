@@ -4,7 +4,7 @@
 \alias{decay}
 \title{Title}
 \usage{
-decay(x, m = 38)
+decay(x, m = 38, max.terms = 2)
 }
 \arguments{
 \item{value}{}
