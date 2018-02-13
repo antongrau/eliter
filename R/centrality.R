@@ -1,6 +1,6 @@
 # Centrality ---
 
-#' Reach centrality
+#' Reach centrality 
 #' 
 #' The number of people you can reach within a few steps (usually 2). This is 
 #' similar to the size of your neighborhood except that reach takes the strength
