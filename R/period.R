@@ -186,7 +186,7 @@ elapsed_months <- function(end_date, start_date) {
 period.graph <- function(spell.graph, start, end){
   del        <- which(E(spell.graph)$start > end | E(spell.graph)$end < start)
   g          <- delete.edges(spell.graph, del)
-  igraph::simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb = "ignore")
+  simplify(g, remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb = "ignore")
 }
 
 

@@ -21,7 +21,10 @@ Depends:
     shiny,
     knitr,
     scales,
-    lubridate
+    lubridate,
+    TraMineR,
+    TraMineRextras,
+    RColorBrewer
 Imports:
     qlcMatrix,
     ggthemes,

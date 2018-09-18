@@ -1,3 +1,11 @@
+#' Danish Power Elite Careers
+#' 
+#' A set of sequences 
+#' @name careers
+#' @doctype data
+NULL
+
+
 #' Danish Elite Network
 #' 
 #' A affiliation network
@@ -451,7 +459,7 @@ NULL
 # save(pe13, net.elite, file = "~/eliter/data/pe13.rda")
 
 ##########################################################################
-# # Names.gender
+# Names.gender ----
 # load("raw_data/names_gender")
 # 
 # ###############################################################################
@@ -466,3 +474,5 @@ NULL
 # Firmaets mænd - Directors 2008
 # directors08 <- read.csv("~/My Dropbox/Elite/Data/Firmaets Mænd 2008/Data_directors_2008.csv", sep = ",", fileEncoding = "UTF-8", dec = ",")
 # save(directors08, file = "~/soc.elite/data/directors08.rda")
+
+
