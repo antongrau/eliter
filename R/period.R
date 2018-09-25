@@ -119,7 +119,7 @@ graph.from.spells  <- function(den, diagonal = FALSE, minimum.duration = 1, refe
 prior.connections    <- function(graph.spell, minimum.gap = 12){
   
   # Remove loops, but keep multiple edges
-  graph.prior          <- simplify(graph.spell, remove.multiple = FALSE, remove.loops = TRUE)
+  graph.prior          <- igraph::simplify(graph.spell, remove.multiple = FALSE, remove.loops = TRUE)
   # Count multiples and remove non-multiple
   graph.prior          <- delete.edges(graph.prior, which(count_multiple(graph.prior) == 1))
   
