@@ -23,6 +23,22 @@ How many people do you live close to within a given distance in meters
 }
 \examples{
 data(pe13)
-graph.neighbour       <- geographical.neighbours(lon = pe13$lon, lat = pe13$lat, id = pe13$Name, distance = 500)
-graph.plot(graph.neighbour)
+graph.2km       <- geographical.neighbours(lon = pe13$lon, lat = pe13$lat, id = pe13$Name, distance = 2000)
+graph.10km       <- geographical.neighbours(lon = pe13$lon, lat = pe13$lat, id = pe13$Name, distance = 10000)
+
+graph.2km     <- graph.adjacency(afstand.2km, mode = "undirected", weighted = TRUE)
+graph.10km    <- graph.adjacency(afstand.10km, mode = "undirected", weighted = TRUE)
+
+deg.afstand.2km  <- degree(graph.2km)
+deg.afstand.10km <- degree(graph.10km)
+
+social.geography <- deg.afstand.2km
+social.geography[deg.afstand.2km == 0 & deg.afstand.10km == 0] <- "Isolated at 10km"
+social.geography[deg.afstand.2km == 0 & deg.afstand.10km != 0] <- "Isolated at 2km"
+social.geography[deg.afstand.2km \%in\% 1:2]                     <- "1-2"
+social.geography[deg.afstand.2km \%in\% 3:6]                     <- "3-6"
+social.geography[deg.afstand.2km \%in\% 7:20]                    <- "7-20"
+social.geography[deg.afstand.2km \%in\% 21:30]                   <- "21-30"
+social.geography[deg.afstand.2km \%in\% 31:max(deg.afstand.2km)] <- "+30"
+as.matrix(table(social.geography))
 }
