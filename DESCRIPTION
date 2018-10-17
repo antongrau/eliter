@@ -24,7 +24,8 @@ Depends:
     lubridate,
     TraMineR,
     TraMineRextras,
-    RColorBrewer
+    RColorBrewer,
+    geosphere
 Imports:
     qlcMatrix,
     ggthemes,

@@ -104,7 +104,7 @@ dynamic.core.analysis <- function(den, graph.spell = NULL, adjacency.list = NULL
 
   # Spell graph
   if (is.null(graph.spell)){
-  graph.spell           <- graph.from.spells(den.clean, diagonal = FALSE, minimum.duration = 1)
+  graph.spell           <- graph.from.spells(den, diagonal = FALSE, minimum.duration = 1)
   }
 
   # Time period
@@ -185,7 +185,7 @@ describe.cores <- function(cores){
   # Adjacencies
 
   number.of.edges     <- sapply(cores$adjacency.list, function(x) length(x@x)) / 2 
-  number.of.nodes     <- sapply(cores$adjacency.list, function(x) sum(rowSums(x) > 0))
+  number.of.nodes     <- sapply(cores$adjacency.list, function(x) sum(Matrix::rowSums(x) > 0))
   sum.of.edges        <- sapply(cores$adjacency.list, function(x) sum(1/x@x)) / 2 
   sum.of.strong.edges <- sapply(cores$adjacency.list, function(x) sum(1/ x@x[x@x <= 1] )) / 2 
   
