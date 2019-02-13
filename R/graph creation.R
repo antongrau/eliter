@@ -237,7 +237,7 @@ ego.two.mode <- function(name, den = den, n = Inf, text = "affil", member.of = p
   }
   
   net.two      <- two.mode(den.affil)
-  elite.net    <- elite.network(den.affil)
+  elite.net    <- elite.network(as.den(den.affil))
   name.in.net  <- which(V(elite.net)$name %in% name)
   sp.ego       <- shortest.paths(elite.net, v = name.in.net)
   sp.ego       <- 1/sp.ego 
