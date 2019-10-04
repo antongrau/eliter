@@ -1,62 +1,96 @@
 # Alternative approach ----
 library(eliter)
+library(tidyverse)
 data(pe13)
-data(den)
-
-den    <- den[den$SOURCE != "Events",]
 
 
 # Two mode decomposition ----
 
 # Decompose each level completely ----
 minimal.members.decomposition <- function(incidence, minimum.memberships = 3){
-
-# The incidence matrix
-inc         <- incidence
-
-# k is the minimum number of members
-k  <- 1
-
-# l.inc is a list of incidence matrices
-l.inc       <- list()
-
-# j is the minimum number of memberships for any individual
-level.up <- function(inc, k, j = 3){
+  
+  # The incidence matrix
+  inc         <- incidence
+  
+  # k is the minimum number of members
+  k  <- 1
+  
+  # l.inc is a list of incidence matrices
+  l.inc       <- list()
+  
+  # j is the minimum number of memberships for any individual
+  level.up <- function(inc, k, j = 3){
+    
+    test.mat <- function(inc, j, k){
+      
+      cond                       <- !is.null(dim(inc))
+      if(cond){
+        cond              <- any(
+          c(
+            any(rowSums(inc) < j), # Is there any individuals with less than j positions
+            any(colSums(inc) < k)  # Is there any affiliations with less than k members
+          ))
+      }
+      cond
+    } 
+    
+    while(test.mat(inc, j, k)){
+      inc.t       <- inc[rowSums(inc) >= j, ]
+      if(is.null(dim(inc.t))) break
+      inc         <- inc.t  # Keep only those members with j or more positions
+      
+      inc.t       <- inc[, colSums(inc) >= k]  # Keep only those affiliations with more than k members
+      if(is.null(dim(inc.t))) break
+      inc         <- inc.t
+    }
+    inc
+  }
+  
   while(
-    all(!is.null(dim(inc)),
-    any(
-      c(
-        any(rowSums(inc) < j), # Is there any individuals with less than j positions
-        any(colSums(inc) < k)  # Is there any affiliations with less than k members
-      )
-    )
-      ) 
+    k <= min(colSums(inc)) & ncol(inc) > minimum.memberships # While k is smaller than the lowest number of members and the number of affiliations is larger than the minimum number of memberships
   ){
-    inc         <- inc[rowSums(inc) >= j, ] # Keep only those members with j or more positions
-    inc         <- inc[, colSums(inc) >= k]  # Keep only those affiliations with more than k members
+    k           <- k + 1
+    tmp         <- level.up(inc, k, j = minimum.memberships)
+    inc         <- tmp
+    #if(identical(duplicate.check, TRUE)) inc <- unique.matrix(inc, MARGIN = 2)
+    l.inc[[k]]  <- inc
+    print(k)
+    print(dim(inc))
   }
-  inc
+  
+  # It gives us an annoying warning because level.up doesn't use a proper test of whether the inc is valid for further operation
+  
+  compact(l.inc)
 }
 
-while(
-  k <= min(colSums(inc)) & ncol(inc) > minimum.memberships # While k is smaller than the lowest number of members and the number of affiliations is larger than the minimum number of memberships
-  ){
-  k           <- k + 1
-  tmp         <- level.up(inc, k, j = minimum.memberships)
-  inc         <- tmp
-  #if(identical(duplicate.check, TRUE)) inc <- unique.matrix(inc, MARGIN = 2)
-  l.inc[[k]]  <- inc
-  print(k)
-  print(dim(inc))
-  }
 
-# It gives us an annoying warning because level.up doesn't use a proper test of whether the inc is valid for further operation
-
-l.inc
+level.membership <- function(l.inc){
+  l.inc       <- compact(l.inc)
+  membership  <- map(l.inc, rownames) %>% imap(~ tibble(Name = .x, Level = .y)) %>%
+    bind_rows() %>% arrange(Name)
+  
+  mem         <- membership %>% group_by(Name) %>% summarise(Level = max(Level))
+  mem[order(mem$Name), ]
 }
 
+level.summary <- function(l.inc){
+  l.inc  <- compact(l.inc)
+  l.g    <- map(l.inc, ~graph_from_incidence_matrix(incidence = .x))
+  l.cl   <- map(l.g, clusters)
+  
+  map_dbl(l.cl, "no")  
+  l.g %>% map(~bipartite.projection(.x)[[1]]) %>% map(degree) %>% map_dbl(mean)
+  
+}
+
+
+data(den)
+den         <- den[den$SOURCE != "Events",]
 incidence   <- xtabs(~NAME + AFFILIATION, droplevels(den), sparse = TRUE)
-l.inc <- minimal.members.decomposition(t(incidence), 3)
+l.inc       <- minimal.members.decomposition(t(incidence), 3)
+
+level.summary(l.inc)
+level.membership(l.inc)
 
 l.inc[[5]] %>% colSums() %>% sort() %>% as.matrix()
 l.inc[[5]] %>% rowSums() %>% sort() %>% as.matrix()
@@ -69,7 +103,7 @@ mca <-mca == 1
 mca <- soc.mca(as.data.frame(mca))
 contribution(mca, 2)
 
-map.ind(mca)
+#map.ind(mca)
 
 den.corp <- den[den$SOURCE == "Corporations",]
 
