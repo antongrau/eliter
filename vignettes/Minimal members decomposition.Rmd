@@ -1,0 +1,244 @@
+---
+title: "Two mode decomposition"
+author: "Anton Grau Larsen"
+date: "7/30/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggridges)
+library(eliter)
+
+```
+
+
+
+## Two mode decomposition
+
+We need specific methods for two mode decomposition when the degree distribution differs substantially between the two modes in a network. In other words when boards and board members have different network dynamics and different levels of degrees.
+
+## Why minimal members decomposition?
+
+We hope to develop a method that can work on datasets where the exact number of members in an affiliation is unknown - and the exact number of memberships also is unknown. 
+
+The method should return results that are relatively similar to the weighted core detection regime - but preferably also be better at the affiliation level. It is a goal that it can retain its two-mode nature.
+
+Our usual weighting scheme for core detection - which relies on the size of affiliations and on the number of ties between nodes is challenged by the missing data - such as we find it in Who's Who data or other sources. Missing data also affects the calculation of the reach graph.
+
+## Definition
+
+```{r}
+minimal.members.decomposition <- function(incidence, minimum.memberships = 3){
+
+# The incidence matrix
+inc         <- incidence
+
+# k is the minimum number of members
+k  <- 1
+
+# l.inc is a list of incidence matrices
+l.inc       <- list()
+
+# j is the minimum number of memberships for any individual
+level.up <- function(inc, k, j = 3){
+  while(
+    all(!is.null(dim(inc)),
+    any(
+      c(
+        any(rowSums(inc) < j), # Is there any individuals with less than j positions
+        any(colSums(inc) < k)  # Is there any affiliations with less than k members
+      )
+    )
+      ) 
+  ){
+    inc         <- inc[rowSums(inc) >= j, ] # Keep only those members with j or more positions
+    inc         <- inc[, colSums(inc) >= k]  # Keep only those affiliations with more than k members
+  }
+  inc
+}
+
+while(
+  k <= min(colSums(inc)) & ncol(inc) > minimum.memberships # While k is smaller than the lowest number of members and the number of affiliations is larger than the minimum number of memberships
+  ){
+  k           <- k + 1
+  tmp         <- level.up(inc, k, j = minimum.memberships)
+  inc         <- tmp
+  #if(identical(duplicate.check, TRUE)) inc <- unique.matrix(inc, MARGIN = 2)
+  l.inc[[k]]  <- inc
+  print(k)
+  print(dim(inc))
+  }
+
+# It gives us an annoying warning because level.up doesn't use a proper test of whether the inc is valid for further operation
+
+compact(l.inc)
+}
+
+```
+
+
+## Theoretical fit
+
+## Observations
+
+### No cut off!
+The main issue is that we do not have a natural cut point. Presently that might still be possible. 
+Most analysis have relatively few levels so choosing the right level of disaggregation is feasible if we have priors on the group size. 
+
+### Speed
+The method scales absurdly well and is lightning fast. The current implementation is not optimized but a simple laptop is able to run the algorithm on very large datasets within seconds.
+
+### The innermost level
+The innermost level is a clique of individuals 
+
+
+## The transposed method
+
+
+
+
+
+## Known issues
+
+Nested affiliations will naturally have linking members equal to the size of the smallest affiliation. This issue is only probably mainly prevalent in high data quality scenarios. In the who's who data people are unlikely to list both affiliations in a nested pair. The solution is to check for nestedness, data cleaning or perhaps to check for uniqueness. The simplest solution is to increase the minimum memberships to three, which still gives nested affilations a head start.
+
+In ultra high data quality scenarios we don't know the number of memberships because of fake affiliations.
+
+## Simulating missing
+
+__Privacy missing:__ A complete biography is missing. A likely form of missing is an existing biography with no affiliations listed. Lets call these types of missing privacy missing. Here there is not discrimination - any memberships are left out.  
+
+__Prominence missing:__ Less prominent positions are left out because of space considerations. A particularly active member leaves out positions in less prominent affiliations because otherwise his biography is going to be too long. It is likely to be somewhat unimportant affiliations that will be left out. But what is important to one person can be trivial for another. Affiliations that produce sector density are likely to be left out, while public commissions are likely to be registers.
+
+
+
+
+# Examples
+
+
+## DEN classic
+
+
+
+```{r den classic}
+data(pe13)
+data(den)
+
+den    <- den[den$SOURCE != "Events",]
+den    <- as.den(den)
+
+plot.collapse <- function(l.inc){
+
+  l.inc <- compact(l.inc)
+  names(l.inc) <- seq_along(l.inc)  
+  
+  d  <- tibble(level = names(l.inc),
+               rows = map(l.inc, nrow) %>% unlist(),
+         cols = map(l.inc, ncol) %>% unlist()
+            )
+  
+d    <- gather(d, key = "dim", "value", -level)  
+
+p    <- ggplot(d, aes(x = as.factor(level), y = value, fill = dim)) + geom_col( position = "dodge", color = "black") 
+p    <- p + theme_classic() + scale_fill_brewer(type = "qual", palette = "Pastel1", name = "Dimension")
+p + xlab("Level") + ylab("Count") + ggtitle("Minimal membership collapse sequence")
+
+#rs <- l.inc %>% map(colSums) %>% map_dbl(mean)
+ 
+# ggplot(rs, aes(y = values, x = ind)) + geom_jitter() + geom_violin()
+}
+
+
+level.membership <- function(l.inc){
+  l.inc       <- compact(l.inc)
+  membership  <- map(l.inc, rownames) %>% imap(~ tibble(Name = .x, Level = .y)) %>%
+                  bind_rows() %>% arrange(Name)
+  
+  mem         <- membership %>% group_by(Name) %>% summarise(Level = max(Level))
+  mem[order(mem$Name), ]
+  }
+
+level.summary <- function(l.inc){
+  l.inc  <- compact(l.inc)
+  l.g    <- map(l.inc, ~graph_from_incidence_matrix(incidence = .x))
+  l.cl   <- map(l.g, clusters)
+
+map_dbl(l.cl, "no")  
+l.g %>% map(~bipartite.projection(.x)[[1]]) %>% map(degree) %>% map_dbl(mean)
+
+}
+
+
+
+incidence   <- xtabs(~NAME + AFFILIATION, den, sparse = TRUE, drop.unused.levels = T)
+incidence   <- incidence[order(rownames(incidence)), ] # Der er noget helt galt, hvor xtabs ikke sorterer rigtigt!
+is.unsorted(rownames(incidence))
+l.inc       <- minimal.members.decomposition(incidence, 3)
+
+# Membership for affil mangler
+
+l.inc[[7]] %>% colSums() %>% sort() %>% as.matrix()
+l.inc[[7]] %>% rowSums() %>% sort() %>% as.matrix()
+
+l.inc[[5]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = FALSE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type, vertex.size = 0)
+
+l.inc[[7]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = TRUE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type)
+
+i <- l.inc[[8]]
+
+l.mem <- level.membership(l.inc)
+
+g   <- l.inc[[1]] %>% graph_from_incidence_matrix() %>% bipartite_projection(which = "false")
+all.equal(V(g)$name, l.mem$Name)
+
+d <- tibble(level = l.mem$Level, degree = degree(g), closeness = rank(closeness(g)),
+           between = rank(betweenness(g)), coreness = coreness(g))
+
+dl <- map_df(d, rank) >= nrow(d) - 500
+cor(dl)
+
+```
+
+```{r den.corp}
+den.corp <- den[den$SOURCE == "Corporations",]
+
+incidence   <- xtabs(~NAME + AFFILIATION, droplevels(den.corp), sparse = TRUE)
+l.inc       <- minimal.members.decomposition(incidence, 3)
+
+l.inc[[2]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = TRUE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type)
+```
+
+
+```{r den 17}
+load("~/Dropbox/Elite og Tal/Magtelite 2016/data/workspace_4.Rda")
+
+
+#den.db    <- den.db[!den.db$AFFILIATION %in% den.events$AFFILIATION %>% unique(), ]
+
+incidence   <- xtabs(~NAME + AFFILIATION, droplevels(den.db), sparse = TRUE)
+incidence   <- incidence[, colSums(incidence) <= 100]
+incidence   <- incidence[rowSums(incidence) > 0,]
+incidence   <- incidence > 0
+l.inc       <- minimal.members.decomposition(incidence, 3)
+
+l.inc[[7]] %>% colSums() %>% sort() %>% as.matrix()
+l.inc[[9]] %>% rowSums() %>% sort() %>% as.matrix()
+
+```
+
+```{r CORDIS}
+# load("~/Dropbox/Granted/R/Granted_data/data/Clean data.Rda")
+# 
+# rcn <- soc.projects$RCN[soc.projects$eu.ssh]
+# 
+# incidence   <- xtabs(~ org_legalName + `Project RCN`, participants[participants$`Project RCN` %in% rcn,], sparse = TRUE)
+# incidence   <- incidence[, colSums(incidence) <= 50]
+# l.inc       <- minimal.members.decomposition(incidence, 3)
+# 
+# tail(l.inc, 10)[[6]] %>% rowSums() %>% sort() %>% as.matrix()
+```
+
