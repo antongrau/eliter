@@ -85,11 +85,6 @@ graph.plot  <- function(graph, layout = layout_with_fr(graph, weight = E(graph)$
     midpoint.aes$y              <- (edge.coords$start.y + edge.coords$slut.y) / 2
     
     
-    # Her bevæger vi os 1/l hen af vectoren imod slutpunktet. x1 kan så være midpunktet.
-    # l = sqrt((x2 - x1)^2 + (y2 -y1)^2)
-    # x3 = x1 + (1/l) * (x2 - x1)
-    # y3 = y1 + (1/l) * (y2 - y1)
-    
     a                            <- (edge.coords$slut.x - midpoint.aes$x)^2
     b                            <- (edge.coords$slut.y - midpoint.aes$y)^2
     L                            <- sqrt(a + b)
@@ -234,11 +229,6 @@ graph.plot.repel  <- function(graph, layout = layout_with_fr(graph, weight = E(g
     midpoint.aes$x              <- (edge.coords$start.x + edge.coords$slut.x) / 2
     midpoint.aes$y              <- (edge.coords$start.y + edge.coords$slut.y) / 2
     
-    
-    # Her bevæger vi os 1/l hen af vectoren imod slutpunktet. x1 kan så være midpunktet.
-    # l = sqrt((x2 - x1)^2 + (y2 -y1)^2)
-    # x3 = x1 + (1/l) * (x2 - x1)
-    # y3 = y1 + (1/l) * (y2 - y1)
     
     a                            <- (edge.coords$slut.x - midpoint.aes$x)^2
     b                            <- (edge.coords$slut.y - midpoint.aes$y)^2

@@ -4,7 +4,7 @@
 \alias{extract.postal.codes}
 \title{Extract Danish postal codes from an adress string}
 \usage{
-extract.postal.codes(x, check.valid = FALSE)
+\method{extract}{postal.codes}(x, check.valid = FALSE)
 }
 \arguments{
 \item{x}{a character vector with addresses}
