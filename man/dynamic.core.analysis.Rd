@@ -4,9 +4,15 @@
 \alias{dynamic.core.analysis}
 \title{Identify dynamic cores}
 \usage{
-dynamic.core.analysis(den, graph.spell = NULL, adjacency.list = NULL,
-  period = c(ymd(19880101), ymd(19901231)), median.term = 38,
-  max.terms = 2, boost = 38)
+dynamic.core.analysis(
+  den,
+  graph.spell = NULL,
+  adjacency.list = NULL,
+  period = c(ymd(19880101), ymd(19901231)),
+  median.term = 38,
+  max.terms = 2,
+  boost = 38
+)
 }
 \arguments{
 \item{den}{a den class object}
@@ -22,6 +28,9 @@ dynamic.core.analysis(den, graph.spell = NULL, adjacency.list = NULL,
 \item{max.terms}{the maximum number of terms}
 
 \item{boost}{the minimum value of active relations}
+}
+\value{
+
 }
 \description{
 Identify dynamic cores

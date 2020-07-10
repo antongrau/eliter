@@ -4,8 +4,15 @@
 \alias{layout.cl}
 \title{Layout with Louvain clusters}
 \usage{
-layout.cl(graph, decompose = TRUE, n = 3, remove.isolates = FALSE,
-  isolates.distance = 0.2, isolates.cloud.size = 1.2, ...)
+layout.cl(
+  graph,
+  decompose = TRUE,
+  n = 3,
+  remove.isolates = FALSE,
+  isolates.distance = 0.2,
+  isolates.cloud.size = 1.2,
+  ...
+)
 }
 \arguments{
 \item{graph}{}
@@ -21,6 +28,9 @@ layout.cl(graph, decompose = TRUE, n = 3, remove.isolates = FALSE,
 \item{isolates.cloud.size}{}
 
 \item{...}{}
+}
+\value{
+
 }
 \description{
 Layout with Louvain clusters

@@ -12,9 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggridges)
 library(eliter)
-
 ```
-
 
 
 ## Two mode decomposition
@@ -32,52 +30,7 @@ Our usual weighting scheme for core detection - which relies on the size of affi
 ## Definition
 
 ```{r}
-minimal.members.decomposition <- function(incidence, minimum.memberships = 3){
-
-# The incidence matrix
-inc         <- incidence
-
-# k is the minimum number of members
-k  <- 1
-
-# l.inc is a list of incidence matrices
-l.inc       <- list()
-
-# j is the minimum number of memberships for any individual
-level.up <- function(inc, k, j = 3){
-  while(
-    all(!is.null(dim(inc)),
-    any(
-      c(
-        any(rowSums(inc) < j), # Is there any individuals with less than j positions
-        any(colSums(inc) < k)  # Is there any affiliations with less than k members
-      )
-    )
-      ) 
-  ){
-    inc         <- inc[rowSums(inc) >= j, ] # Keep only those members with j or more positions
-    inc         <- inc[, colSums(inc) >= k]  # Keep only those affiliations with more than k members
-  }
-  inc
-}
-
-while(
-  k <= min(colSums(inc)) & ncol(inc) > minimum.memberships # While k is smaller than the lowest number of members and the number of affiliations is larger than the minimum number of memberships
-  ){
-  k           <- k + 1
-  tmp         <- level.up(inc, k, j = minimum.memberships)
-  inc         <- tmp
-  #if(identical(duplicate.check, TRUE)) inc <- unique.matrix(inc, MARGIN = 2)
-  l.inc[[k]]  <- inc
-  print(k)
-  print(dim(inc))
-  }
-
-# It gives us an annoying warning because level.up doesn't use a proper test of whether the inc is valid for further operation
-
-compact(l.inc)
-}
-
+eliter::minimal.members.decomposition
 ```
 
 
@@ -99,14 +52,15 @@ The innermost level is a clique of individuals
 ## The transposed method
 
 
-
-
-
 ## Known issues
 
-Nested affiliations will naturally have linking members equal to the size of the smallest affiliation. This issue is only probably mainly prevalent in high data quality scenarios. In the who's who data people are unlikely to list both affiliations in a nested pair. The solution is to check for nestedness, data cleaning or perhaps to check for uniqueness. The simplest solution is to increase the minimum memberships to three, which still gives nested affilations a head start.
+Nested affiliations will naturally have linking members equal to the size of the smallest affiliation. This issue is mainly prevalent in high data quality scenarios. In the who's who data people are unlikely to list both affiliations in a nested pair. The solution is to check for nestedness, data cleaning or perhaps to check for uniqueness. The simplest solution is to increase the minimum memberships to three, which still gives nested affilations a head start.
 
 In ultra high data quality scenarios we don't know the number of memberships because of fake affiliations.
+
+We can collapse affilations that have identical members. If done for each level it works somewhat like a betweenness decomposition.
+
+We need to check for multiple memberships in the same affiliation
 
 ## Simulating missing
 
@@ -119,17 +73,102 @@ __Prominence missing:__ Less prominent positions are left out because of space c
 
 # Examples
 
+## Theoretical example
+```{r}
+el            <- list()
+el$david      <- tibble(NAME = "David", AFFILIATION = LETTERS[1:3])
+el$boris      <- tibble(NAME = "Boris", AFFILIATION = LETTERS[c(1:5, 7)])
+el$tony       <- tibble(NAME = "Tony",  AFFILIATION = LETTERS[4:6])
+el$theresa    <- tibble(NAME = "Theresa", AFFILIATION = LETTERS[c(1,4, 6)])
+el$gordon     <- tibble(NAME = "Gordon", AFFILIATION = LETTERS[c(1,2, 3, 6, 7)])
+
+el$iso1     <- tibble(NAME = paste("iso", LETTERS[1], 1:5), AFFILIATION = LETTERS[1])
+el$iso2     <- tibble(NAME = paste("iso", LETTERS[2], 1:5), AFFILIATION = LETTERS[2])
+el$iso3     <- tibble(NAME = paste("iso", LETTERS[3], 1:4), AFFILIATION = LETTERS[3])
+el$iso4     <- tibble(NAME = paste("iso", LETTERS[4], 1:4), AFFILIATION = LETTERS[4])
+el$iso5     <- tibble(NAME = paste("iso", LETTERS[5], 1:4), AFFILIATION = LETTERS[5])
+el$iso6     <- tibble(NAME = paste("iso", LETTERS[6], 1:2), AFFILIATION = LETTERS[6])
+
+el$iso7     <- tibble(NAME = paste("iso", LETTERS[3], 1:4), AFFILIATION = LETTERS[7])
+
+
+el          <- bind_rows(el)
+incidence   <- xtabs(~NAME + AFFILIATION, el, sparse = TRUE)
+
+g           <- graph_from_incidence_matrix(incidence)
+l.inc       <- minimal.members.decomposition(incidence, minimum.memberships = 2, check.for.nested = T)
+
+map(l.inc, dim)
+lev.mem     <- level.membership(l.inc, mode = "two-mode")
+
+p           <- graph.plot(g, text = TRUE, vertex.fill = factor(lev.mem$Level), vertex.shape = factor(lev.mem$type) , edge.color = "black", text.vjust = -1, vertex.size = degree(g), edge.size = 0.2)
+p + scale_shape_manual(values = c(21, 22)) + scale_size(range = c(2,6))
+```
+
+## Minimal example 2 levels
+```{r}
+el            <- list()
+el$david      <- tibble(NAME = "Linker: David", AFFILIATION = LETTERS[1:3])
+el$boris      <- tibble(NAME = "Linker: Boris", AFFILIATION = LETTERS[1:2])
+
+el$iso1     <- tibble(NAME = paste("Isolate", LETTERS[1]), AFFILIATION = LETTERS[1])
+el$iso2     <- tibble(NAME = paste("Isolate", LETTERS[2]), AFFILIATION = LETTERS[2])
+el$iso3     <- tibble(NAME = paste("Isolate", LETTERS[3]), AFFILIATION = LETTERS[3])
+
+
+el          <- bind_rows(el)
+incidence   <- xtabs(~NAME + AFFILIATION, el, sparse = TRUE)
+
+g           <- graph_from_incidence_matrix(incidence)
+l.inc       <- minimal.members.decomposition(incidence, minimum.memberships = 2, check.for.nested = F)
+
+map(l.inc, dim)
+lev.mem     <- level.membership(l.inc, mode = "two-mode")
+
+p           <- graph.plot(g, text = TRUE, vertex.fill = factor(lev.mem$Level), vertex.shape = factor(lev.mem$type) , edge.color = "black", text.vjust = -1, vertex.size = degree(g), edge.size = 0.2)
+p + scale_shape_manual(values = c(21, 22)) + scale_size(range = c(2,6))
+
+```
+
+## Minimal example 3 levels
+```{r}
+el            <- list()
+el$david      <- tibble(NAME = "Linker: David", AFFILIATION = LETTERS[1:3])
+el$boris      <- tibble(NAME = "Linker: Boris", AFFILIATION = LETTERS[1:3])
+el$tony       <- tibble(NAME = "Linker: Tony", AFFILIATION = LETTERS[1:2])
+
+el$iso1     <- tibble(NAME = paste("Isolate", LETTERS[1]), AFFILIATION = LETTERS[1])
+el$iso2     <- tibble(NAME = paste("Isolate", LETTERS[2]), AFFILIATION = LETTERS[2])
+el$iso3     <- tibble(NAME = paste("Isolate", LETTERS[3]), AFFILIATION = LETTERS[3])
+
+
+el          <- bind_rows(el)
+incidence   <- xtabs(~NAME + AFFILIATION, el, sparse = TRUE)
+
+g           <- graph_from_incidence_matrix(incidence)
+l.inc       <- minimal.members.decomposition(incidence, minimum.memberships = 2, check.for.nested = F)
+
+map(l.inc, dim)
+lev.mem     <- level.membership(l.inc, mode = "two-mode")
+
+p           <- graph.plot(g, text = TRUE, vertex.fill = factor(lev.mem$Level), vertex.shape = factor(lev.mem$type) , edge.color = "black", text.vjust = -1, vertex.size = degree(g), edge.size = 0.2)
+p + scale_shape_manual(values = c(21, 22)) + scale_size(range = c(2,6))
+```
+
+
+
+
 
 ## DEN classic
-
-
-
 ```{r den classic}
 data(pe13)
 data(den)
 
 den    <- den[den$SOURCE != "Events",]
+kill   <- c("Arbejdsmiljørådet (Rådsmedlemmer)")
+den    <- den %>% filter(!AFFILIATION %in% kill)
 den    <- as.den(den)
+
 
 plot.collapse <- function(l.inc){
 
@@ -153,14 +192,6 @@ p + xlab("Level") + ylab("Count") + ggtitle("Minimal membership collapse sequenc
 }
 
 
-level.membership <- function(l.inc){
-  l.inc       <- compact(l.inc)
-  membership  <- map(l.inc, rownames) %>% imap(~ tibble(Name = .x, Level = .y)) %>%
-                  bind_rows() %>% arrange(Name)
-  
-  mem         <- membership %>% group_by(Name) %>% summarise(Level = max(Level))
-  mem[order(mem$Name), ]
-  }
 
 level.summary <- function(l.inc){
   l.inc  <- compact(l.inc)
@@ -172,21 +203,37 @@ l.g %>% map(~bipartite.projection(.x)[[1]]) %>% map(degree) %>% map_dbl(mean)
 
 }
 
-
-
 incidence   <- xtabs(~NAME + AFFILIATION, den, sparse = TRUE, drop.unused.levels = T)
+incidence@x[] <- 1
+
 incidence   <- incidence[order(rownames(incidence)), ] # Der er noget helt galt, hvor xtabs ikke sorterer rigtigt!
 is.unsorted(rownames(incidence))
-l.inc       <- minimal.members.decomposition(incidence, 3)
+l.inc       <- minimal.members.decomposition(incidence, 3, check.for.nested = TRUE)
 
 # Membership for affil mangler
+lev.mem     <- level.membership(l.inc)
 
-l.inc[[7]] %>% colSums() %>% sort() %>% as.matrix()
-l.inc[[7]] %>% rowSums() %>% sort() %>% as.matrix()
+map(l.inc, dim)
+l <- length(l.inc)
 
-l.inc[[5]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = FALSE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type, vertex.size = 0)
+l.inc[[l]] %>% colSums() %>% sort() %>% as.matrix()
+l.inc[[l - 1]] %>% colSums() %>% sort() %>% as.matrix()
+l.inc[[l - 2]] %>% colSums() %>% sort() %>% as.matrix()
+l.inc[[l - 3]] %>% colSums() %>% sort() %>% as.matrix()
+l.inc[[l - 4]] %>% colSums() %>% sort() %>% as.matrix()
 
-l.inc[[7]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = TRUE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type)
+l.set <- l.inc[[l]]
+
+
+incidence <- l.inc[[l - 4]]
+
+
+l.set %>% rowSums() %>% as.matrix()
+
+
+l.inc[[l]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = FALSE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type, vertex.size = 0)
+
+l.inc[[l]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = TRUE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type)
 
 i <- l.inc[[8]]
 
@@ -201,6 +248,15 @@ d <- tibble(level = l.mem$Level, degree = degree(g), closeness = rank(closeness(
 dl <- map_df(d, rank) >= nrow(d) - 500
 cor(dl)
 
+# Fejl med haveselskabet
+s <- c("Haveselskabet (bestyrelse)", "Haveselskabet (styrelsesråd)")
+
+incidence <- l.inc[[8]]
+l.i <- minimal.members.decomposition(l.inc[[8]], 2, check.for.nested = TRUE)
+l.i[[1]][, s] %>% colSums() %>% sort(decreasing = TRUE)
+
+
+
 ```
 
 ```{r den.corp}
@@ -209,7 +265,7 @@ den.corp <- den[den$SOURCE == "Corporations",]
 incidence   <- xtabs(~NAME + AFFILIATION, droplevels(den.corp), sparse = TRUE)
 l.inc       <- minimal.members.decomposition(incidence, 3)
 
-l.inc[[2]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = TRUE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type)
+l.inc[[1]] %>% graph_from_incidence_matrix() %>% graph.plot.twomode(text = TRUE, edge.color = "grey50", edge.size = 0.5, vertex.fill = V(.)$type)
 ```
 
 
@@ -240,5 +296,10 @@ l.inc[[9]] %>% rowSums() %>% sort() %>% as.matrix()
 # l.inc       <- minimal.members.decomposition(incidence, 3)
 # 
 # tail(l.inc, 10)[[6]] %>% rowSums() %>% sort() %>% as.matrix()
+```
+
+
+```{r}
+
 ```
 

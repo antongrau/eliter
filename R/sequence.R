@@ -1,5 +1,95 @@
 # Functions for sequences -----
 
+#' Title
+#'
+#' @param data the sequence data set
+#'
+#' @return
+#' @details data needs to have the following format: start and end in years. organization is the name of the organization.
+#' @export
+#'
+#' @examples
+#' data("careers")
+#' dt        <- sequence.data_raw[!gsub(",", ".", sequence.data_raw$`Career level`) %in% c(0.3, 0.5, 0.6, 0.7, 0.8,0.9),]
+#' dt        <- data.frame(name = dt$NAME, organization = dt$Organisation, start = dt$Start, end = dt$End)
+#' plot_cum_ind_pr_org(dt)
+
+plot_cum_ind_pr_org <- function(data, reference.year = 2013, cut.points = c(0.5, 0.75, 0.9, 0.95), x.position = 200) {
+  
+  data      <- na.omit(data)
+  data      <- data %>% mutate(duration = (end - start) + 1, present.in.reference = end == reference.year)
+  org.stat  <- data %>% group_by(organization, name) %>% summarise(duration.in.position = sum(duration), present = sum(present.in.reference))
+  org.stat  <- org.stat %>% summarise(years.in.org = sum(duration.in.position), pers.in.org = n(), present = sum(present))
+  org.stat  <- org.stat %>% arrange(-pers.in.org) %>% mutate(cum.sum.pers = cumsum(pers.in.org), cum.sum.pers.share = cumsum(pers.in.org)/sum(pers.in.org))
+
+  # Persons
+  persons <- tibble(x = 1:length(unique(org.stat$organization)), nb = NA, nb_still = NA, cum_pct_ind = NA)
+  
+  i <- 1
+  for(i in 1:nrow(persons)){
+    persons$nb[i]                 <- length(unique(data$name[data$organization %in% org.stat$organization[1:i]]))
+    persons$nb_still[i]           <- length(unique(data$name[data$end == reference.year & data$organization %in% org_stat$organization[1:i]]))
+    persons$cum_pct_ind[i]        <- length(unique(data$name[data$organization %in% org.stat$organization[1:i]])) / length(unique(data$name))
+  }
+  
+  # creating 'cut points' for the graph
+  
+  f <- function(persons, x){
+    nrow(persons) - sum(persons$cum_pct_ind >= x) + 1
+  }
+  
+  cp      <- map(cut.points, ~f(persons, .x)) %>% unlist()
+  seg.dat <- tibble(cp = cp, share = cut.points)
+  
+  p <- ggplot() + geom_line(data = persons, aes(x = 1:nrow(persons), y = cum_pct_ind), size = 0.6, alpha = 0.8,) 
+  p <- p + scale_y_continuous(expand = c(0,0), breaks = c(0, 25, 50, 75, 90, 95,100)/100, labels = percent, minor_breaks = seq(0, 100, 12.5))
+  p <- p + geom_segment(data = seg.dat, mapping = aes(x = 0, y = share, xend = cp, yend = share), size = 0.4, alpha = 0.8)
+  p <- p + geom_segment(data = seg.dat, mapping = aes(x = cp, y = 0, xend = cp, yend = share), size = 0.4, alpha = 0.8)
+  
+  p <- p + xlab('Nb of organizations (orderd by Nb of individuals)')
+  p <- p + ylab(paste0('Cumulated % unique individuals', " (N = ", length(unique(data$name)), ")", sep = ""))
+  p <- p + theme_classic() + theme(text = element_text(family = "serif"))
+
+  breaks  <- c(1, 100, 200, 300, 400, 500, 600, length(unique(org.stat$organization)),
+               cp) %>% sort()
+  
+  
+  p1 <- p1 + scale_x_continuous(expand = c(0,0), breaks = breaks, 
+                                labels = breaks,
+                                minor_breaks = seq(0, nrow(org.stat), 100))
+  
+  p1 <- p1 + labs(title = "", family  = "serif")
+  
+  # Plotting table
+  t.m <- org.stat %>% select(Organization = organization, Years = years.in.org, Persons = pers.in.org, `Still active` = present)
+  t.p <- t.m %>% mutate(Organization = as.character(Organization))
+  t.p <- t.p[1:cp[1], ]  
+  t.p[nrow(t.p) + 1,] <- "..."
+  t.p[nrow(t.p) + 1,] <- c("Total", t.m[1:cp[1], ] %>% select(-Organization) %>% colSums())
+  t.p[nrow(t.p) + 1,] <- "..."
+  t.p[nrow(t.p) + 1,] <- c("Grand total", sum(org.stat$years.in.org), n_distinct(data$name), n_distinct(data$name))
+  tab <- t.p
+  
+  
+  just                  <- matrix(NA, nrow = nrow(tab), ncol = ncol(tab))
+  just.x                <- just
+  just[,1]              <- 0
+  just.x[,1]            <- 0.05
+  just[,2:ncol(just)]   <- 1
+  just.x[,2:ncol(just)] <- 0.9
+  
+  tbody.style <- tbody_style(color = "black", face = "plain", size = 8, hjust = just, x = just.x, fill = "white") 
+  colnames.style <- colnames_style(color = "black", face = "bold", fill =  "white",size = 10, hjust = c(0,1,1,1), x = c(0.05,0.9,0.9,0.9))
+  stable.p <- ggtexttable(tab, rows = NULL, theme = ttheme(tbody.style = tbody.style, padding = unit(c(3,3), "mm"), colnames.style = colnames.style), cols = c("Organisation","Years", "Persons", paste0("Still active (", reference.year, ")")))
+  stable.p  <- stable.p + theme(text = element_text(family = "serif"))
+  
+  p1 <- p + annotation_custom(ggplotGrob(stable.p),
+                              ymax = 0.95,
+                              xmin = x.position)
+  p1
+}
+
+
 
 
 

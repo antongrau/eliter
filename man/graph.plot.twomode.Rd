@@ -4,9 +4,15 @@
 \alias{graph.plot.twomode}
 \title{Twomode graphs}
 \usage{
-graph.plot.twomode(graph, layout = "default", vertex.fill = "type",
-  vertex.size = "degree", edge.color = "edge.betweenness",
-  edge.alpha = "edge.betweenness", ...)
+graph.plot.twomode(
+  graph,
+  layout = "default",
+  vertex.fill = "type",
+  vertex.size = "degree",
+  edge.color = "edge.betweenness",
+  edge.alpha = "edge.betweenness",
+  ...
+)
 }
 \arguments{
 \item{graph}{a twomode graph}

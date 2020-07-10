@@ -3,7 +3,7 @@ Type: Package
 Title: Contains the Danish Elite Network for 2012 and 2017 with analytical functions.
 Version: 1.0
 Date: 2019-09-19
-Author: Anton Grau Larsen, Christoph Ellersgaard, Ronnie Taarnborg
+Author: Anton Grau Larsen, Christoph Ellersgaard, Ronnie Taarnborg, Jacob Lunding
 Maintainer: Who to complain to <antongrau@gmail.com>
 Description: Here we collect and develop a set of tools for the analysis of affiliation networks. Currently it contains functions for weighting networks, temporal affiliation networks, k-shell decomposition, betweenness decomposition and a ton of convience and plotting functions. Furthermore this package contains data and code from published works on elites.
 Depends:
@@ -25,12 +25,17 @@ Depends:
     TraMineR,
     TraMineRextras,
     RColorBrewer,
-    geosphere
+    geosphere,
+    rvest,
+    xml2,
+    httr,
+    WikipediR
 Imports:
     qlcMatrix,
     ggthemes,
     plyr,
-    shiny
+    shiny,
+    ggpubr
 License: GPL-3
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Encoding: UTF-8

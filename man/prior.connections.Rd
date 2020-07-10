@@ -11,6 +11,9 @@ prior.connections(graph.spell, minimum.gap = 12)
 
 \item{minimum.gap}{}
 }
+\value{
+
+}
 \description{
 Title
 }

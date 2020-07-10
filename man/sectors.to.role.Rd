@@ -4,8 +4,13 @@
 \alias{sectors.to.role}
 \title{Roles and position on the basis of sectors}
 \usage{
-sectors.to.role(den, list.dens, role = c("Chief executive", "Executive"),
-  other = "Other", mutually.exclusive = FALSE)
+sectors.to.role(
+  den,
+  list.dens,
+  role = c("Chief executive", "Executive"),
+  other = "Other",
+  mutually.exclusive = FALSE
+)
 }
 \arguments{
 \item{den}{a den class object, see \link{as.den} with a ROLE variable}

@@ -4,8 +4,14 @@
 \alias{ego.two.mode}
 \title{A report of the first neighborhood of an individiual}
 \usage{
-ego.two.mode(name, den = den, n = Inf, text = "affil",
-  member.of = pe13$Name, ...)
+ego.two.mode(
+  name,
+  den = den,
+  n = Inf,
+  text = "affil",
+  member.of = pe13$Name,
+  ...
+)
 }
 \arguments{
 \item{name}{a single or several names}

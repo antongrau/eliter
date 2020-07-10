@@ -4,9 +4,18 @@
 \alias{dist.plot}
 \title{Distribution plot}
 \usage{
-dist.plot(x, decreasing = TRUE, sort = TRUE, navn = substitute(x),
-  mean = FALSE, linecolor = "darkblue", rug = FALSE, area = TRUE,
-  plf = FALSE, ...)
+dist.plot(
+  x,
+  decreasing = TRUE,
+  sort = TRUE,
+  navn = substitute(x),
+  mean = FALSE,
+  linecolor = "darkblue",
+  rug = FALSE,
+  area = TRUE,
+  plf = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{a numerical vector}

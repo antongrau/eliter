@@ -6,7 +6,7 @@
 NULL
 
 
-#' Danish Elite Network
+#' Danish Elite Network 2012/2013
 #' 
 #' A affiliation network
 #'
@@ -22,6 +22,16 @@ NULL
 #' @name pe13
 #' @docType data
 NULL
+
+#' Danish Elite Network 2012/2013
+#' 
+#' A affiliation network
+#'
+#' @name den17
+#' @docType data
+NULL
+
+
 
 #'Directors 2008 dataset
 #'
@@ -475,4 +485,7 @@ NULL
 # directors08 <- read.csv("~/My Dropbox/Elite/Data/Firmaets Mænd 2008/Data_directors_2008.csv", sep = ",", fileEncoding = "UTF-8", dec = ",")
 # save(directors08, file = "~/soc.elite/data/directors08.rda")
 
+# Save den17 ----
+# den17          <- read_delim("raw_data/den17.csv", delim = ";")
+# save(den17, file = "data/den17.rda")
 

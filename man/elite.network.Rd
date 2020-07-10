@@ -4,8 +4,12 @@
 \alias{elite.network}
 \title{Create a weighted network graph}
 \usage{
-elite.network(den, result = c("ind", "affil", "two.mode"), sigma = 14,
-  base = exp(1))
+elite.network(
+  den,
+  result = c("ind", "affil", "two.mode"),
+  sigma = 14,
+  base = exp(1)
+)
 }
 \arguments{
 \item{den}{a den class object, see \link{as.den}}

@@ -5,9 +5,15 @@
 \alias{eliteDB_cvr}
 \title{eliteDB_cvr}
 \usage{
-eliteDB_cvr(conn = NULL, user = NULL, pass = NULL,
-  db = "elitedb_bigdata", cvr = NULL, ownership = NULL,
-  employees = NULL)
+eliteDB_cvr(
+  conn = NULL,
+  user = NULL,
+  pass = NULL,
+  db = "elitedb_bigdata",
+  cvr = NULL,
+  ownership = NULL,
+  employees = NULL
+)
 }
 \arguments{
 \item{conn}{en åben forbindelse til eliteDB}

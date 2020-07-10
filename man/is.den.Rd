@@ -9,6 +9,9 @@ is.den(x)
 \arguments{
 \item{x}{an R object}
 }
+\value{
+
+}
 \description{
 Check if it is a den class object
 }

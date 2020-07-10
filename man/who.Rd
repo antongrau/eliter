@@ -4,8 +4,14 @@
 \alias{who}
 \title{Who?}
 \usage{
-who(name, den = "den", only.affiliations = TRUE, ignore.case = TRUE,
-  tags = FALSE, ...)
+who(
+  name,
+  den = "den",
+  only.affiliations = TRUE,
+  ignore.case = TRUE,
+  tags = FALSE,
+  ...
+)
 }
 \arguments{
 \item{name}{the name of the individual}

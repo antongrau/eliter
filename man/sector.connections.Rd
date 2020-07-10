@@ -15,6 +15,9 @@ sector.connections(graph, you = V(graph)$name, sectors, how.well = 2)
 
 \item{how.well}{}
 }
+\value{
+
+}
 \description{
 Title
 }

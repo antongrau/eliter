@@ -4,8 +4,13 @@
 \alias{reach}
 \title{Reach centrality}
 \usage{
-reach(graph, order = 2, mode = "all", weight = E(graph)$weight,
-  max.path = NULL)
+reach(
+  graph,
+  order = 2,
+  mode = "all",
+  weight = E(graph)$weight,
+  max.path = NULL
+)
 }
 \arguments{
 \item{graph}{a weighted graph}

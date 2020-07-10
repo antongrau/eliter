@@ -11,6 +11,9 @@ add_density(layout, ...)
 
 \item{...}{}
 }
+\value{
+
+}
 \description{
 Height curves show where on a plot the concentration of points is largest.
 In the example below we are interested in where in the network women are concentrated.

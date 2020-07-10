@@ -4,8 +4,15 @@
 \alias{weighted.graph}
 \title{Title}
 \usage{
-weighted.graph(spell.graph, start, end, to.distance = TRUE,
-  distance.weight = distance.weight, decay = decay, m = 38)
+weighted.graph(
+  spell.graph,
+  start,
+  end,
+  to.distance = TRUE,
+  distance.weight = distance.weight,
+  decay = decay,
+  m = 38
+)
 }
 \arguments{
 \item{spell.graph}{}
@@ -19,6 +26,9 @@ weighted.graph(spell.graph, start, end, to.distance = TRUE,
 \item{distance.weight}{}
 
 \item{decay}{}
+}
+\value{
+
 }
 \description{
 Title

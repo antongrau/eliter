@@ -8,6 +8,7 @@
 #' @param vertex.shape a single value or a vector of the same length and order as the vertices in graph.
 #' @param vertex.size a single value or a vector of the same length and order as the vertices in graph.
 #' @param vertex.alpha a single value between 0 and 1 or a vector of the same length and order as the vertices in graph. 
+#' @param vertex.stroke a single numeric value controlling the stroke size of points
 #' @param vertex.order a numeric vector of the same length and order as the vertices in the graph. 
 #' @param edges if TRUE edges are drawn.
 #' @param edge.color a single value or a vector of the same length and order as the edges in graph. See \link{colors} for valid single values.
@@ -32,7 +33,7 @@
 #' data(den)
 #' health.affil  <- has.tags(den, c("Health"))
 #' den.health    <- droplevels(den[den$AFFILIATION %in% health.affil,])
-#' net.org       <- elite.network.org(den.health)
+#' net.org       <- elite.network(den.health, result = "affil")
 #' lay.org       <- layout.fruchterman.reingold(net.org)
 #' p             <- graph.plot(net.org, layout = lay.org, vertex.size = V(net.org)$members, vertex.fill = degree(net.org),
 #'                             edge.color = "darkmagenta", edge.alpha = log(1/E(net.org)$weight))
@@ -40,7 +41,7 @@
 #' p + scale_alpha_continuous(range = c(0,1))
 
 graph.plot  <- function(graph, layout = layout_with_fr(graph, weight = E(graph)$weight^2, grid = "nogrid"),
-                        vertex.color = "black", vertex.fill = "grey60", vertex.shape = 21, vertex.size = 3, vertex.alpha = 1, vertex.order = FALSE, vertex.background = "white",
+                        vertex.color = "black", vertex.fill = "grey60", vertex.shape = 21, vertex.size = 3, vertex.alpha = 1, vertex.stroke = 0.5, vertex.order = FALSE, vertex.background = "white",
                         edges = TRUE, edge.color = "darkblue", edge.alpha = E(graph)$weight, edge.size = 1, edge.line = "solid", edge.order = FALSE,
                         text = FALSE, text.background = NULL, text.background.alpha = 0.4, text.background.border = 0, text.size = 3, text.color = "black", text.alpha = 1, legend = "side", text.vjust = 1.5, text.family = "Times", midpoints = FALSE,
                         midpoint.arrow = arrow(angle = 20, length = unit(0.33, "cm"), ends = "last", type = "closed"), edge.text = FALSE, edge.text.size = 3, edge.text.alpha = 0.9, norm.coords = TRUE){
@@ -48,7 +49,7 @@ graph.plot  <- function(graph, layout = layout_with_fr(graph, weight = E(graph)$
   if (identical(norm.coords, TRUE))  layout[, 1:2]           <- norm_coords(layout[, 1:2], xmin = 1, xmax = 10^10, ymin = 1, ymax = 10^10)
  
   vertex.coords           <- as.data.frame(vertex.coord(graph, layout))
-  vertex.l                <- list(color=vertex.color, fill = vertex.fill, shape=vertex.shape, size=vertex.size, alpha=vertex.alpha)
+  vertex.l                <- list(color=vertex.color, fill = vertex.fill, shape=vertex.shape, size=vertex.size, alpha=vertex.alpha, stroke = vertex.stroke)
   v.i                     <- unlist(lapply(vertex.l, length)) == 1
   vertex.attributes       <- vertex.l[v.i]
   vertex.aes              <- vertex.l[v.i == FALSE]
@@ -170,7 +171,7 @@ graph.plot  <- function(graph, layout = layout_with_fr(graph, weight = E(graph)$
   
   # Formatting
   p <- p + theme_bw() + theme(text=element_text(family = text.family))
-  p <- p + labs(alpha="Alpha", shape="Shape", color="Color", linetype="Linetype", size="Size", fill="Fill")
+  p <- p + labs(alpha="", shape="", color="", linetype="", size="", fill="")
   
   if(legend=="bottom")  p <- p + theme(legend.position='bottom', legend.direction="horizontal", legend.box="horizontal")
   

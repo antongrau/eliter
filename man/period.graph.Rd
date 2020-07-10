@@ -11,6 +11,9 @@ period.graph(spell.graph, start, end)
 
 \item{period}{}
 }
+\value{
+
+}
 \description{
 Title
 }

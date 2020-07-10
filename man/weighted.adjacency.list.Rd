@@ -4,8 +4,15 @@
 \alias{weighted.adjacency.list}
 \title{Create a list af weighted adjacency matrices}
 \usage{
-weighted.adjacency.list(spell.graph, start, end, m = 38, boost = m,
-  max.terms = 3, to.distance = TRUE)
+weighted.adjacency.list(
+  spell.graph,
+  start,
+  end,
+  m = 38,
+  boost = m,
+  max.terms = 3,
+  to.distance = TRUE
+)
 }
 \arguments{
 \item{spell.graph}{a spell.graph}
@@ -15,6 +22,9 @@ weighted.adjacency.list(spell.graph, start, end, m = 38, boost = m,
 \item{end}{}
 
 \item{to.distance}{if TRUE weights are recalculated with \link{distance.weight}, otherwise weighted months}
+}
+\value{
+
 }
 \description{
 A more efficient way of creating time series of \link{weighted.graph}

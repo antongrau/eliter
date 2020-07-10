@@ -4,8 +4,14 @@
 \alias{tags.to.sectors}
 \title{Convert list of tags to sectors}
 \usage{
-tags.to.sectors(den, sector.tags, other = "Other", silent = FALSE,
-  mutually.exclusive = FALSE, sector.membership = FALSE)
+tags.to.sectors(
+  den,
+  sector.tags,
+  other = "Other",
+  silent = FALSE,
+  mutually.exclusive = FALSE,
+  sector.membership = FALSE
+)
 }
 \arguments{
 \item{den}{a den class object}

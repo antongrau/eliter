@@ -190,7 +190,7 @@ levels(market.leader) <- c("Incumbent", "Dominated")
 net.corp     <- elite.network(sector.rels$Corporations, result = "affil")
 lay          <- layout_with_fr(net.corp, weights = E(net.corp)$weight^2, grid = "nogrid") * -1
 p            <- graph.plot(net.corp, lay, vertex.fill = market.leader, vertex.size = num.mem[,9], edge.alpha = 0.1, edge.color = "black", edge.size = 0.5)
-p            <- p + scale_fill_manual(values = c("red2", "white"), name = "Market position") + scale_size_continuous(range = c(1, 6), name = "Non-corporate \\nmemberships")
+p            <- p + scale_fill_manual(values = c("red2", "white"), name = "Market position") + scale_size_continuous(range = c(1, 6), name = "Non-corporate \nmemberships")
 p
 
 # pdf(file = "output_corporate/Figure.1_corporate_network.pdf", height = 11, width = 12)

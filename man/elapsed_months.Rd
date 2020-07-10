@@ -11,6 +11,9 @@ elapsed_months(end_date, start_date)
 
 \item{start_date}{}
 }
+\value{
+
+}
 \description{
 Title
 }

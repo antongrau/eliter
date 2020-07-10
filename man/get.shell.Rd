@@ -13,6 +13,9 @@ get.shell(x, start.level = 20, verbose = FALSE)
 
 \item{verbose}{if TRUE prints a lot of info}
 }
+\value{
+
+}
 \description{
 Get shell from adjacency matrix
 }

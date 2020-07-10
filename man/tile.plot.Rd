@@ -5,8 +5,7 @@
 \title{Tile.plot
 Plots a matrix as tile with color according to intensity}
 \usage{
-tile.plot(adj.mat, max.color.value = 0.8, text.size = 3,
-  brewer.set = "Set1")
+tile.plot(adj.mat, max.color.value = 0.8, text.size = 3, brewer.set = "Set1")
 }
 \arguments{
 \item{adj.mat}{is the input matrix, with named rows and columns and numerical cells}

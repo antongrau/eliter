@@ -13,6 +13,9 @@ accumulation.thresholds(x, boost = 12, max = 76)
 
 \item{max}{}
 }
+\value{
+
+}
 \description{
 Title
 }

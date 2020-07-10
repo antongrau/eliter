@@ -4,8 +4,13 @@
 \alias{line.plot}
 \title{Line plots}
 \usage{
-line.plot(x, sort = TRUE, var.names = colnames(x), label.x = NULL,
-  label.y = NULL)
+line.plot(
+  x,
+  sort = TRUE,
+  var.names = colnames(x),
+  label.x = NULL,
+  label.y = NULL
+)
 }
 \arguments{
 \item{x}{is a vector or a dataframe of vectors}

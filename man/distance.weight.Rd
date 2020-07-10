@@ -9,6 +9,9 @@ distance.weight(x, m = 38, max.terms = 2)
 \arguments{
 \item{value}{}
 }
+\value{
+
+}
 \description{
 Title
 }
