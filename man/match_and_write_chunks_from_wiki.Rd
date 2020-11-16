@@ -11,7 +11,8 @@ match_and_write_chunks_from_wiki(
   save.every = 10,
   key.words = c("city"),
   blacklist = c("is a list of", "may also refer to", "commonly refers to"),
-  valid.qids = NULL
+  valid.qids = NULL,
+  language = "en"
 )
 }
 \arguments{

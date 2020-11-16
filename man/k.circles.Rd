@@ -21,7 +21,7 @@ K-circles decomposition
 data(den)
 den         <- den[den$SOURCE != "Events",]
 incidence   <- xtabs(~NAME + AFFILIATION, droplevels(den), sparse = TRUE)
-l.inc       <- k.circles(incidence, 3)
+l.inc       <- k.circles(incidence, 3, check.for.nested = TRUE)
 level.membership(l.inc)
 l.inc[[5]] \%>\% colSums() \%>\% sort() \%>\% as.matrix()
 l.inc[[5]] \%>\% rowSums() \%>\% sort() \%>\% as.matrix()

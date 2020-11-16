@@ -10,7 +10,7 @@ blacklist.part <- c("is a list of",
                     "may refer to", "article disambiguation")
 
 x              <- c("Roskilde Universitet", "RUC", "Roskilde universitets center", "Roskilde University", "Roskille University", "Roskilde University (RUC)", "Facebook", "Roskilde", "Roskilde Festival", "Walt Disney", "UNIVERSIDAD COMPLUTENSE DE MADRID (UMC)")
-test           <- match_and_write_chunks_from_wiki(x, file = "dev/wiki.Rda", key.words = key.words.part, blacklist = blacklist.part)
+test           <- match_and_write_chunks_from_wiki(x, file = "dev/w.Rda", key.words = key.words.part, blacklist = blacklist.part)
 match <- x 
 
 blacklist <- blacklist.part
@@ -88,4 +88,9 @@ x <- c("nonsesssss","Maersk", "ABB_Group", "Acciona", "Adani_Group", "African_Ra
 get_wikidata_qid_from_wikipedia_title(x)
 
 
-                                 
+# På dansk ------
+match <- c("metropolitanskolen", "statens kunstfond", "industrirådet", "københavns universitet", "kbh uni", "mærsk", "A. P. Møller Mærsk")
+x <- match
+
+nif <- match_and_write_chunks_from_wiki(x, file = "dev/w.Rda", language = "da", key.words = c("Skole", "school", "Corporation", "university", "universitet"))
+View(nif)

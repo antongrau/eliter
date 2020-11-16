@@ -107,7 +107,7 @@ minimal.members.decomposition <- function(incidence, minimum.memberships = 3, ch
 #' data(den)
 #' den         <- den[den$SOURCE != "Events",]
 #' incidence   <- xtabs(~NAME + AFFILIATION, droplevels(den), sparse = TRUE)
-#' l.inc       <- k.circles(incidence, 3)
+#' l.inc       <- k.circles(incidence, 3, check.for.nested = TRUE)
 #' level.membership(l.inc)
 #' l.inc[[5]] %>% colSums() %>% sort() %>% as.matrix()
 #' l.inc[[5]] %>% rowSums() %>% sort() %>% as.matrix()
@@ -194,19 +194,26 @@ k.circles <- function(incidence, minimum.memberships = 3, check.for.nested = TRU
 }
 
 
-merge.perfect.overlap    <- function(incidence, combine.labels = "&"){
+
+merge.perfect.overlap <- function(incidence, combine.labels = "&"){
   # This functions throws an error if any of the affiliations are empty
+  
+  # Goal: Merge perfectly overlapping affiliations
+  # Combine their labels and remove one of the columns.
+  # They merge into either to largest affiliation or to the first in the order
+  # It is run when the incidence has been pruned. So affiliations with just a single member will have disappeared
+  # The merged affiliation will have all its values set to 0
   
   adj                    <- Matrix::crossprod(incidence)
   affil.members          <- Matrix::diag(adj)
   names(affil.members)   <- rownames(adj)
   adj.s                  <- adj / affil.members
   diag(adj.s)            <- 0
-  merge.ind              <- Matrix::which(adj.s == 1, arr.ind = TRUE) %>% as_tibble()
+  merge.ind              <- Matrix::which(adj.s == 1, arr.ind = TRUE) %>% as_tibble() # Row and column indices
   
-  s                      <- merge.ind %>% map_df(1, sort)     # Check if two of equal size are there.
-  if(nrow(s) > 1) merge.ind <- merge.ind %>% filter(!duplicated(s))
-    
+  s                      <- merge.ind %>% apply(1, sort)  %>% t()         
+  if(nrow(s) > 1) merge.ind <- merge.ind %>% filter(!duplicated(s)) # Check if two of equal size are there.
+  
   s                      <- merge.ind$col %in% merge.ind$row  # col må ikke være i row - fordi vi må ikke slette noget der er blevet merget ind i.
   merge.ind              <- merge.ind %>% filter(!s)
   
@@ -226,8 +233,6 @@ merge.perfect.overlap    <- function(incidence, combine.labels = "&"){
   incidence[, merge.ind$row] <- 0 
   drop0(incidence)
 }
-
-
 #' Level membership from minimal membership decomposition
 #'
 #' @param l.inc a list of nested incidence matrices

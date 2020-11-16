@@ -3,7 +3,8 @@ match_to_wikipedia <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.
   # If it has & sign it should enquote it.
   
   o       <- tibble("original" = x, "wiki_handle" = NA, "wiki_url" = NA, 
-                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA, "wikidata_description" = NA)
+                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA, "wikidata_description" = NA) %>%
+    mutate_at(vars(-is_a_hit), as.character)
   
   if(grepl("&", x, fixed = TRUE) & identical(check.names, TRUE)) x <- paste0('"', x, '"')
   
@@ -81,15 +82,15 @@ match_to_wikipedia <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.
 match_to_wikidata <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.language = "en", check.names = TRUE, key.words = NULL, valid.qids = NULL){
   # Link to documentation of the wikidata api: https://www.wikidata.org/w/api.php?action=help&modules=wbsearchentities
   # If it has & sign it should enquote it.
-  
-  o       <- tibble("original" = x, "wiki_handle" = NA, "wiki_url" = NA, 
-                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA)
+    o       <- tibble("original" = x, "wiki_handle" = NA, "wiki_url" = NA, 
+                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA) %>%
+    mutate_at(vars(-is_a_hit), as.character)
   
   # Search wikidata
   if(identical(check.names, TRUE)) x <- fix_the_search_title_for_wiki_URL(x)
 
   url     <- paste0("https://www.wikidata.org/w/api.php?action=wbsearchentities&search=", x,
-                    "&language=en&format=json&limit=50") 
+                    "&language=", wiki.language ,"&format=json&limit=50") 
   
   got    <- tryCatch({
     url %>% fromJSON()},
@@ -125,7 +126,7 @@ match_to_wikidata <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.l
   o["wikidata_qid"]         <- hit.id
   
   # Get data from wikipedia
-  sites  <- paste0(c("en", "es", "de", "fr"), "wiki")
+  sites  <- paste0(unique(c(wiki.language, "en", "es", "de", "fr")), "wiki")
   sites.collapse <- sites %>% paste(collapse = "|")
   url    <- paste0("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=", hit.id, "&sitefilter=", sites.collapse,"&props=sitelinks&format=json")
   
@@ -170,7 +171,8 @@ match_to_wikidata <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.l
 match_to_wikidata_special_search <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.language = "en", key.words = NULL, valid.qids = NULL){
   
   o       <- tibble("original" = x, "wiki_handle" = NA, "wiki_url" = NA, 
-                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA)
+                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA) %>%
+    mutate_at(vars(-is_a_hit), as.character)
   
   
   u.start <- "https://www.wikidata.org/w/index.php?sort=relevance&search="
@@ -193,6 +195,7 @@ match_to_wikidata_special_search <- function(x, timeout.seconds = 30, save_html 
   o["search_url"] <- url
   
   if(identical(is.na(got), TRUE))  return(o)
+  if(identical(got$status_code, as.integer(400)))  return(o)
   
   w      <- got %>% read_html()
   hits   <- w %>% html_nodes(".mw-search-result")
@@ -227,7 +230,7 @@ match_to_wikidata_special_search <- function(x, timeout.seconds = 30, save_html 
   o["wikidata_qid"]         <- hit.id
   
   # Get data from wikipedia
-  sites  <- paste0(c("en", "es", "de", "fr"), "wiki")
+  sites  <- paste0(unique(c(wiki.language, "en", "es", "de", "fr")), "wiki")
   sites.collapse <- sites %>% paste(collapse = "|")
   url    <- paste0("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=", hit.id, "&sitefilter=", sites.collapse,"&props=sitelinks&format=json")
   
@@ -276,7 +279,8 @@ match_to_wikipedia_with_json <- function(x, timeout.seconds = 30, save_html = FA
   # If it has & sign it should enquote it.
   
   o       <- tibble("original" = x, "wiki_handle" = NA, "wiki_url" = NA, 
-                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA)
+                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA) %>%
+    mutate_at(vars(-is_a_hit), as.character)
   
   if(grepl("&", x, fixed = TRUE) & identical(check.names, TRUE)) x <- paste0('"', x, '"')
   
@@ -313,7 +317,8 @@ match_to_wikipedia_with_json <- function(x, timeout.seconds = 30, save_html = FA
 match_to_wikipedia_with_google <- function(x, timeout.seconds = 30, save_html = FALSE){
   
   o       <- tibble("original" = x, "wiki_handle" = NA, "wiki_url" = NA, 
-                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA)
+                    "is_a_hit" = NA, "wiki_title" = NA, "first_paragraph" = NA, "search_url" = NA)  %>%
+    mutate_at(vars(-is_a_hit), as.character)
   
   url     <- paste0("https://www.googleapis.com/customsearch/v1?key=AIzaSyCwPTphV-svyoGSQu0xBujwhZtXSodabBY&cx=004983950661609638858:mjbkvt7lgh6&q=", x) %>% URLencode()
   
@@ -348,7 +353,7 @@ match_to_wikipedia_with_google <- function(x, timeout.seconds = 30, save_html = 
   
 }
 
-check.wiki.match.quality <- function(wiki, key.words = c("corporation"), blacklist = c("this is a list of", "may also refer to", "commonly refers to")){
+check.wiki.match.quality <- function(wiki, key.words = c("corporation"), blacklist = c("this is a list of", "may also refer to", "commonly refers to"), language = "en"){
   
   text                       <- paste(wiki$first_paragraph, wiki$wikidata_description)
   
@@ -356,7 +361,7 @@ check.wiki.match.quality <- function(wiki, key.words = c("corporation"), blackli
   wiki$test.blacklist.text   <- text %>% grepl(paste(blacklist, collapse = "|"), ignore.case = TRUE, .)
   
   # Categories
-  wiki$categories            <- get_categories_from_wiki(wiki$pageID)
+  wiki$categories            <- get_categories_from_wiki(wiki$pageID, language) %>% as.character()
   
   # Black list categories 
   wiki$test.blacklist.cat    <- wiki$categories %>% grepl(paste(blacklist, collapse = "|"), ignore.case = TRUE, .)
@@ -374,26 +379,25 @@ check.wiki.match.quality <- function(wiki, key.words = c("corporation"), blackli
   wiki
 }
 
-search_and_match_to_wiki <- function(match, key.words, blacklist = c("this is a list of", "may also refer to", "commonly refers to"), valid.qids = NULL){
+search_and_match_to_wiki <- function(match, key.words, blacklist = c("this is a list of", "may also refer to", "commonly refers to"), valid.qids = NULL, language = "en"){
   # It should fill out the wikidata stuff for those where it couldn't find it in the original lookup.
-  
   stopifnot(length(match) <= 10)
   
-  wiki         <- vector("list", length = length(match))
+  wiki         <- vector("list", length = length(match)) %>% map(as.character)
   names(wiki)  <- match
   
   # Wikidata ----
   j            <- 1 
   for(i in j:length(match)){
     j         <- i                                                       # We use i and j because we can then restart the loop from j - if it fails or we have to pause it.
-    hit       <- match_to_wikidata(match[i], check.names = TRUE, key.words = key.words, valid.qids = valid.qids)
+    hit       <- match_to_wikidata(match[i], check.names = TRUE, key.words = key.words, valid.qids = valid.qids, wiki.language = language)
     cat("\n", i,". ", hit$original, " = ", hit$wiki_handle, "(", "Wikidata hit =", hit$is_a_hit ,")", "\n")
     wiki[[i]] <- hit
     }
   
   wiki             <- bind_rows(wiki)
   wiki$matchtype   <- "Wikidata"
-  wiki             <- check.wiki.match.quality(wiki, key.words = key.words, blacklist = blacklist)
+  wiki             <- check.wiki.match.quality(wiki, key.words = key.words, blacklist = blacklist, language = language)
   
   if(any(wiki$redo) == FALSE) return(wiki)
   
@@ -408,7 +412,7 @@ search_and_match_to_wiki <- function(match, key.words, blacklist = c("this is a 
   j            <- 1 
   for(i in j:length(match)){
     j         <- i                                                       # We use i and j because we can then restart the loop from j - if it fails or we have to pause it.
-    hit       <- match_to_wikipedia(match[i], check.names = TRUE)
+    hit       <- match_to_wikipedia(match[i], check.names = TRUE, wiki.language = language)
     cat("\n", i,". ", hit$original, " = ", hit$wiki_handle, "(", "Wikipedia first try Hit =", hit$is_a_hit ,")", "\n")
     wiki.list[[i]] <- hit
     }
@@ -417,7 +421,7 @@ search_and_match_to_wiki <- function(match, key.words, blacklist = c("this is a 
   wiki.first$matchtype   <- "First wikipedia"
   
   # Check quality
-  wiki.first                           <- check.wiki.match.quality(wiki.first, key.words = key.words, blacklist = blacklist)
+  wiki.first                           <- check.wiki.match.quality(wiki.first, key.words = key.words, blacklist = blacklist, language = language)
   
   # Join wikidata and first try.
   
@@ -442,13 +446,13 @@ search_and_match_to_wiki <- function(match, key.words, blacklist = c("this is a 
   j            <- 1 
   for(i in j:length(match)){
     j         <- i                                                       # We use i and j because we can then restart the loop from j - if it fails or we have to pause it.
-    hit       <- match_to_wikidata_special_search(match[i], key.words = key.words, valid.qids = valid.qids)
+    hit       <- match_to_wikidata_special_search(match[i], key.words = key.words, valid.qids = valid.qids, wiki.language = language)
     cat("\n", i,". ", hit$original, " = ", hit$wiki_handle, "(", "Wikidata special redo Hit =", hit$is_a_hit ,")", "\n")
     wiki.list[[i]] <- hit
   }
   
   wiki.special.hit    <- bind_rows(wiki.list, .id = "wiki_id") 
-  wiki.special.hit    <- check.wiki.match.quality(wiki.special.hit, key.words = key.words, blacklist = blacklist)
+  wiki.special.hit    <- check.wiki.match.quality(wiki.special.hit, key.words = key.words, blacklist = blacklist, language = language)
   wiki.special.hit    <- wiki.special.hit %>% select(-original) %>% rename(original = wiki_id)
   
   wiki.special.hit$matchtype   <- "Wikidata special"
@@ -460,16 +464,16 @@ search_and_match_to_wiki <- function(match, key.words, blacklist = c("this is a 
   
   # Get extra data in bulk 
 
-  wiki       <- get_wikidata_description(wiki)
+  wiki       <- get_wikidata_description(wiki, language)
   wiki
   
 }
 
-get_wikidata_description <- function(wiki){
+get_wikidata_description <- function(wiki, language = language){
   x      <- wiki$wikidata_qid
   xs     <- paste0(unique(na.omit(x)), collapse = "|")
-  url    <- paste0("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=", xs,"&props=descriptions&languages=en&format=json") %>% URLencode()
-  
+  url    <- paste0("https://www.wikidata.org/w/api.php?action=wbgetentities&ids=", xs,"&props=descriptions&languages=", language,"&format=json") %>% URLencode()
+
   got    <- tryCatch({
     url %>% fromJSON()},
     error = function(e) return(NA))
@@ -478,18 +482,21 @@ get_wikidata_description <- function(wiki){
   
   if(nrow(o) == 0) return(wiki)
   
-  desc    <- o %>% rename(wikidata_description = "en")
+  desc    <- tibble(wikidata_qid = o$wikidata_qid, o = o[, 2])
   
-  wiki       <- wiki %>% select(-wikidata_description) %>% left_join(., desc, by = "wikidata_qid")
+  
+  if(is.null(wiki$wikidata_description) == FALSE) wiki <-  wiki %>% select(-wikidata_description)
+  wiki       <- wiki %>% left_join(., desc, by = "wikidata_qid")
   wiki
   
 }
 
 
-get_categories_from_wiki <- function(x){
+get_categories_from_wiki <- function(x, language){
+  
   stopifnot(length(x) <= 10)
   x.o     <- na.omit(x)
-  url     <- paste0("https://en.wikipedia.org/w/api.php?format=jsonfm&action=query&pageids=", paste0(x.o, collapse = "|"), "&prop=categories&cllimit=max&format=json") %>% URLencode()
+  url     <- paste0("https://", language,".wikipedia.org/w/api.php?format=jsonfm&action=query&pageids=", paste0(x.o, collapse = "|"), "&prop=categories&cllimit=max&format=json") %>% URLencode()
   wiki    <- tryCatch({jsonlite::fromJSON(url)},
                       error = function(e) return(NA))
   
@@ -507,6 +514,8 @@ get_categories_from_wiki <- function(x){
 
 
 
+
+
 #' Match search terms to Wikipedia
 #'
 #' @param x a character vector
@@ -521,7 +530,7 @@ get_categories_from_wiki <- function(x){
 #'
 #' @examples
 
-match_and_write_chunks_from_wiki <- function(x, file = "saved/wiki_match.Rda", chunk.size = 10, save.every = 10, key.words = c("city"), blacklist = c("is a list of", "may also refer to", "commonly refers to"), valid.qids = NULL){
+match_and_write_chunks_from_wiki <- function(x, file = "saved/wiki_match.Rda", chunk.size = 10, save.every = 10, key.words = c("city"), blacklist = c("is a list of", "may also refer to", "commonly refers to"), valid.qids = NULL, language = "en"){
   
   wiki_match         <- NULL
   # Does file exits
@@ -551,7 +560,7 @@ match_and_write_chunks_from_wiki <- function(x, file = "saved/wiki_match.Rda", c
     cat("\n", "Chunk", i, "of", length(x.l), "\n",
         paste(x.l[[i]], "\n"), "\n")
     
-    o              <- search_and_match_to_wiki(x.l[[i]], key.words = key.words, blacklist = blacklist, valid.qids = valid.qids)
+    o              <- search_and_match_to_wiki(x.l[[i]], key.words = key.words, blacklist = blacklist, valid.qids = valid.qids, language = language)
     wiki_match     <- bind_rows(wiki_match, o)
     if(i %in% save.sequence) save(wiki_match, file = file)
     }
