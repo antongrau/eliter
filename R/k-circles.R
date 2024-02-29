@@ -112,6 +112,7 @@ minimal.members.decomposition <- function(incidence, minimum.memberships = 3, ch
 #' l.inc[[5]] %>% colSums() %>% sort() %>% as.matrix()
 #' l.inc[[5]] %>% rowSums() %>% sort() %>% as.matrix()
 
+
 k.circles <- function(incidence, minimum.memberships = 3, check.for.nested = TRUE){
   
   
@@ -126,7 +127,12 @@ k.circles <- function(incidence, minimum.memberships = 3, check.for.nested = TRU
   if(any(incidence@x != 1)) warning("incidence has values other than 1 and . (the sparse version of 0). Try table(incidence@x) to see them.")
   
   # Backup of the incidence matrix
+  original.colnames           <- colnames(incidence)
+  colnames(incidence)         <- 1:ncol(incidence)
+  
   inc         <- incidence
+  
+  
   
   # k is the minimum number of members
   k  <- 1
@@ -164,7 +170,7 @@ k.circles <- function(incidence, minimum.memberships = 3, check.for.nested = TRU
       
       # Merging overlapping affiliations
       if(identical(check.for.nested, TRUE)){
-        inc         <- merge.perfect.overlap(inc, combine.labels = "&")
+        inc         <- eliter:::merge.perfect.overlap(inc, combine.labels = "&")
       }
       
     }
@@ -184,18 +190,33 @@ k.circles <- function(incidence, minimum.memberships = 3, check.for.nested = TRU
   
   # It gives us an annoying warning because level.up doesn't use a proper test of whether the inc is valid for further operation
   
+  
+  
   # Clean up and class
   l.inc        <- c(incidence, l.inc)
   l.inc        <- compact(l.inc)
   class(l.inc) <- append("k.circle", class(l.inc))
-  l.inc
   
+  # Here we reconstruct the original names and we add the merge.clusters as an attribute.
+  
+  give.the.old.names.back <- function(i){
+    n            <- str_split(colnames(i), pattern = "&") %>% map(str_trim) %>% map(as.numeric)
+    colnames(i)  <- map_chr(n, ~paste(original.colnames[.x], collapse = " & ")) 
+    names(n)     <- colnames(i)
+    n            <- map(n, ~ enframe(original.colnames[.x])) %>% bind_rows(.id = "name") %>% transmute(AFFILIATION = value, overlap.cluster = name)
+    attr(i, "col.circle.merge.cluster") <- n
+    i
+  }
+  
+  l.inc <- map(l.inc, give.the.old.names.back)
+  l.inc
   
 }
 
 
 
-merge.perfect.overlap <- function(incidence, combine.labels = "&"){
+
+merge.perfect.overlap <- function(incidence, combine.labels = "&", cutoff = 1){
   # This functions throws an error if any of the affiliations are empty
   
   # Goal: Merge perfectly overlapping affiliations
@@ -209,15 +230,25 @@ merge.perfect.overlap <- function(incidence, combine.labels = "&"){
   names(affil.members)   <- rownames(adj)
   adj.s                  <- adj / affil.members
   diag(adj.s)            <- 0
-  merge.ind              <- Matrix::which(adj.s == 1, arr.ind = TRUE) %>% as_tibble() # Row and column indices
+  merge.ind              <- Matrix::which(adj.s >= cutoff, arr.ind = TRUE)
+  merge.ind              <- tibble(row = merge.ind[, 1], col = merge.ind[, 2]) # Row and column indices
   
   s                      <- merge.ind %>% apply(1, sort)  %>% t()         
   if(nrow(s) > 1) merge.ind <- merge.ind %>% filter(!duplicated(s)) # Check if two of equal size are there.
+  
+  merge.ind$row.name <- colnames(adj)[merge.ind$row]
+  merge.ind$col.name <- colnames(adj)[merge.ind$col]
+  
+  
   
   s                      <- merge.ind$col %in% merge.ind$row  # col må ikke være i row - fordi vi må ikke slette noget der er blevet merget ind i.
   merge.ind              <- merge.ind %>% filter(!s)
   
   
+  
+  # If one of the nodes are there twice - it means that it will be merged two times. That is not a great problem as it does not influence the scores - except for merged clusters.
+  # graph_from_edgelist(merge.ind[, 3:4] %>% as.matrix()) %>% plot() # Here we check if any node has an outdegree of 2 - that is not allowed!
+  merge.ind             <- merge.ind[!duplicated(merge.ind$row), ]
   
   if(nrow(merge.ind) == 0) return(incidence)
   
@@ -230,9 +261,24 @@ merge.perfect.overlap <- function(incidence, combine.labels = "&"){
     }
   }
   
+  add_together <- function(x,i){
+    row <- merge.ind[i, ]$row
+    col <-  merge.ind[i, ]$col
+    
+    change <- x[, row] > 0 & x[, col] == 0   
+    x[change, col] <- x[change, row] 
+    x
+  }
+  
+  for(i in 1:nrow(merge.ind)){
+    incidence <- add_together(incidence, i)
+    
+  }
+  
   incidence[, merge.ind$row] <- 0 
   drop0(incidence)
 }
+
 #' Level membership from minimal membership decomposition
 #'
 #' @param l.inc a list of nested incidence matrices

@@ -26,8 +26,8 @@ match_to_wikipedia <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.
   o$is_a_hit <- TRUE
   
   # Perfect hit scenario  
-  link.type <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("rel")
-  link      <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("href")
+  link.type <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("rel")
+  link      <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("href")
   hit       <- link[link.type == "canonical"]
   hit       <- hit %>% gsub(".*wiki/(.*)", "\\1" , .)
   
@@ -35,7 +35,7 @@ match_to_wikipedia <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.
   # Not a perfect hit 
   if(grepl("Special:Search?", hit, fixed = TRUE)){
     o["is_a_hit"]  <- FALSE 
-    search.results <- wiki %>% html_nodes("body") %>% html_nodes("li") %>% html_nodes("div") %>% html_nodes("a") %>% html_attr("href")
+    search.results <- wiki %>% html_elements("body") %>% html_elements("li") %>% html_elements("div") %>% html_elements("a") %>% html_attr("href")
     hit            <- search.results[1] %>% gsub("/wiki/", "", ., fixed = TRUE)
     
     if(identical(is.na(hit), TRUE))  return(o)
@@ -47,8 +47,8 @@ match_to_wikipedia <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.
     
     wiki <- got %>% read_html(.)
     
-    link.type <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("rel")
-    link      <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("href")
+    link.type <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("rel")
+    link      <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("href")
     hit       <- link[link.type == "canonical"]
     hit       <- hit %>% gsub(".*wiki/(.*)", "\\1" , .)
   }
@@ -57,8 +57,8 @@ match_to_wikipedia <- function(x, timeout.seconds = 30, save_html = FALSE, wiki.
   
   o["wiki_handle"]     <- hit
   o["wiki_url"]        <- link[link.type == "canonical"]
-  o["wiki_title"]      <- wiki %>% html_nodes("body") %>% html_nodes("#firstHeading") %>% html_text()
-  content              <- wiki %>% html_nodes("body") %>% html_nodes("#mw-content-text") %>% html_nodes("p")
+  o["wiki_title"]      <- wiki %>% html_elements("body") %>% html_elements("#firstHeading") %>% html_text()
+  content              <- wiki %>% html_elements("body") %>% html_elements("#mw-content-text") %>% html_elements("p")
   o["first_paragraph"] <- head(content, 10) %>% html_text() %>% paste(collapse = " ") %>% strtrim(1000)
   
   # Look up the wikidata id of a wikipage
@@ -198,14 +198,14 @@ match_to_wikidata_special_search <- function(x, timeout.seconds = 30, save_html 
   if(identical(got$status_code, as.integer(400)))  return(o)
   
   w      <- got %>% read_html()
-  hits   <- w %>% html_nodes(".mw-search-result")
+  hits   <- w %>% html_elements(".mw-search-result")
   
   if(length(hits) == 0)  return(o)
   
   
-  titles      <- hits %>% html_nodes(".mw-search-result-heading") %>% html_nodes("span") %>% html_nodes(".wb-itemlink-label") %>% html_text()
-  id          <- hits %>% html_nodes(".mw-search-result-heading") %>% html_nodes("span") %>% html_nodes(".wb-itemlink-id") %>% html_text() %>% gsub(pattern = "\\(|\\)", x = ., replacement = "")
-  text        <- hits %>% html_nodes(".mw-search-result-heading") %>% html_nodes("a") %>% html_attrs() %>% pluck("title") %>% unlist()
+  titles      <- hits %>% html_elements(".mw-search-result-heading") %>% html_elements("span") %>% html_elements(".wb-itemlink-label") %>% html_text()
+  id          <- hits %>% html_elements(".mw-search-result-heading") %>% html_elements("span") %>% html_elements(".wb-itemlink-id") %>% html_text() %>% gsub(pattern = "\\(|\\)", x = ., replacement = "")
+  text        <- hits %>% html_elements(".mw-search-result-heading") %>% html_elements("a") %>% html_attr("title")
   
   wikidata    <- tibble(titles, id, text)
   
@@ -342,8 +342,8 @@ match_to_wikipedia_with_google <- function(x, timeout.seconds = 30, save_html = 
   
   if(identical(is.na(wiki), TRUE)) return(o)
   
-  o["wiki_title"]      <- wiki %>% html_nodes("body") %>% html_nodes("#firstHeading") %>% html_text()
-  content              <- wiki %>% html_nodes("body") %>% html_nodes("#mw-content-text") %>% html_nodes("p")
+  o["wiki_title"]      <- wiki %>% html_elements("body") %>% html_elements("#firstHeading") %>% html_text()
+  content              <- wiki %>% html_elements("body") %>% html_elements("#mw-content-text") %>% html_elements("p")
   o["first_paragraph"] <- head(content, 10) %>% html_text() %>% paste(collapse = " ") %>% strtrim(1000)
   
   # Save HTML ----
@@ -644,8 +644,8 @@ get_wikidata_qid_from_wikipedia_title <- function(x, chunk.size = 500){
 #   o$is_a_hit <- TRUE
 #   
 #   # Perfect hit scenario  
-#   link.type <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("rel")
-#   link      <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("href")
+#   link.type <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("rel")
+#   link      <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("href")
 #   hit       <- link[link.type == "canonical"]
 #   hit       <- hit %>% gsub(".*wiki/(.*)", "\\1" , .)
 #   
@@ -653,7 +653,7 @@ get_wikidata_qid_from_wikipedia_title <- function(x, chunk.size = 500){
 #   # Not a perfect hit 
 #   if(grepl("Special:Search?", hit, fixed = TRUE)){
 #     o["is_a_hit"]  <- FALSE 
-#     search.results <- wiki %>% html_nodes("body") %>% html_nodes("li") %>% html_nodes("div") %>% html_nodes("a") %>% html_attr("href")
+#     search.results <- wiki %>% html_elements("body") %>% html_elements("li") %>% html_elements("div") %>% html_elements("a") %>% html_attr("href")
 #     hit            <- search.results[1] %>% gsub("/wiki/", "", ., fixed = TRUE)
 #     
 #     if(identical(is.na(hit), TRUE))  return(o)
@@ -665,8 +665,8 @@ get_wikidata_qid_from_wikipedia_title <- function(x, chunk.size = 500){
 #     
 #     wiki <- got %>% read_html(.)
 #     
-#     link.type <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("rel")
-#     link      <- wiki %>% html_nodes("head") %>% html_nodes("link") %>% html_attr("href")
+#     link.type <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("rel")
+#     link      <- wiki %>% html_elements("head") %>% html_elements("link") %>% html_attr("href")
 #     hit       <- link[link.type == "canonical"]
 #     hit       <- hit %>% gsub(".*wiki/(.*)", "\\1" , .)
 #   }
@@ -675,8 +675,8 @@ get_wikidata_qid_from_wikipedia_title <- function(x, chunk.size = 500){
 #   
 #   o["wiki_handle"]     <- hit
 #   o["wiki_url"]        <- link[link.type == "canonical"]
-#   o["wiki_title"]      <- wiki %>% html_nodes("body") %>% html_nodes("#firstHeading") %>% html_text()
-#   content              <- wiki %>% html_nodes("body") %>% html_nodes("#mw-content-text") %>% html_nodes("p")
+#   o["wiki_title"]      <- wiki %>% html_elements("body") %>% html_elements("#firstHeading") %>% html_text()
+#   content              <- wiki %>% html_elements("body") %>% html_elements("#mw-content-text") %>% html_elements("p")
 #   o["first_paragraph"] <- head(content, 10) %>% html_text() %>% paste(collapse = " ") %>% strtrim(1000)
 #   
 #   Q                    <- wiki %>% html_text() %>% str_extract("www\\.wikidata\\.org\\\\\\/entity\\\\\\/Q[0-9]{1,}") # Det her er fucked up!

@@ -101,7 +101,11 @@ elite.network.ind    <- function(den, sigma = 14, base = exp(1)){
   memberships             <- Matrix::rowSums(incidence)
   
   # Occassions weight
-  col.max                 <- as.numeric(qlcMatrix::colMax(incidence))
+  Y                       <- slam::as.simple_triplet_matrix(drop0(Matrix::t(incidence)))
+  col.max                 <- as(slam::rollup(Y, 2, FUN = max), "sparseVector")
+  col.max                 <- as.numeric(col.max)
+  # col.max                 <- as.numeric(qlcMatrix::colMax(incidence)) # This line is replaced with that above to remove the dependency on qlcMatrix
+  
   incidence               <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
   
   # Affiliation size weight
@@ -147,7 +151,14 @@ elite.network.affil      <- function(den = den, sigma = 14, base = exp(1)){
   incidence              <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
   
   # Occassions weight
-  col.max                <- as.numeric(qlcMatrix::colMax(incidence))
+  
+  Y                       <- slam::as.simple_triplet_matrix(drop0(Matrix::t(incidence)))
+  col.max                 <- as(slam::rollup(Y, 2, FUN = max), "sparseVector")
+  col.max                 <- as.numeric(col.max)
+  # col.max                 <- as.numeric(qlcMatrix::colMax(incidence)) # This line is replaced with that above to remove the dependency on qlcMatrix
+  
+  
+  
   incidence              <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
 
   adj.affil              <- Matrix::crossprod(incidence)
@@ -181,7 +192,11 @@ elite.network.two.mode             <- function(den, sigma = 14){
   incidence                        <- xtabs(formula = ~ NAME + AFFILIATION, data = den, sparse = TRUE)
   
   # Occassions weight
-  col.max                          <- as.numeric(qlcMatrix::colMax(incidence))
+  
+  Y                       <- slam::as.simple_triplet_matrix(drop0(Matrix::t(incidence)))
+  col.max                 <- as(slam::rollup(Y, 2, FUN = max), "sparseVector")
+  col.max                 <- as.numeric(col.max)
+  # col.max                 <- as.numeric(qlcMatrix::colMax(incidence)) # This line is replaced with that above to remove the dependency on qlcMatrix
   
   incidence                        <- Matrix::t(Matrix::t(incidence) * (1 / col.max))
   

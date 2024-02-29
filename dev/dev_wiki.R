@@ -94,3 +94,15 @@ x <- match
 
 nif <- match_and_write_chunks_from_wiki(x, file = "dev/w.Rda", language = "da", key.words = c("Skole", "school", "Corporation", "university", "universitet"))
 View(nif)
+
+
+# Get all wikidata qids from a wikipage ----
+x <- "Dolphin"
+  "https://en.wikipedia.org/w/api.php?action=query&generator=links&format=xml&redirects=1&titles=Dolphin&prop=pageprops|extracts|pageimages&gpllimit=20&ppprop=wikibase_item&exintro=1&exlimit=20&piprop=name&pilimit=20"
+get.all.wikidataqids.from.wikipedia.page <- function(limit = 500){
+  # From this stackoverflow anser: https://stackoverflow.com/questions/37093911/how-to-get-all-links-and-their-wikidata-ids-for-a-wikipedia-page
+  paste0("https://en.wikipedia.org/w/api.php?action=query&generator=links&format=xml&redirects=1&titles=", x,"&prop=pageprops&ppprop=wikibase_item&exlimit=500")
+  
+  
+  
+}

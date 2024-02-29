@@ -17,7 +17,6 @@ Depends:
     jsonlite,
     curl,
     grid,
-    qlcMatrix,
     tidyverse,
     knitr,
     scales,
@@ -31,7 +30,6 @@ Depends:
     httr,
     WikipediR
 Imports:
-    qlcMatrix,
     ggthemes,
     plyr,
     shiny,
